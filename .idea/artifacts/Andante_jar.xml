@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Andante:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Andante_jar</output-path>
+    <root id="archive" name="Andante.jar">
+      <element id="module-output" name="Andante" />
+    </root>
+  </artifact>
+</component>
