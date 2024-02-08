@@ -39,8 +39,11 @@ import java.util.StringJoiner;
 
 public abstract class BattleProblem extends Problem {
 
+  protected final Aim aim;
+
   public BattleProblem(Position position, Aim aim, int nMoves) {
-    super(position, aim, nMoves);
+    super(position, nMoves);
+    this.aim = aim;
   }
 
   @Override
@@ -53,13 +56,14 @@ public abstract class BattleProblem extends Problem {
   protected void solve(Position position, Aim aim, int nMoves, boolean includeSetPlay,
       int includeTries, boolean includeVariations, boolean includeThreats,
       boolean includeShortVariations, Locale locale, boolean logMoves) {
-    List<SolutionWriter.Branch> branches = new ArrayList<>();
     List<Move> pseudoLegalMoves = new ArrayList<>();
     boolean includeActualPlay = position.isLegal(pseudoLegalMoves);
     if (includeActualPlay || includeSetPlay) {
+      List<SolutionWriter.Branch> branches = new ArrayList<>();
       analyseMax(position, aim, nMoves, pseudoLegalMoves, branches, locale, includeVariations,
           includeThreats, includeShortVariations, includeSetPlay, includeTries, includeActualPlay,
           includeActualPlay, logMoves);
+      System.out.println(SolutionWriter.toFormatted(SolutionWriter.toGrouped(branches)));
     }
     if (!includeActualPlay) {
       if (includeSetPlay) {
@@ -68,7 +72,6 @@ public abstract class BattleProblem extends Problem {
         System.out.println("Illegal position.");
       }
     }
-    System.out.println(SolutionWriter.toFormatted(SolutionWriter.toGrouped(branches)));
   }
 
   protected void analyseMax(Position position, Aim aim, int depth, List<Move> pseudoLegalMovesMax,

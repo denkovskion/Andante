@@ -30,7 +30,7 @@ import blog.art.chess.andante.problem.Task;
 public class Andante {
 
   public static void main(String[] args) {
-    System.out.println("Andante [2024-01-31] Copyright 2024 Ivan Denkovski");
+    System.out.println("Andante [develop] [2024-02-08] Copyright 2024 Ivan Denkovski");
     new Parser(args.length > 0 ? args[0] : null).readAllTasks().forEach(Task::solve);
   }
 }

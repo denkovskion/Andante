@@ -13,9 +13,10 @@ java -jar Andante.jar [inputfile]
 
 ## EPD-based input
 
-Mate search up to a given depth can be stipulated
-in [Extended Position Description](https://www.chessprogramming.org/Extended_Position_Description)
-notation. Andante accepts one operation: direct mate fullmove count (opcode `dm`).
+Andante
+accepts [Extended Position Description](https://www.chessprogramming.org/Extended_Position_Description)
+records with a single operation: direct mate fullmove count (opcode `dm`) for stipulating mate
+search, or analysis count depth (opcode `acd`) for perft.
 
 ### Example
 

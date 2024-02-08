@@ -39,10 +39,12 @@ import java.util.StringJoiner;
 public class HelpProblem extends Problem {
 
   private final boolean halfMove;
+  private final Aim aim;
 
   public HelpProblem(Position position, Aim aim, int nMoves, boolean halfMove) {
-    super(position, aim, nMoves);
+    super(position, nMoves);
     this.halfMove = halfMove;
+    this.aim = aim;
   }
 
   @Override
@@ -53,10 +55,10 @@ public class HelpProblem extends Problem {
 
   private void solve(Position position, Aim aim, int nMoves, boolean halfMove,
       boolean includeSetPlay, boolean includeTempoTries, Locale locale, boolean logMoves) {
-    List<SolutionWriter.Branch> branches = new ArrayList<>();
     List<Move> pseudoLegalMoves = new ArrayList<>();
     boolean includeActualPlay = position.isLegal(pseudoLegalMoves);
     if (includeActualPlay || includeSetPlay) {
+      List<SolutionWriter.Branch> branches = new ArrayList<>();
       if (halfMove) {
         analyseMax(position, aim, nMoves + 1, pseudoLegalMoves, branches, locale, includeTempoTries,
             includeSetPlay, includeActualPlay, logMoves);
@@ -64,6 +66,7 @@ public class HelpProblem extends Problem {
         analyseMin(position, aim, nMoves, pseudoLegalMoves, branches, locale, includeTempoTries,
             includeSetPlay, includeActualPlay, logMoves);
       }
+      System.out.println(SolutionWriter.toFormatted(SolutionWriter.toGrouped(branches)));
     }
     if (!includeActualPlay) {
       if (includeSetPlay) {
@@ -72,7 +75,6 @@ public class HelpProblem extends Problem {
         System.out.println("Illegal position.");
       }
     }
-    System.out.println(SolutionWriter.toFormatted(SolutionWriter.toGrouped(branches)));
   }
 
   private int analyseMax(Position position, Aim aim, int depth, List<Move> pseudoLegalMovesMax,

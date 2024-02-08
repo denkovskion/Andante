@@ -24,6 +24,9 @@
 
 package blog.art.chess.andante.problem;
 
-public record NullOptions() implements AnalysisOptions {
+import java.util.Locale;
+
+public record LogOptions(Locale outputLanguage, boolean internalModel,
+                         boolean internalProgress) implements DisplayOptions {
 
 }

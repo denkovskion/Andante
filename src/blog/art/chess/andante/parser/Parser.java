@@ -41,11 +41,14 @@ import blog.art.chess.andante.position.Table;
 import blog.art.chess.andante.problem.Aim;
 import blog.art.chess.andante.problem.AnalysisOptions;
 import blog.art.chess.andante.problem.BattlePlayOptions;
+import blog.art.chess.andante.problem.BattleProblem;
 import blog.art.chess.andante.problem.DirectProblem;
 import blog.art.chess.andante.problem.DisplayOptions;
 import blog.art.chess.andante.problem.HelpPlayOptions;
 import blog.art.chess.andante.problem.HelpProblem;
-import blog.art.chess.andante.problem.NullOptions;
+import blog.art.chess.andante.problem.LogOptions;
+import blog.art.chess.andante.problem.MateSearch;
+import blog.art.chess.andante.problem.Perft;
 import blog.art.chess.andante.problem.Problem;
 import blog.art.chess.andante.problem.SelfProblem;
 import blog.art.chess.andante.problem.Task;
@@ -73,10 +76,7 @@ import java.util.stream.Stream;
 
 public class Parser {
 
-  private enum Description {EPD, POPEYE}
-
   private final String inputFile;
-  private Description inputFormat;
   private Locale inputLanguage;
 
   public Parser(String inputFile) {
@@ -95,7 +95,6 @@ public class Parser {
                       locale)).map(bundle -> bundle.getString(Popeye.Directive.BeginProblem.name()))
               .collect(Collectors.joining("|")), Pattern.CASE_INSENSITIVE);
       if (scanner.hasNext(beginProblemPattern)) {
-        inputFormat = Description.POPEYE;
         String beginProblemToken = token = scanner.next(beginProblemPattern);
         ResourceBundle keywords = Stream.of(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN).map(
             locale -> ResourceBundle.getBundle("blog.art.chess.andante.parser.PopeyeKeywords",
@@ -285,7 +284,6 @@ public class Parser {
           }
         }
       } else {
-        inputFormat = Description.EPD;
         inputLanguage = Locale.ROOT;
         ResourceBundle pieceTypeCodes = ResourceBundle.getBundle(
             "blog.art.chess.andante.piece.PieceCodes", inputLanguage);
@@ -330,11 +328,13 @@ public class Parser {
             }
             lineScanner.next("\\s");
             lineScanner.reset();
-            if (lineScanner.hasNext("b")) {
-              lineScanner.next("b");
-              problem.getOptions().setHalfDuplex();
+            Popeye.Colour sideToMove;
+            if (lineScanner.hasNext("w")) {
+              lineScanner.next();
+              sideToMove = Popeye.Colour.White;
             } else {
-              lineScanner.next("w");
+              lineScanner.next("b");
+              sideToMove = Popeye.Colour.Black;
             }
             if (lineScanner.hasNext("\\bK?Q?k?q?")) {
               String castlingToken = lineScanner.next();
@@ -383,11 +383,31 @@ public class Parser {
             } else {
               lineScanner.next("-");
             }
-            lineScanner.next("dm");
-            Popeye.StipulationType stipulationType = Popeye.StipulationType.Direct;
-            Popeye.Goal goal = Popeye.Goal.Mate;
-            int nMoves = Integer.parseInt(lineScanner.next("[1-9]\\d*;$").replace(";", ""));
-            problem.setStipulation(new Popeye.Stipulation(stipulationType, goal, nMoves));
+            if (lineScanner.hasNext("acd")) {
+              lineScanner.next();
+              int nPlies = Integer.parseInt(lineScanner.next("(0|[1-9]\\d*);$").replace(";", ""));
+              int nMoves = (nPlies + 1) / 2;
+              problem.setStipulation(
+                  new Popeye.Stipulation(Popeye.StipulationType.Help, null, nMoves));
+              if (nPlies % 2 == 1) {
+                problem.getOptions().setWhiteToPlay();
+                if (sideToMove == Popeye.Colour.Black) {
+                  problem.getOptions().setHalfDuplex();
+                }
+              } else {
+                if (sideToMove == Popeye.Colour.White) {
+                  problem.getOptions().setHalfDuplex();
+                }
+              }
+            } else {
+              lineScanner.next("dm");
+              int nMoves = Integer.parseInt(lineScanner.next("[1-9]\\d*;$").replace(";", ""));
+              problem.setStipulation(
+                  new Popeye.Stipulation(Popeye.StipulationType.Direct, null, nMoves));
+              if (sideToMove == Popeye.Colour.Black) {
+                problem.getOptions().setHalfDuplex();
+              }
+            }
             problems.add(problem);
           }
         }
@@ -519,10 +539,11 @@ public class Parser {
         .forEach(state::setEnPassant);
     Memory memory = new Memory();
     Position position = new Position(board, box, table, sideToMove, state, memory);
-    Aim aim = switch (specification.getStipulation().goal()) {
-      case Mate -> Aim.MATE;
-      case Stalemate -> Aim.STALEMATE;
-    };
+    Aim aim = specification.getStipulation().goal() == null ? null
+        : switch (specification.getStipulation().goal()) {
+          case Mate -> Aim.MATE;
+          case Stalemate -> Aim.STALEMATE;
+        };
     int nMoves = switch (specification.getStipulation().stipulationType()) {
       case Direct, Self -> false;
       case Help -> specification.getOptions().isWhiteToPlay();
@@ -532,9 +553,13 @@ public class Parser {
       case Help -> specification.getOptions().isWhiteToPlay();
     };
     Problem problem = switch (specification.getStipulation().stipulationType()) {
-      case Direct -> new DirectProblem(position, aim, nMoves);
+      case Direct ->
+          specification.getStipulation().goal() == null ? new MateSearch(position, nMoves)
+              : new DirectProblem(position, aim, nMoves);
       case Self -> new SelfProblem(position, aim, nMoves);
-      case Help -> new HelpProblem(position, aim, nMoves, halfMove);
+      case Help ->
+          specification.getStipulation().goal() == null ? new Perft(position, nMoves, halfMove)
+              : new HelpProblem(position, aim, nMoves, halfMove);
     };
     boolean setPlay = specification.getOptions().isSetPlay();
     int nRefutations = Math.max(specification.getOptions().getDefence(),
@@ -547,19 +572,27 @@ public class Parser {
             .isNoShortVariations();
     boolean tempoTries =
         specification.getOptions().isNullMoves() || specification.getOptions().isTry();
-    AnalysisOptions analysisOptions = switch (inputFormat) {
-      case EPD -> new NullOptions();
-      case POPEYE -> switch (specification.getStipulation().stipulationType()) {
-        case Direct, Self ->
-            new BattlePlayOptions(setPlay, nRefutations, variations, threats, shortVariations);
-        case Help -> new HelpPlayOptions(setPlay, tempoTries);
-      };
-    };
+    AnalysisOptions analysisOptions =
+        problem instanceof BattleProblem ? new BattlePlayOptions(setPlay, nRefutations, variations,
+            threats, shortVariations)
+            : problem instanceof HelpProblem ? new HelpPlayOptions(setPlay, tempoTries)
+                : new AnalysisOptions() {
+                  @Override
+                  public String toString() {
+                    return "default";
+                  }
+                };
     Locale outputLanguage = inputLanguage;
     boolean internalModel = !specification.getOptions().isNoBoard();
     boolean internalProgress = specification.getOptions().isMoveNumbers();
-    DisplayOptions displayOptions = new DisplayOptions(outputLanguage, internalModel,
-        internalProgress);
+    DisplayOptions displayOptions =
+        problem instanceof BattleProblem || problem instanceof HelpProblem ? new LogOptions(
+            outputLanguage, internalModel, internalProgress) : new DisplayOptions() {
+          @Override
+          public String toString() {
+            return "default";
+          }
+        };
     return new Task(problem, analysisOptions, displayOptions);
   }
 

@@ -30,12 +30,10 @@ import java.util.StringJoiner;
 public abstract class Problem {
 
   protected final Position position;
-  protected final Aim aim;
   protected final int nMoves;
 
-  public Problem(Position position, Aim aim, int nMoves) {
+  public Problem(Position position, int nMoves) {
     this.position = position;
-    this.aim = aim;
     this.nMoves = nMoves;
   }
 
@@ -54,6 +52,6 @@ public abstract class Problem {
   @Override
   public String toString() {
     return new StringJoiner(", ", Problem.class.getSimpleName() + "[", "]").add(
-        "position=" + position).add("aim=" + aim).add("nMoves=" + nMoves).toString();
+        "position=" + position).add("nMoves=" + nMoves).toString();
   }
 }

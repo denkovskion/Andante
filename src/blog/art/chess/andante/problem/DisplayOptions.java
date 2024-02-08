@@ -26,7 +26,17 @@ package blog.art.chess.andante.problem;
 
 import java.util.Locale;
 
-public record DisplayOptions(Locale outputLanguage, boolean internalModel,
-                             boolean internalProgress) {
+public interface DisplayOptions {
 
+  default Locale outputLanguage() {
+    return Locale.ROOT;
+  }
+
+  default boolean internalModel() {
+    return false;
+  }
+
+  default boolean internalProgress() {
+    return false;
+  }
 }

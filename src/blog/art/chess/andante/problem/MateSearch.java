@@ -26,47 +26,71 @@ package blog.art.chess.andante.problem;
 
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.position.Position;
+import blog.art.chess.andante.solution.SolutionWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.StringJoiner;
 
-public class DirectProblem extends BattleProblem {
+public class MateSearch extends Problem {
 
-  public DirectProblem(Position position, Aim aim, int nMoves) {
-    super(position, aim, nMoves);
+  public MateSearch(Position position, int nMoves) {
+    super(position, nMoves);
   }
 
   @Override
-  protected int searchMax(Position position, Aim aim, int depth, List<Move> pseudoLegalMovesMax) {
-    int max = Integer.MIN_VALUE;
+  public void solve(AnalysisOptions analysisOptions, DisplayOptions displayOptions) {
+    solve(position, nMoves, displayOptions.outputLanguage());
+  }
+
+  private void solve(Position position, int nMoves, Locale locale) {
+    List<Move> pseudoLegalMovesMax = new ArrayList<>();
+    if (position.isLegal(pseudoLegalMovesMax)) {
+      List<SolutionWriter.Point> points = new ArrayList<>();
+      for (Move move : pseudoLegalMovesMax) {
+        List<Move> pseudoLegalMovesMin = new ArrayList<>();
+        StringBuilder lanBuilder = new StringBuilder();
+        if (move.make(position, pseudoLegalMovesMin, lanBuilder, locale)) {
+          for (int depth = 1; depth <= nMoves; depth++) {
+            int score = searchMin(position, depth, pseudoLegalMovesMin);
+            if (score > 0) {
+              points.add(new SolutionWriter.Point("+M" + depth, lanBuilder.toString()));
+              break;
+            }
+          }
+        }
+        move.unmake(position);
+      }
+      System.out.println(SolutionWriter.toOrderedAndFormatted(points));
+    } else {
+      System.out.println("Illegal position.");
+    }
+  }
+
+  private int searchMax(Position position, int depth, List<Move> pseudoLegalMovesMax) {
+    int max = -1;
     for (Move move : pseudoLegalMovesMax) {
       List<Move> pseudoLegalMovesMin = new ArrayList<>();
       if (move.make(position, pseudoLegalMovesMin, null, null)) {
-        int score = searchMin(position, aim, depth, pseudoLegalMovesMin, 0);
-        if (score > max) {
-          max = score;
-        }
+        max = searchMin(position, depth, pseudoLegalMovesMin);
       }
       move.unmake(position);
-      if (max == depth) {
+      if (max > 0) {
         break;
       }
     }
     return max;
   }
 
-  @Override
-  protected int searchMin(Position position, Aim aim, int depth, List<Move> pseudoLegalMovesMin,
-      int nRefutations) {
+  private int searchMin(Position position, int depth, List<Move> pseudoLegalMovesMin) {
     int min = 0;
     if (depth == 1) {
       for (Move move : pseudoLegalMovesMin) {
         if (move.make(position, null, null, null)) {
-          min--;
+          min = -1;
         }
         move.unmake(position);
-        if (min < -nRefutations) {
-          min = Integer.MIN_VALUE;
+        if (min < 0) {
           break;
         }
       }
@@ -74,52 +98,27 @@ public class DirectProblem extends BattleProblem {
       for (Move move : pseudoLegalMovesMin) {
         List<Move> pseudoLegalMovesMax = new ArrayList<>();
         if (move.make(position, pseudoLegalMovesMax, null, null)) {
-          int score = searchMax(position, aim, depth - 1, pseudoLegalMovesMax);
-          if (min == 0) {
-            if (score < 0) {
-              min = -1;
-            } else {
-              min = score;
-            }
-          } else if (min > 0) {
-            if (score < 0) {
-              min = -1;
-            } else {
-              if (score < min) {
-                min = score;
-              }
-            }
-          } else {
-            if (score < 0) {
-              min--;
-            }
-          }
+          min = searchMax(position, depth - 1, pseudoLegalMovesMax);
         }
         move.unmake(position);
-        if (min < -nRefutations) {
-          min = Integer.MIN_VALUE;
+        if (min < 0) {
           break;
         }
       }
     }
     if (min == 0) {
-      if (evaluateTerminalNode(position, aim)) {
-        min = depth;
+      if (evaluateTerminalNode(position, Aim.MATE)) {
+        min = 1;
       } else {
-        min = Integer.MIN_VALUE;
+        min = -1;
       }
     }
     return min;
   }
 
   @Override
-  protected int getTerminalDepth() {
-    return 1;
-  }
-
-  @Override
   public String toString() {
-    return new StringJoiner(", ", DirectProblem.class.getSimpleName() + "[", "]").add(
-        "position=" + position).add("aim=" + aim).add("nMoves=" + nMoves).toString();
+    return new StringJoiner(", ", MateSearch.class.getSimpleName() + "[", "]").add(
+        "position=" + position).add("nMoves=" + nMoves).toString();
   }
 }
