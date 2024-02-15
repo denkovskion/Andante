@@ -26,11 +26,12 @@ package blog.art.chess.andante;
 
 import blog.art.chess.andante.parser.Parser;
 import blog.art.chess.andante.problem.Task;
+import java.util.Arrays;
 
 public class Andante {
 
   public static void main(String[] args) {
-    System.out.println("Andante [develop] [2024-02-08] Copyright 2024 Ivan Denkovski");
-    new Parser(args.length > 0 ? args[0] : null).readAllTasks().forEach(Task::solve);
+    System.out.println("Andante [develop] [2024-02-15] Copyright 2024 Ivan Denkovski");
+    new Parser(Arrays.stream(args).findFirst().orElse(null)).readAllTasks().forEach(Task::solve);
   }
 }

@@ -66,7 +66,6 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.ResourceBundle;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -287,57 +286,41 @@ public class Parser {
         inputLanguage = Locale.ROOT;
         ResourceBundle pieceTypeCodes = ResourceBundle.getBundle(
             "blog.art.chess.andante.piece.PieceCodes", inputLanguage);
-        while (scanner.hasNext()) {
-          String source = (line =
-              scanner.next() + (scanner.hasNextLine() ? scanner.nextLine() : "")).trim();
-          try (Scanner lineScanner = new Scanner(source)) {
+        while (scanner.hasNextLine()) {
+          line = scanner.nextLine();
+          if (line.isBlank()) {
+            continue;
+          }
+          try (Scanner lineScanner = new Scanner(line.strip())) {
             Popeye.Problem problem = new Popeye.Problem();
-            lineScanner.useDelimiter("");
-            int iRank = Popeye.Rank._8.ordinal();
-            int iFile = Popeye.File._a.ordinal();
-            String pieceRegex = "[KQRBNPkqrbnp12345678]";
-            while (true) {
-              char pieceSymbol = lineScanner.next(pieceRegex).charAt(0);
-              if (Character.isLetter(pieceSymbol)) {
-                Popeye.Colour colour =
-                    Character.isLowerCase(pieceSymbol) ? Popeye.Colour.Black : Popeye.Colour.White;
-                Popeye.PieceType pieceType = Arrays.stream(Popeye.PieceType.values()).filter(
-                    value -> pieceTypeCodes.getString(value.name())
-                        .equalsIgnoreCase(String.valueOf(pieceSymbol))).findAny().orElseThrow();
-                Popeye.Square square = new Popeye.Square(Popeye.File.values()[iFile],
-                    Popeye.Rank.values()[iRank]);
-                problem.getPieces().add(new Popeye.Piece(square, pieceType, colour));
-                iFile++;
-                pieceRegex =
-                    "[KQRBNPkqrbnp" + "12345678".substring(0, Popeye.File._h.ordinal() + 1 - iFile)
-                        + "]";
-              } else {
-                iFile += Character.getNumericValue(pieceSymbol);
-                pieceRegex = "[KQRBNPkqrbnp]";
-              }
-              if (iFile == Popeye.File._h.ordinal() + 1) {
-                if (iRank == Popeye.Rank._1.ordinal()) {
-                  break;
-                } else {
-                  lineScanner.next("/");
-                  iRank--;
-                  iFile = Popeye.File._a.ordinal();
-                  pieceRegex = "[KQRBNPkqrbnp12345678]";
+            String piecePlacementToken = lineScanner.next(
+                "(((?!\\d{2,})[KQRBNPkqrbnp1-8]){1,8}/){7}((?!\\d{2,})[KQRBNPkqrbnp1-8]){1,8}");
+            try (Scanner piecePlacementScanner = new Scanner(piecePlacementToken.chars().mapToObj(
+                symbol -> Character.isDigit((char) symbol) ? "1".repeat(symbol - '0')
+                    : String.valueOf((char) symbol)).collect(Collectors.joining())).useDelimiter(
+                "/")) {
+              for (int iRank = Popeye.Rank._8.ordinal(); iRank >= Popeye.Rank._1.ordinal();
+                  iRank--) {
+                String symbols = piecePlacementScanner.next("[KQRBNPkqrbnp1]{8}");
+                for (int iFile = Popeye.File._a.ordinal(); iFile <= Popeye.File._h.ordinal();
+                    iFile++) {
+                  char symbol = symbols.charAt(iFile);
+                  if (Character.isLetter(symbol)) {
+                    Popeye.Colour colour =
+                        Character.isLowerCase(symbol) ? Popeye.Colour.Black : Popeye.Colour.White;
+                    Popeye.PieceType pieceType = Arrays.stream(Popeye.PieceType.values()).filter(
+                        value -> pieceTypeCodes.getString(value.name())
+                            .equalsIgnoreCase(String.valueOf(symbol))).findAny().orElseThrow();
+                    Popeye.Square square = new Popeye.Square(Popeye.File.values()[iFile],
+                        Popeye.Rank.values()[iRank]);
+                    problem.getPieces().add(new Popeye.Piece(square, pieceType, colour));
+                  }
                 }
               }
             }
-            lineScanner.next("\\s");
-            lineScanner.reset();
-            Popeye.Colour sideToMove;
-            if (lineScanner.hasNext("w")) {
-              lineScanner.next();
-              sideToMove = Popeye.Colour.White;
-            } else {
-              lineScanner.next("b");
-              sideToMove = Popeye.Colour.Black;
-            }
-            if (lineScanner.hasNext("\\bK?Q?k?q?")) {
-              String castlingToken = lineScanner.next();
+            String sideToMoveToken = lineScanner.next("[wb]");
+            String castlingToken = lineScanner.next("\\bK?Q?k?q?|-");
+            if (castlingToken.matches("\\bK?Q?k?q?")) {
               if (castlingToken.indexOf('K') == -1) {
                 problem.getOptions().getNoCastling()
                     .add(new Popeye.Square(Popeye.File._h, Popeye.Rank._1));
@@ -363,14 +346,13 @@ public class Parser {
                     .add(new Popeye.Square(Popeye.File._e, Popeye.Rank._8));
               }
             } else {
-              lineScanner.next("-");
               Stream.of(Popeye.File._h, Popeye.File._a, Popeye.File._e).flatMap(
                       file -> Stream.of(Popeye.Rank._1, Popeye.Rank._8)
                           .map(rank -> new Popeye.Square(file, rank)))
                   .forEach(square -> problem.getOptions().getNoCastling().add(square));
             }
-            if (lineScanner.hasNext("[a-h][36]")) {
-              String enPassantToken = lineScanner.next();
+            String enPassantToken = lineScanner.next("[a-h][36]|-");
+            if (enPassantToken.matches("[a-h][36]")) {
               Popeye.File file = Arrays.stream(Popeye.File.values()).filter(
                       value -> Popeye.fileCodes.get(value)
                           .equalsIgnoreCase(String.valueOf(enPassantToken.charAt(0)))).findAny()
@@ -380,31 +362,30 @@ public class Parser {
                           .equalsIgnoreCase(String.valueOf(enPassantToken.charAt(1)))).findAny()
                   .orElseThrow();
               problem.getOptions().getEnPassant().add(new Popeye.Square(file, rank));
-            } else {
-              lineScanner.next("-");
             }
-            if (lineScanner.hasNext("acd")) {
-              lineScanner.next();
-              int nPlies = Integer.parseInt(lineScanner.next("(0|[1-9]\\d*);$").replace(";", ""));
+            String opcodeToken = lineScanner.next("acd|dm");
+            if (opcodeToken.equals("acd")) {
+              String operandToken = lineScanner.next("(0|[1-9]\\d*);$");
+              int nPlies = Integer.parseInt(operandToken.replace(";", ""));
               int nMoves = (nPlies + 1) / 2;
               problem.setStipulation(
                   new Popeye.Stipulation(Popeye.StipulationType.Help, null, nMoves));
               if (nPlies % 2 == 1) {
                 problem.getOptions().setWhiteToPlay();
-                if (sideToMove == Popeye.Colour.Black) {
+                if (sideToMoveToken.equals("b")) {
                   problem.getOptions().setHalfDuplex();
                 }
               } else {
-                if (sideToMove == Popeye.Colour.White) {
+                if (sideToMoveToken.equals("w")) {
                   problem.getOptions().setHalfDuplex();
                 }
               }
             } else {
-              lineScanner.next("dm");
-              int nMoves = Integer.parseInt(lineScanner.next("[1-9]\\d*;$").replace(";", ""));
+              String operandToken = lineScanner.next("[1-9]\\d*;$");
+              int nMoves = Integer.parseInt(operandToken.replace(";", ""));
               problem.setStipulation(
                   new Popeye.Stipulation(Popeye.StipulationType.Direct, null, nMoves));
-              if (sideToMove == Popeye.Colour.Black) {
+              if (sideToMoveToken.equals("b")) {
                 problem.getOptions().setHalfDuplex();
               }
             }
@@ -516,13 +497,11 @@ public class Parser {
               piece -> piece.colour() == colour && piece.pieceType() == Popeye.PieceType.Pawn ? 1 : 0)
           .sum();
       int maxPromotion = Math.min(maxMove, nPawns);
-      AtomicInteger order = new AtomicInteger(0);
-      return Stream.of(Popeye.PieceType.Queen, Popeye.PieceType.Rook, Popeye.PieceType.Bishop,
-          Popeye.PieceType.Knight).flatMap(pieceType -> {
-        order.getAndIncrement();
-        return IntStream.range(0, maxPromotion)
-            .mapToObj(promotionNo -> new Popeye.Promotion(colour, order.get(), pieceType));
-      });
+      Popeye.PieceType[] pieceTypes = new Popeye.PieceType[]{Popeye.PieceType.Queen,
+          Popeye.PieceType.Rook, Popeye.PieceType.Bishop, Popeye.PieceType.Knight};
+      return IntStream.range(0, pieceTypes.length).mapToObj(
+          index -> Stream.generate(() -> new Popeye.Promotion(colour, index + 1, pieceTypes[index]))
+              .limit(maxPromotion)).flatMap(Function.identity());
     }).map(this::convertPromotion).forEach(box::push);
     Table table = new Table();
     Colour sideToMove = switch (specification.getStipulation().stipulationType()) {
