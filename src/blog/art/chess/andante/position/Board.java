@@ -152,17 +152,21 @@ public class Board {
             || colour == Colour.BLACK && square.rank() == Rank.LAST)
         || pieceType.equals(Pawn.class) && (
         colour == Colour.WHITE && square.rank() == Rank.FIRST + 1
-            || colour == Colour.BLACK && square.rank() == Rank.LAST - 1)
-        || pieceType.equals(Piece.class) && (colour == Colour.WHITE && square.rank() == Rank.LAST
-        || colour == Colour.BLACK && square.rank() == Rank.FIRST)) && (
+            || colour == Colour.BLACK && square.rank() == Rank.LAST - 1) ||
+        !(pieceType.equals(King.class) || pieceType.equals(Queen.class) || pieceType.equals(
+            Rook.class) || pieceType.equals(Bishop.class) || pieceType.equals(Knight.class)
+            || pieceType.equals(Pawn.class)) && (
+            colour == Colour.WHITE && square.rank() == Rank.LAST
+                || colour == Colour.BLACK && square.rank() == Rank.FIRST)) && (
         pieceType.equals(King.class) && square.file() == File.KING
             || pieceType.equals(Queen.class) && square.file() == File.QUEEN
             || pieceType.equals(Rook.class) && (square.file() == File.QUEEN_ROOK
             || square.file() == File.KING_ROOK) || pieceType.equals(Bishop.class) && (
             square.file() == File.QUEEN_BISHOP || square.file() == File.KING_BISHOP)
             || pieceType.equals(Knight.class) && (square.file() == File.QUEEN_KNIGHT
-            || square.file() == File.KING_KNIGHT) || pieceType.equals(Pawn.class)
-            || pieceType.equals(Piece.class));
+            || square.file() == File.KING_KNIGHT) || !(pieceType.equals(King.class)
+            || pieceType.equals(Queen.class) || pieceType.equals(Rook.class) || pieceType.equals(
+            Bishop.class) || pieceType.equals(Knight.class)));
   }
 
   public String toCode(Square square) {
