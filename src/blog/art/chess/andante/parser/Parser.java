@@ -27,6 +27,7 @@ package blog.art.chess.andante.parser;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.fairy.Grasshopper;
+import blog.art.chess.andante.piece.fairy.Nightrider;
 import blog.art.chess.andante.piece.orthodox.Bishop;
 import blog.art.chess.andante.piece.orthodox.King;
 import blog.art.chess.andante.piece.orthodox.Knight;
@@ -599,6 +600,7 @@ public class Parser {
       case Knight -> new Knight(convertColour(colour));
       case Pawn -> new Pawn(convertColour(colour));
       case Grasshopper -> new Grasshopper(convertColour(colour));
+      case Nightrider -> new Nightrider(convertColour(colour));
     };
   }
 
