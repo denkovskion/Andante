@@ -22,53 +22,29 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move;
+package blog.art.chess.andante.position;
 
-import blog.art.chess.andante.position.Position;
-import java.util.List;
-import java.util.Locale;
+import blog.art.chess.andante.piece.Piece;
+import java.util.Stack;
 import java.util.StringJoiner;
 
-public class NullMove extends Move {
+public class DefaultTable implements Table {
+
+  private final Stack<Piece> pieces = new Stack<>();
 
   @Override
-  protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
-    return true;
+  public Piece pop() {
+    return pieces.pop();
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    lanBuilder.append((String) null);
-  }
-
-  @Override
-  public void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
-      StringBuilder lanBuilder) {
-  }
-
-  @Override
-  protected void updatePieces(Position position) {
-  }
-
-  @Override
-  protected void revertPieces(Position position) {
-  }
-
-  @Override
-  protected void updateState(Position position) {
-    position.getMemory().push(position.getState().copy());
-    position.getState().resetEnPassant();
-    position.toggleSideToMove();
-  }
-
-  @Override
-  protected void revertState(Position position) {
-    position.toggleSideToMove();
-    position.setState(position.getMemory().pop());
+  public void push(Piece piece) {
+    pieces.push(piece);
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", NullMove.class.getSimpleName() + "[", "]").toString();
+    return new StringJoiner(", ", DefaultTable.class.getSimpleName() + "[", "]").add(
+        "pieces=" + pieces).toString();
   }
 }

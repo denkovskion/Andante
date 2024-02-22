@@ -91,7 +91,7 @@ public class Position {
   }
 
   public int isCheck() {
-    memory.push(new State(state));
+    memory.push(state.copy());
     state.resetEnPassant();
     toggleSideToMove();
     int nChecks = board.getOrigins().stream().filter(origin -> {

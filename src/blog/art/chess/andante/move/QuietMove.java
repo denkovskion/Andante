@@ -29,7 +29,6 @@ import blog.art.chess.andante.piece.orthodox.King;
 import blog.art.chess.andante.piece.orthodox.Rook;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Square;
-import blog.art.chess.andante.position.State;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
@@ -84,7 +83,7 @@ public class QuietMove extends NullMove {
 
   @Override
   protected void updateState(Position position) {
-    position.getMemory().push(new State(position.getState()));
+    position.getMemory().push(position.getState().copy());
     addNoCastling(position);
     setEnPassant(position);
     position.toggleSideToMove();

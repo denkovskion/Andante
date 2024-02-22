@@ -22,53 +22,58 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move;
+package blog.art.chess.andante.position;
 
-import blog.art.chess.andante.position.Position;
-import java.util.List;
-import java.util.Locale;
+import java.util.Set;
 import java.util.StringJoiner;
+import java.util.TreeSet;
 
-public class NullMove extends Move {
+public class DefaultState implements State {
 
-  @Override
-  protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
-    return true;
+  private final Set<Square> noCastling = new TreeSet<>();
+  private Square enPassant;
+
+  public DefaultState() {
+  }
+
+  private DefaultState(DefaultState state) {
+    this.noCastling.addAll(state.noCastling);
+    this.enPassant = state.enPassant;
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    lanBuilder.append((String) null);
+  public State copy() {
+    return new DefaultState(this);
   }
 
   @Override
-  public void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
-      StringBuilder lanBuilder) {
+  public boolean isNoCastling(Square square) {
+    return noCastling.contains(square);
   }
 
   @Override
-  protected void updatePieces(Position position) {
+  public void addNoCastling(Square square) {
+    noCastling.add(square);
   }
 
   @Override
-  protected void revertPieces(Position position) {
+  public boolean isEnPassant(Square square) {
+    return square.equals(enPassant);
   }
 
   @Override
-  protected void updateState(Position position) {
-    position.getMemory().push(position.getState().copy());
-    position.getState().resetEnPassant();
-    position.toggleSideToMove();
+  public void setEnPassant(Square enPassant) {
+    this.enPassant = enPassant;
   }
 
   @Override
-  protected void revertState(Position position) {
-    position.toggleSideToMove();
-    position.setState(position.getMemory().pop());
+  public void resetEnPassant() {
+    this.enPassant = null;
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", NullMove.class.getSimpleName() + "[", "]").toString();
+    return new StringJoiner(", ", DefaultState.class.getSimpleName() + "[", "]").add(
+        "noCastling=" + noCastling).add("enPassant=" + enPassant).toString();
   }
 }

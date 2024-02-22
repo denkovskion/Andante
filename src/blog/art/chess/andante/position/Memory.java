@@ -24,24 +24,9 @@
 
 package blog.art.chess.andante.position;
 
-import java.util.Stack;
-import java.util.StringJoiner;
+public interface Memory {
 
-public class Memory {
+  State pop();
 
-  private final Stack<State> states = new Stack<>();
-
-  public State pop() {
-    return states.pop();
-  }
-
-  public void push(State state) {
-    states.push(state);
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", Memory.class.getSimpleName() + "[", "]").add("states=" + states)
-        .toString();
-  }
+  void push(State state);
 }

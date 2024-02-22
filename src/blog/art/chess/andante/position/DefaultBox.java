@@ -22,53 +22,48 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move;
+package blog.art.chess.andante.position;
 
-import blog.art.chess.andante.position.Position;
+import blog.art.chess.andante.piece.Colour;
+import blog.art.chess.andante.piece.Piece;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
+import java.util.Stack;
 import java.util.StringJoiner;
+import java.util.TreeMap;
 
-public class NullMove extends Move {
+public class DefaultBox implements Box {
+
+  private final Map<Section, Stack<Piece>> pieces = new TreeMap<>();
 
   @Override
-  protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
-    return true;
+  public Piece peek(Section section) {
+    return pieces.get(section).peek();
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    lanBuilder.append((String) null);
+  public Piece pop(Section section) {
+    return pieces.get(section).pop();
   }
 
   @Override
-  public void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
-      StringBuilder lanBuilder) {
+  public void push(Section section, Piece piece) {
+    pieces.computeIfAbsent(section, s -> new Stack<>()).push(piece);
   }
 
   @Override
-  protected void updatePieces(Position position) {
+  public void push(Entry entry) {
+    push(new Section(entry.colour(), entry.order()), entry.piece());
   }
 
   @Override
-  protected void revertPieces(Position position) {
-  }
-
-  @Override
-  protected void updateState(Position position) {
-    position.getMemory().push(position.getState().copy());
-    position.getState().resetEnPassant();
-    position.toggleSideToMove();
-  }
-
-  @Override
-  protected void revertState(Position position) {
-    position.toggleSideToMove();
-    position.setState(position.getMemory().pop());
+  public List<Section> getSections(Colour colour) {
+    return pieces.keySet().stream().filter(entry -> entry.colour() == colour).toList();
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", NullMove.class.getSimpleName() + "[", "]").toString();
+    return new StringJoiner(", ", DefaultBox.class.getSimpleName() + "[", "]").add(
+        "pieces=" + pieces).toString();
   }
 }
