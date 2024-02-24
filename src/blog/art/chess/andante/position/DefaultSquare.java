@@ -24,17 +24,12 @@
 
 package blog.art.chess.andante.position;
 
-public interface Direction extends Comparable<Direction> {
+import java.util.Comparator;
 
-  default int fileOffset() {
-    throw new UnsupportedOperationException();
-  }
+public record DefaultSquare(int file, int rank) implements Square {
 
-  default int rankOffset() {
-    throw new UnsupportedOperationException();
-  }
-
-  default int offset() {
-    throw new UnsupportedOperationException();
+  @Override
+  public int compareTo(Square o) {
+    return Comparator.comparingInt(Square::file).thenComparingInt(Square::rank).compare(this, o);
   }
 }

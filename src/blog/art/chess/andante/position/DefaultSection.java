@@ -24,17 +24,13 @@
 
 package blog.art.chess.andante.position;
 
-public interface Direction extends Comparable<Direction> {
+import blog.art.chess.andante.piece.Colour;
+import java.util.Comparator;
 
-  default int fileOffset() {
-    throw new UnsupportedOperationException();
-  }
+public record DefaultSection(Colour colour, int order) implements Section {
 
-  default int rankOffset() {
-    throw new UnsupportedOperationException();
-  }
-
-  default int offset() {
-    throw new UnsupportedOperationException();
+  @Override
+  public int compareTo(Section o) {
+    return Comparator.comparing(Section::colour).thenComparingInt(Section::order).compare(this, o);
   }
 }

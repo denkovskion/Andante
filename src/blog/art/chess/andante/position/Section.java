@@ -25,12 +25,10 @@
 package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.piece.Colour;
-import java.util.Comparator;
 
-public record Section(Colour colour, int order) implements Comparable<Section> {
+public interface Section extends Comparable<Section> {
 
-  @Override
-  public int compareTo(Section o) {
-    return Comparator.comparing(Section::colour).thenComparingInt(Section::order).compare(this, o);
-  }
+  Colour colour();
+
+  int order();
 }

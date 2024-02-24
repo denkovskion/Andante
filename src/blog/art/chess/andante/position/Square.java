@@ -24,12 +24,17 @@
 
 package blog.art.chess.andante.position;
 
-import java.util.Comparator;
+public interface Square extends Comparable<Square> {
 
-public record Square(int file, int rank) implements Comparable<Square> {
+  default int file() {
+    throw new UnsupportedOperationException();
+  }
 
-  @Override
-  public int compareTo(Square o) {
-    return Comparator.comparingInt(Square::file).thenComparingInt(Square::rank).compare(this, o);
+  default int rank() {
+    throw new UnsupportedOperationException();
+  }
+
+  default int number() {
+    throw new UnsupportedOperationException();
   }
 }
