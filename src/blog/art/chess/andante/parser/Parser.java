@@ -41,6 +41,7 @@ import blog.art.chess.andante.position.DefaultBox;
 import blog.art.chess.andante.position.DefaultMemory;
 import blog.art.chess.andante.position.DefaultState;
 import blog.art.chess.andante.position.DefaultTable;
+import blog.art.chess.andante.position.MailboxBoard;
 import blog.art.chess.andante.position.Memory;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.State;
@@ -483,7 +484,11 @@ public class Parser {
   }
 
   private Task convertProblem(Popeye.Problem specification) {
-    Board board = new DefaultBoard();
+    Board board = specification.getPieces().stream().map(Popeye.Piece::pieceType).allMatch(
+        pieceType -> pieceType == Popeye.PieceType.King || pieceType == Popeye.PieceType.Queen
+            || pieceType == Popeye.PieceType.Rook || pieceType == Popeye.PieceType.Bishop
+            || pieceType == Popeye.PieceType.Knight || pieceType == Popeye.PieceType.Pawn)
+        ? new MailboxBoard() : new DefaultBoard();
     specification.getPieces().stream().map(this::convertPiece).forEach(board::put);
     Box box = new DefaultBox();
     Popeye.PieceType[] promotionTypes = Stream.concat(
