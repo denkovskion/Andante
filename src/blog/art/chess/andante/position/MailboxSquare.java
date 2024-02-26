@@ -28,6 +28,20 @@ import java.util.Comparator;
 
 public record MailboxSquare(int number) implements Square {
 
+  public MailboxSquare(int file, int rank) {
+    this(10 * (file + 1) + rank);
+  }
+
+  @Override
+  public int file() {
+    return number / 10 - 1;
+  }
+
+  @Override
+  public int rank() {
+    return number % 10;
+  }
+
   @Override
   public int compareTo(Square o) {
     return Comparator.comparingInt(Square::number).compare(this, o);

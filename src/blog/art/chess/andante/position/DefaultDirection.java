@@ -29,6 +29,11 @@ import java.util.Comparator;
 public record DefaultDirection(int fileOffset, int rankOffset) implements Direction {
 
   @Override
+  public int offset() {
+    throw new IllegalStateException();
+  }
+
+  @Override
   public int compareTo(Direction o) {
     return Comparator.comparingInt(Direction::fileOffset).thenComparingInt(Direction::rankOffset)
         .compare(this, o);

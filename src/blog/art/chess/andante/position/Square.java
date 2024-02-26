@@ -26,15 +26,9 @@ package blog.art.chess.andante.position;
 
 public interface Square extends Comparable<Square> {
 
-  default int file() {
-    throw new UnsupportedOperationException();
-  }
+  int file();
 
-  default int rank() {
-    throw new UnsupportedOperationException();
-  }
+  int rank();
 
-  default int number() {
-    throw new UnsupportedOperationException();
-  }
+  int number();
 }

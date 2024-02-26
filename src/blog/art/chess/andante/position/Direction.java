@@ -26,15 +26,9 @@ package blog.art.chess.andante.position;
 
 public interface Direction extends Comparable<Direction> {
 
-  default int fileOffset() {
-    throw new UnsupportedOperationException();
-  }
+  int fileOffset();
 
-  default int rankOffset() {
-    throw new UnsupportedOperationException();
-  }
+  int rankOffset();
 
-  default int offset() {
-    throw new UnsupportedOperationException();
-  }
+  int offset();
 }

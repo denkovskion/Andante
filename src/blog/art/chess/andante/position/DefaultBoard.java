@@ -24,45 +24,15 @@
 
 package blog.art.chess.andante.position;
 
-import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
-import blog.art.chess.andante.piece.orthodox.Bishop;
-import blog.art.chess.andante.piece.orthodox.King;
-import blog.art.chess.andante.piece.orthodox.Knight;
-import blog.art.chess.andante.piece.orthodox.Pawn;
-import blog.art.chess.andante.piece.orthodox.Queen;
-import blog.art.chess.andante.piece.orthodox.Rook;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-public class DefaultBoard implements Board {
-
-  private static class File {
-
-    static final int FIRST = 1;
-    static final int LAST = 8;
-    static final int QUEEN_ROOK = 1;
-    static final int QUEEN_KNIGHT = 2;
-    static final int QUEEN_BISHOP = 3;
-    static final int QUEEN = 4;
-    static final int KING = 5;
-    static final int KING_BISHOP = 6;
-    static final int KING_KNIGHT = 7;
-    static final int KING_ROOK = 8;
-  }
-
-  private static class Rank {
-
-    static final int FIRST = 1;
-    static final int LAST = 8;
-  }
+public class DefaultBoard extends AbstractOrthodoxBoard {
 
   private final Map<Square, Piece> pieces = new TreeMap<>();
 
@@ -74,15 +44,6 @@ public class DefaultBoard implements Board {
   @Override
   public void put(Square square, Piece piece) {
     pieces.put(square, piece);
-  }
-
-  @Override
-  public void put(Entry entry) {
-    if (entry.file() < File.FIRST || entry.file() > File.LAST || entry.rank() < Rank.FIRST
-        || entry.rank() > Rank.LAST) {
-      throw new IllegalArgumentException(entry.toString());
-    }
-    put(new DefaultSquare(entry.file(), entry.rank()), entry.piece());
   }
 
   @Override
@@ -109,7 +70,7 @@ public class DefaultBoard implements Board {
   @Override
   public Square getSquare(int file, int rank) {
     if (file < File.FIRST || file > File.LAST || rank < Rank.FIRST || rank > Rank.LAST) {
-      throw new IllegalArgumentException(new DefaultSquare(file, rank).toString());
+      throw new IndexOutOfBoundsException();
     }
     return new DefaultSquare(file, rank);
   }
@@ -119,65 +80,11 @@ public class DefaultBoard implements Board {
     return new DefaultDirection(fileOffset, rankOffset);
   }
 
-  private static final Map<Set<Direction>, List<Direction>> directions = new HashMap<>();
+  private static final Map<Set<Direction>, List<Direction>> defaultDirections = new HashMap<>();
 
   @Override
-  public List<Direction> getDirections(int baseFileOffset, int baseRankOffset) {
-    return directions.computeIfAbsent(Set.of(new DefaultDirection(baseFileOffset, baseRankOffset)),
-        this::computeDirections);
-  }
-
-  @Override
-  public List<Direction> getDirections(int base1FileOffset, int base1RankOffset,
-      int base2FileOffset, int base2RankOffset) {
-    return directions.computeIfAbsent(Set.of(new DefaultDirection(base1FileOffset, base1RankOffset),
-        new DefaultDirection(base2FileOffset, base2RankOffset)), this::computeDirections);
-  }
-
-  @Override
-  public List<Direction> getDirections(int... baseOffsets) {
-    return directions.computeIfAbsent(IntStream.range(0, baseOffsets.length / 2).mapToObj(
-            halfNo -> new DefaultDirection(baseOffsets[halfNo * 2], baseOffsets[halfNo * 2 + 1]))
-        .collect(Collectors.toUnmodifiableSet()), this::computeDirections);
-  }
-
-  private List<Direction> computeDirections(Set<Direction> bases) {
-    return bases.stream().flatMap(
-            direction -> Stream.of(-direction.fileOffset(), direction.fileOffset()).flatMap(
-                fileOffset -> Stream.of(-direction.rankOffset(), direction.rankOffset()).flatMap(
-                    rankOffset -> Stream.of(new DefaultDirection(fileOffset, rankOffset),
-                        new DefaultDirection(rankOffset, fileOffset))))).distinct().sorted()
-        .map(direction -> (Direction) direction).toList();
-  }
-
-  @Override
-  public boolean isRebirthSquare(Square square, Class<? extends Piece> pieceType, Colour colour) {
-    return ((pieceType.equals(King.class) || pieceType.equals(Queen.class) || pieceType.equals(
-        Rook.class) || pieceType.equals(Bishop.class) || pieceType.equals(Knight.class)) && (
-        colour == Colour.WHITE && square.rank() == Rank.FIRST
-            || colour == Colour.BLACK && square.rank() == Rank.LAST)
-        || pieceType.equals(Pawn.class) && (
-        colour == Colour.WHITE && square.rank() == Rank.FIRST + 1
-            || colour == Colour.BLACK && square.rank() == Rank.LAST - 1) ||
-        !(pieceType.equals(King.class) || pieceType.equals(Queen.class) || pieceType.equals(
-            Rook.class) || pieceType.equals(Bishop.class) || pieceType.equals(Knight.class)
-            || pieceType.equals(Pawn.class)) && (
-            colour == Colour.WHITE && square.rank() == Rank.LAST
-                || colour == Colour.BLACK && square.rank() == Rank.FIRST)) && (
-        pieceType.equals(King.class) && square.file() == File.KING
-            || pieceType.equals(Queen.class) && square.file() == File.QUEEN
-            || pieceType.equals(Rook.class) && (square.file() == File.QUEEN_ROOK
-            || square.file() == File.KING_ROOK) || pieceType.equals(Bishop.class) && (
-            square.file() == File.QUEEN_BISHOP || square.file() == File.KING_BISHOP)
-            || pieceType.equals(Knight.class) && (square.file() == File.QUEEN_KNIGHT
-            || square.file() == File.KING_KNIGHT) || !(pieceType.equals(King.class)
-            || pieceType.equals(Queen.class) || pieceType.equals(Rook.class) || pieceType.equals(
-            Bishop.class) || pieceType.equals(Knight.class)));
-  }
-
-  @Override
-  public String toCode(Square square) {
-    return "" + (char) ('a' + square.file() - 1) + (char) ('1' + square.rank() - 1);
+  protected Map<Set<Direction>, List<Direction>> getAllDirections() {
+    return defaultDirections;
   }
 
   @Override

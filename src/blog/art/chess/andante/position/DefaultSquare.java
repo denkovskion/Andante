@@ -29,6 +29,11 @@ import java.util.Comparator;
 public record DefaultSquare(int file, int rank) implements Square {
 
   @Override
+  public int number() {
+    throw new IllegalStateException();
+  }
+
+  @Override
   public int compareTo(Square o) {
     return Comparator.comparingInt(Square::file).thenComparingInt(Square::rank).compare(this, o);
   }

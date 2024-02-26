@@ -28,6 +28,20 @@ import java.util.Comparator;
 
 public record MailboxDirection(int offset) implements Direction {
 
+  public MailboxDirection(int fileOffset, int rankOffset) {
+    this(10 * fileOffset + rankOffset);
+  }
+
+  @Override
+  public int fileOffset() {
+    throw new IllegalStateException();
+  }
+
+  @Override
+  public int rankOffset() {
+    throw new IllegalStateException();
+  }
+
   @Override
   public int compareTo(Direction o) {
     return Comparator.comparingInt(Direction::offset).compare(this, o);
