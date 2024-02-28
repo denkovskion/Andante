@@ -24,6 +24,14 @@
 
 package blog.art.chess.andante.position;
 
+import blog.art.chess.andante.piece.Colour;
+import blog.art.chess.andante.piece.Piece;
+import blog.art.chess.andante.piece.orthodox.Bishop;
+import blog.art.chess.andante.piece.orthodox.King;
+import blog.art.chess.andante.piece.orthodox.Knight;
+import blog.art.chess.andante.piece.orthodox.Pawn;
+import blog.art.chess.andante.piece.orthodox.Queen;
+import blog.art.chess.andante.piece.orthodox.Rook;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +40,26 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public abstract class AbstractBoard implements Board {
+
+  protected static class File {
+
+    static final int FIRST = 1;
+    static final int LAST = 8;
+    static final int QUEEN_ROOK = 1;
+    static final int QUEEN_KNIGHT = 2;
+    static final int QUEEN_BISHOP = 3;
+    static final int QUEEN = 4;
+    static final int KING = 5;
+    static final int KING_BISHOP = 6;
+    static final int KING_KNIGHT = 7;
+    static final int KING_ROOK = 8;
+  }
+
+  protected static class Rank {
+
+    static final int FIRST = 1;
+    static final int LAST = 8;
+  }
 
   @Override
   public void put(Entry entry) {
@@ -67,5 +95,42 @@ public abstract class AbstractBoard implements Board {
             fileOffset -> Stream.of(-direction.rankOffset(), direction.rankOffset()).flatMap(
                 rankOffset -> Stream.of(getDirection(fileOffset, rankOffset),
                     getDirection(rankOffset, fileOffset))))).distinct().sorted().toList();
+  }
+
+  @Override
+  public boolean isRebirthSquare(Square square, Class<? extends Piece> pieceType, Colour colour) {
+    return switch (colour) {
+      case WHITE ->
+          pieceType.equals(King.class) ? square.rank() == Rank.FIRST && square.file() == File.KING
+              : pieceType.equals(Queen.class) ? square.rank() == Rank.FIRST
+                  && square.file() == File.QUEEN
+                  : pieceType.equals(Rook.class) ? square.rank() == Rank.FIRST && (
+                      square.file() == File.QUEEN_ROOK || square.file() == File.KING_ROOK)
+                      : pieceType.equals(Bishop.class) ? square.rank() == Rank.FIRST && (
+                          square.file() == File.QUEEN_BISHOP || square.file() == File.KING_BISHOP)
+                          : pieceType.equals(Knight.class) ? square.rank() == Rank.FIRST && (
+                              square.file() == File.QUEEN_KNIGHT
+                                  || square.file() == File.KING_KNIGHT)
+                              : pieceType.equals(Pawn.class) ? square.rank() == Rank.FIRST + 1
+                                  : square.rank() == Rank.LAST;
+      case BLACK ->
+          pieceType.equals(King.class) ? square.rank() == Rank.LAST && square.file() == File.KING
+              : pieceType.equals(Queen.class) ? square.rank() == Rank.LAST
+                  && square.file() == File.QUEEN
+                  : pieceType.equals(Rook.class) ? square.rank() == Rank.LAST && (
+                      square.file() == File.QUEEN_ROOK || square.file() == File.KING_ROOK)
+                      : pieceType.equals(Bishop.class) ? square.rank() == Rank.LAST && (
+                          square.file() == File.QUEEN_BISHOP || square.file() == File.KING_BISHOP)
+                          : pieceType.equals(Knight.class) ? square.rank() == Rank.LAST && (
+                              square.file() == File.QUEEN_KNIGHT
+                                  || square.file() == File.KING_KNIGHT)
+                              : pieceType.equals(Pawn.class) ? square.rank() == Rank.LAST - 1
+                                  : square.rank() == Rank.FIRST;
+    };
+  }
+
+  @Override
+  public String toCode(Square square) {
+    return "" + (char) ('a' + square.file() - 1) + (char) ('1' + square.rank() - 1);
   }
 }

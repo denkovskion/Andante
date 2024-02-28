@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.TreeMap;
 
-public class DefaultBoard extends AbstractOrthodoxBoard {
+public class DefaultBoard extends AbstractBoard {
 
   private final Map<Square, Piece> pieces = new TreeMap<>();
 

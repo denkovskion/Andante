@@ -26,6 +26,7 @@ package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.piece.Piece;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class MailboxBoard extends AbstractOrthodoxBoard {
+public class MailboxBoard extends AbstractBoard {
 
   private final List<Piece> pieces = Stream.generate(() -> (Piece) null).limit(120)
       .collect(Collectors.toCollection(ArrayList::new));
@@ -45,6 +46,12 @@ public class MailboxBoard extends AbstractOrthodoxBoard {
     return square.file() < File.FIRST || square.file() > File.LAST || square.rank() < Rank.FIRST
         || square.rank() > Rank.LAST ? null : square;
   }).collect(Collectors.toCollection(ArrayList::new));
+
+  private static final int[] numbers = IntStream.range(0, 120).filter(number -> {
+    Square square = new MailboxSquare(number);
+    return !(square.file() < File.FIRST || square.file() > File.LAST || square.rank() < Rank.FIRST
+        || square.rank() > Rank.LAST);
+  }).toArray();
 
   @Override
   public Piece get(Square square) {
@@ -63,7 +70,7 @@ public class MailboxBoard extends AbstractOrthodoxBoard {
 
   @Override
   public List<Square> getOrigins() {
-    return IntStream.range(0, 120).filter(number -> pieces.get(number) != null)
+    return Arrays.stream(numbers).filter(number -> pieces.get(number) != null)
         .mapToObj(squares::get).toList();
   }
 
