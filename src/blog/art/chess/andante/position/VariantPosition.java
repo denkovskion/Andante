@@ -24,61 +24,40 @@
 
 package blog.art.chess.andante.position;
 
-import java.util.Set;
+import blog.art.chess.andante.move.Move;
+import blog.art.chess.andante.piece.Colour;
+import blog.art.chess.andante.piece.Piece;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringJoiner;
-import java.util.TreeSet;
 
-public class DefaultState implements State {
+public class VariantPosition extends Position {
 
-  private final Set<Square> noCastling = new TreeSet<>();
-  private Square enPassant;
+  private final Variant variant;
 
-  public DefaultState() {
-  }
-
-  private DefaultState(DefaultState state) {
-    this.noCastling.addAll(state.noCastling);
-    this.enPassant = state.enPassant;
+  public VariantPosition(Board board, Box box, Table table, Colour sideToMove, State state,
+      Memory memory, Variant variant) {
+    super(board, box, table, sideToMove, state, memory);
+    this.variant = variant;
   }
 
   @Override
-  public State copy() {
-    return new DefaultState(this);
-  }
-
-  @Override
-  public boolean isNoCastling(Square square) {
-    return noCastling.contains(square);
-  }
-
-  @Override
-  public void addNoCastling(Square square) {
-    noCastling.add(square);
-  }
-
-  @Override
-  public void removeNoCastling(Square square) {
-    noCastling.remove(square);
-  }
-
-  @Override
-  public boolean isEnPassant(Square square) {
-    return square.equals(enPassant);
-  }
-
-  @Override
-  public void setEnPassant(Square enPassant) {
-    this.enPassant = enPassant;
-  }
-
-  @Override
-  public void resetEnPassant() {
-    this.enPassant = null;
+  protected boolean generatePseudoLegalMoves(Piece piece, Square origin,
+      List<Move> pseudoLegalMoves) {
+    if (pseudoLegalMoves != null) {
+      List<Move> baseMoves = new ArrayList<>();
+      boolean legal = piece.generateMoves(board, box, state, origin, baseMoves);
+      variant.decorateMoves(board, baseMoves, pseudoLegalMoves);
+      return legal;
+    } else {
+      return piece.generateMoves(board, box, state, origin, null);
+    }
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", DefaultState.class.getSimpleName() + "[", "]").add(
-        "noCastling=" + noCastling).add("enPassant=" + enPassant).toString();
+    return new StringJoiner(", ", VariantPosition.class.getSimpleName() + "[", "]").add(
+            "board=" + board).add("box=" + box).add("table=" + table).add("sideToMove=" + sideToMove)
+        .add("state=" + state).add("memory=" + memory).add("variant=" + variant).toString();
   }
 }

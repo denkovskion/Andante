@@ -38,6 +38,10 @@ public class EnPassant extends QuietMove {
     this.stop = stop;
   }
 
+  public Square getStop() {
+    return stop;
+  }
+
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))

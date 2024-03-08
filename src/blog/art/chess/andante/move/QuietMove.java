@@ -43,6 +43,14 @@ public class QuietMove extends NullMove {
     this.target = target;
   }
 
+  public Square getOrigin() {
+    return origin;
+  }
+
+  public Square getTarget() {
+    return target;
+  }
+
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))

@@ -24,19 +24,10 @@
 
 package blog.art.chess.andante.position;
 
-public interface State {
+import blog.art.chess.andante.move.Move;
+import java.util.List;
 
-  State copy();
+public interface Variant {
 
-  boolean isNoCastling(Square square);
-
-  void addNoCastling(Square square);
-
-  void removeNoCastling(Square square);
-
-  boolean isEnPassant(Square square);
-
-  void setEnPassant(Square enPassant);
-
-  void resetEnPassant();
+  void decorateMoves(Board board, List<Move> baseMoves, List<Move> moves);
 }

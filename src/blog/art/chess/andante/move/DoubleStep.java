@@ -37,6 +37,10 @@ public class DoubleStep extends QuietMove {
     this.stop = stop;
   }
 
+  public Square getStop() {
+    return stop;
+  }
+
   @Override
   protected void setEnPassant(Position position) {
     position.getState().setEnPassant(stop);

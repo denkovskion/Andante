@@ -24,4 +24,14 @@
 
 package blog.art.chess.andante.piece;
 
-public enum Colour {WHITE, BLACK}
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+public enum Colour {
+  WHITE, BLACK;
+
+  public String getCode(Locale locale) {
+    return ResourceBundle.getBundle("blog.art.chess.andante.piece.ColourCodes", locale)
+        .getString(name());
+  }
+}

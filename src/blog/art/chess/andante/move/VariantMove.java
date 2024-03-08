@@ -22,63 +22,68 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.position;
+package blog.art.chess.andante.move;
 
-import java.util.Set;
+import blog.art.chess.andante.position.Position;
+import java.util.List;
+import java.util.Locale;
 import java.util.StringJoiner;
-import java.util.TreeSet;
 
-public class DefaultState implements State {
+public class VariantMove extends Move {
 
-  private final Set<Square> noCastling = new TreeSet<>();
-  private Square enPassant;
+  protected final Move move;
 
-  public DefaultState() {
+  public VariantMove(Move move) {
+    this.move = move;
   }
 
-  private DefaultState(DefaultState state) {
-    this.noCastling.addAll(state.noCastling);
-    this.enPassant = state.enPassant;
-  }
-
-  @Override
-  public State copy() {
-    return new DefaultState(this);
+  public Move findBaseMove() {
+    if (move instanceof VariantMove) {
+      return ((VariantMove) move).findBaseMove();
+    } else {
+      return move;
+    }
   }
 
   @Override
-  public boolean isNoCastling(Square square) {
-    return noCastling.contains(square);
+  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
+    move.preWrite(position, lanBuilder, locale);
   }
 
   @Override
-  public void addNoCastling(Square square) {
-    noCastling.add(square);
+  public void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
+      StringBuilder lanBuilder) {
+    move.postWrite(position, generatedPseudoLegalMoves, lanBuilder);
   }
 
   @Override
-  public void removeNoCastling(Square square) {
-    noCastling.remove(square);
+  protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
+    return move.preMake(position, lanBuilder, locale);
   }
 
   @Override
-  public boolean isEnPassant(Square square) {
-    return square.equals(enPassant);
+  protected void updatePieces(Position position) {
+    move.updatePieces(position);
   }
 
   @Override
-  public void setEnPassant(Square enPassant) {
-    this.enPassant = enPassant;
+  protected void revertPieces(Position position) {
+    move.revertPieces(position);
   }
 
   @Override
-  public void resetEnPassant() {
-    this.enPassant = null;
+  protected void updateState(Position position) {
+    move.updateState(position);
+  }
+
+  @Override
+  protected void revertState(Position position) {
+    move.revertState(position);
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", DefaultState.class.getSimpleName() + "[", "]").add(
-        "noCastling=" + noCastling).add("enPassant=" + enPassant).toString();
+    return new StringJoiner(", ", VariantMove.class.getSimpleName() + "[", "]").add("move=" + move)
+        .toString();
   }
 }

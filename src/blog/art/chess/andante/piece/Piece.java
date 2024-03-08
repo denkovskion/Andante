@@ -36,7 +36,7 @@ import java.util.StringJoiner;
 
 public abstract class Piece {
 
-  protected final Colour colour;
+  protected Colour colour;
 
   public Piece(Colour colour) {
     this.colour = colour;
@@ -44,6 +44,10 @@ public abstract class Piece {
 
   public Colour getColour() {
     return colour;
+  }
+
+  public void setColour(Colour colour) {
+    this.colour = colour;
   }
 
   public abstract boolean generateMoves(Board board, Box box, State state, Square origin,

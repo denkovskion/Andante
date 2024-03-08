@@ -36,16 +36,20 @@ import blog.art.chess.andante.piece.orthodox.Queen;
 import blog.art.chess.andante.piece.orthodox.Rook;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
+import blog.art.chess.andante.position.Condition;
 import blog.art.chess.andante.position.DefaultBoard;
 import blog.art.chess.andante.position.DefaultBox;
 import blog.art.chess.andante.position.DefaultMemory;
 import blog.art.chess.andante.position.DefaultState;
 import blog.art.chess.andante.position.DefaultTable;
+import blog.art.chess.andante.position.DefaultVariant;
 import blog.art.chess.andante.position.MailboxBoard;
 import blog.art.chess.andante.position.Memory;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.State;
 import blog.art.chess.andante.position.Table;
+import blog.art.chess.andante.position.Variant;
+import blog.art.chess.andante.position.VariantPosition;
 import blog.art.chess.andante.problem.Aim;
 import blog.art.chess.andante.problem.AnalysisOptions;
 import blog.art.chess.andante.problem.BattlePlayOptions;
@@ -72,6 +76,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -122,6 +127,22 @@ public class Parser {
                 .findAny().orElseThrow();
             switch (command) {
               case Remark -> scanner.nextLine();
+              case Condition -> {
+                Pattern conditionPattern = Pattern.compile(
+                    Arrays.stream(Popeye.Condition.values()).map(Enum::name)
+                        .map(keywords::getString).collect(Collectors.joining("|")),
+                    Pattern.CASE_INSENSITIVE);
+                do {
+                  String conditionToken = token = scanner.next(conditionPattern);
+                  Popeye.Condition condition = Arrays.stream(Popeye.Condition.values()).filter(
+                          value -> keywords.getString(value.name()).equalsIgnoreCase(conditionToken))
+                      .findAny().orElseThrow();
+                  switch (condition) {
+                    case Circe -> problem.getConditions().setCirce();
+                    case AndernachChess -> problem.getConditions().setAndernachChess();
+                  }
+                } while (scanner.hasNext(conditionPattern));
+              }
               case Option -> {
                 Pattern optionPattern = Pattern.compile(
                     Arrays.stream(Popeye.Option.values()).map(Enum::name).map(keywords::getString)
@@ -510,10 +531,10 @@ public class Parser {
         case Self -> false;
       } ? specification.getStipulation().nMoves() : specification.getStipulation().nMoves() + 1;
       int nPawns = specification.getPieces().stream().collect(
-              Collectors.toMap(Popeye.Piece::square, Function.identity(),
-                  (oldValue, newValue) -> newValue)).values().stream().mapToInt(
-              piece -> piece.colour() == colour && piece.pieceType() == Popeye.PieceType.Pawn ? 1 : 0)
-          .sum();
+          Collectors.toMap(Popeye.Piece::square, Function.identity(),
+              (oldValue, newValue) -> newValue)).values().stream().mapToInt(piece ->
+          (piece.colour() == colour || specification.getConditions().isAndernachChess())
+              && piece.pieceType() == Popeye.PieceType.Pawn ? 1 : 0).sum();
       int maxPromotion = Math.min(maxMove, nPawns);
       return IntStream.range(0, promotionTypes.length).mapToObj(index -> Stream.generate(
               () -> new Popeye.Promotion(colour, index + 1, promotionTypes[index])).limit(maxPromotion))
@@ -533,7 +554,15 @@ public class Parser {
         .map(square -> board.getSquare(convertFile(square.file()), convertRank(square.rank())))
         .forEach(state::setEnPassant);
     Memory memory = new DefaultMemory();
-    Position position = new Position(board, box, table, sideToMove, state, memory);
+    Condition[] conditions = Stream.of(
+            specification.getConditions().isAndernachChess() ? Condition.ANDERNACH : null,
+            specification.getConditions().isCirce() ? Condition.CIRCE : null).filter(Objects::nonNull)
+        .toArray(Condition[]::new);
+    Variant variant = new DefaultVariant(conditions);
+    Position position =
+        specification.getConditions().isAndernachChess() || specification.getConditions().isCirce()
+            ? new VariantPosition(board, box, table, sideToMove, state, memory, variant)
+            : new Position(board, box, table, sideToMove, state, memory);
     Aim aim = specification.getStipulation().goal() == null ? null
         : switch (specification.getStipulation().goal()) {
           case Mate -> Aim.MATE;

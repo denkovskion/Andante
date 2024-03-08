@@ -22,21 +22,14 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.position;
+package blog.art.chess.andante.piece;
 
-public interface State {
+import java.util.ListResourceBundle;
 
-  State copy();
+public class ColourCodes_de extends ListResourceBundle {
 
-  boolean isNoCastling(Square square);
-
-  void addNoCastling(Square square);
-
-  void removeNoCastling(Square square);
-
-  boolean isEnPassant(Square square);
-
-  void setEnPassant(Square enPassant);
-
-  void resetEnPassant();
+  @Override
+  protected Object[][] getContents() {
+    return new Object[][]{{Colour.WHITE.name(), "W"}, {Colour.BLACK.name(), "S"}};
+  }
 }

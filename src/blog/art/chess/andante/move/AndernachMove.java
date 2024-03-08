@@ -24,43 +24,59 @@
 
 package blog.art.chess.andante.move;
 
+import blog.art.chess.andante.piece.Colour;
+import blog.art.chess.andante.piece.orthodox.Rook;
 import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class PromotionCapture extends Promotion {
+public class AndernachMove extends VariantMove {
 
-  public PromotionCapture(Square origin, Square target, Section section) {
-    super(origin, target, section);
+  private final Square change;
+  private final Colour origin;
+  private final Colour target;
+
+  public AndernachMove(Move move, Square change, Colour origin, Colour target) {
+    super(move);
+    this.change = change;
+    this.origin = origin;
+    this.target = target;
   }
 
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    lanBuilder.append(position.getBoard().get(origin).getCode(locale))
-        .append(position.getBoard().toCode(origin)).append("x")
-        .append(position.getBoard().toCode(target)).append("=")
-        .append(position.getBox().peek(section).getCode(locale));
+    move.preWrite(position, lanBuilder, locale);
+    lanBuilder.append("(").append(target.getCode(locale)).append(")");
   }
 
   @Override
   protected void updatePieces(Position position) {
-    position.getTable().push(position.getBoard().remove(origin));
-    position.getTable().push(position.getBoard().remove(target));
-    position.getBoard().put(target, position.getBox().pop(section));
+    move.updatePieces(position);
+    position.getBoard().get(change).setColour(target);
   }
 
   @Override
   protected void revertPieces(Position position) {
-    position.getBox().push(section, position.getBoard().remove(target));
-    position.getBoard().put(target, position.getTable().pop());
-    position.getBoard().put(origin, position.getTable().pop());
+    position.getBoard().get(change).setColour(origin);
+    move.revertPieces(position);
+  }
+
+  @Override
+  protected void updateState(Position position) {
+    move.updateState(position);
+    if ((position.getBoard().isRebirthSquare(change, Rook.class, Colour.WHITE)
+        || position.getBoard().isRebirthSquare(change, Rook.class, Colour.BLACK))
+        && position.getBoard().isRebirthSquare(change, position.getBoard().get(change).getClass(),
+        position.getBoard().get(change).getColour())) {
+      position.getState().removeNoCastling(change);
+    }
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", PromotionCapture.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).add("section=" + section).toString();
+    return new StringJoiner(", ", AndernachMove.class.getSimpleName() + "[", "]").add(
+            "move=" + move).add("change=" + change).add("origin=" + origin).add("target=" + target)
+        .toString();
   }
 }

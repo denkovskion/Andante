@@ -39,6 +39,10 @@ public class Promotion extends QuietMove {
     this.section = section;
   }
 
+  public Section getSection() {
+    return section;
+  }
+
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))

@@ -40,6 +40,14 @@ public abstract class Castling extends QuietMove {
     this.target2 = target2;
   }
 
+  public Square getOrigin2() {
+    return origin2;
+  }
+
+  public Square getTarget2() {
+    return target2;
+  }
+
   @Override
   protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
     Move nullMove = new NullMove();

@@ -24,19 +24,34 @@
 
 package blog.art.chess.andante.position;
 
-public interface State {
+import blog.art.chess.andante.move.Move;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.StringJoiner;
+import java.util.TreeSet;
 
-  State copy();
+public class DefaultVariant implements Variant {
 
-  boolean isNoCastling(Square square);
+  private final SortedSet<Condition> conditions;
 
-  void addNoCastling(Square square);
+  public DefaultVariant(Condition... conditions) {
+    this.conditions = new TreeSet<>(List.of(conditions));
+  }
 
-  void removeNoCastling(Square square);
+  @Override
+  public void decorateMoves(Board board, List<Move> baseMoves, List<Move> moves) {
+    for (Move baseMove : baseMoves) {
+      Move move = baseMove;
+      for (Condition condition : conditions) {
+        move = condition.decorateMove(board, move);
+      }
+      moves.add(move);
+    }
+  }
 
-  boolean isEnPassant(Square square);
-
-  void setEnPassant(Square enPassant);
-
-  void resetEnPassant();
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", DefaultVariant.class.getSimpleName() + "[", "]").add(
+        "conditions=" + conditions).toString();
+  }
 }
