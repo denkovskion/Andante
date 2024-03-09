@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.parser;
 
+import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.fairy.Grasshopper;
@@ -36,7 +37,6 @@ import blog.art.chess.andante.piece.orthodox.Queen;
 import blog.art.chess.andante.piece.orthodox.Rook;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
-import blog.art.chess.andante.position.Condition;
 import blog.art.chess.andante.position.DefaultBoard;
 import blog.art.chess.andante.position.DefaultBox;
 import blog.art.chess.andante.position.DefaultMemory;

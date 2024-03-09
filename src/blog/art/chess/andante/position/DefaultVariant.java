@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.position;
 
+import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.move.Move;
 import java.util.List;
 import java.util.SortedSet;

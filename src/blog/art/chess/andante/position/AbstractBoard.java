@@ -102,31 +102,29 @@ public abstract class AbstractBoard implements Board {
   public boolean isRebirthSquare(Square square, Class<? extends Piece> pieceType, Colour colour) {
     return switch (colour) {
       case WHITE ->
-          pieceType.equals(King.class) ? square.rank() == Rank.FIRST && square.file() == File.KING
-              : pieceType.equals(Queen.class) ? square.rank() == Rank.FIRST
-                  && square.file() == File.QUEEN
-                  : pieceType.equals(Rook.class) ? square.rank() == Rank.FIRST && (
-                      square.file() == File.QUEEN_ROOK || square.file() == File.KING_ROOK)
-                      : pieceType.equals(Bishop.class) ? square.rank() == Rank.FIRST && (
-                          square.file() == File.QUEEN_BISHOP || square.file() == File.KING_BISHOP)
-                          : pieceType.equals(Knight.class) ? square.rank() == Rank.FIRST && (
-                              square.file() == File.QUEEN_KNIGHT
-                                  || square.file() == File.KING_KNIGHT)
-                              : pieceType.equals(Pawn.class) ? square.rank() == Rank.FIRST + 1
-                                  : square.rank() == Rank.LAST;
+          pieceType.equals(King.class) ? square.file() == File.KING && square.rank() == Rank.FIRST
+              : pieceType.equals(Queen.class) ? square.file() == File.QUEEN
+                  && square.rank() == Rank.FIRST : pieceType.equals(Rook.class) ?
+                  (square.file() == File.QUEEN_ROOK || square.file() == File.KING_ROOK)
+                      && square.rank() == Rank.FIRST : pieceType.equals(Bishop.class) ?
+                  (square.file() == File.QUEEN_BISHOP || square.file() == File.KING_BISHOP)
+                      && square.rank() == Rank.FIRST : pieceType.equals(Knight.class) ?
+                  (square.file() == File.QUEEN_KNIGHT || square.file() == File.KING_KNIGHT)
+                      && square.rank() == Rank.FIRST
+                  : pieceType.equals(Pawn.class) ? square.rank() == Rank.FIRST + 1
+                      : square.rank() == Rank.LAST;
       case BLACK ->
-          pieceType.equals(King.class) ? square.rank() == Rank.LAST && square.file() == File.KING
-              : pieceType.equals(Queen.class) ? square.rank() == Rank.LAST
-                  && square.file() == File.QUEEN
-                  : pieceType.equals(Rook.class) ? square.rank() == Rank.LAST && (
-                      square.file() == File.QUEEN_ROOK || square.file() == File.KING_ROOK)
-                      : pieceType.equals(Bishop.class) ? square.rank() == Rank.LAST && (
-                          square.file() == File.QUEEN_BISHOP || square.file() == File.KING_BISHOP)
-                          : pieceType.equals(Knight.class) ? square.rank() == Rank.LAST && (
-                              square.file() == File.QUEEN_KNIGHT
-                                  || square.file() == File.KING_KNIGHT)
-                              : pieceType.equals(Pawn.class) ? square.rank() == Rank.LAST - 1
-                                  : square.rank() == Rank.FIRST;
+          pieceType.equals(King.class) ? square.file() == File.KING && square.rank() == Rank.LAST
+              : pieceType.equals(Queen.class) ? square.file() == File.QUEEN
+                  && square.rank() == Rank.LAST : pieceType.equals(Rook.class) ?
+                  (square.file() == File.QUEEN_ROOK || square.file() == File.KING_ROOK)
+                      && square.rank() == Rank.LAST : pieceType.equals(Bishop.class) ?
+                  (square.file() == File.QUEEN_BISHOP || square.file() == File.KING_BISHOP)
+                      && square.rank() == Rank.LAST : pieceType.equals(Knight.class) ?
+                  (square.file() == File.QUEEN_KNIGHT || square.file() == File.KING_KNIGHT)
+                      && square.rank() == Rank.LAST
+                  : pieceType.equals(Pawn.class) ? square.rank() == Rank.LAST - 1
+                      : square.rank() == Rank.FIRST;
     };
   }
 
@@ -135,26 +133,26 @@ public abstract class AbstractBoard implements Board {
     return switch (colour) {
       case WHITE -> pieceType.equals(King.class) ? getSquare(File.KING, Rank.FIRST)
           : pieceType.equals(Queen.class) ? getSquare(File.QUEEN, Rank.FIRST)
-              : pieceType.equals(Rook.class) ? (square.file() + square.rank()) % 2 == 0 ? getSquare(
-                  File.QUEEN_ROOK, Rank.FIRST) : getSquare(File.KING_ROOK, Rank.FIRST)
-                  : pieceType.equals(Bishop.class) ? (square.file() + square.rank()) % 2 == 0
-                      ? getSquare(File.QUEEN_BISHOP, Rank.FIRST)
-                      : getSquare(File.KING_BISHOP, Rank.FIRST)
-                      : pieceType.equals(Knight.class) ? (square.file() + square.rank()) % 2 == 0
-                          ? getSquare(File.KING_KNIGHT, Rank.FIRST)
-                          : getSquare(File.QUEEN_KNIGHT, Rank.FIRST)
+              : pieceType.equals(Rook.class) ? (square.file() + square.rank()) % 2 != 0 ? getSquare(
+                  File.KING_ROOK, Rank.FIRST) : getSquare(File.QUEEN_ROOK, Rank.FIRST)
+                  : pieceType.equals(Bishop.class) ? (square.file() + square.rank()) % 2 != 0
+                      ? getSquare(File.KING_BISHOP, Rank.FIRST)
+                      : getSquare(File.QUEEN_BISHOP, Rank.FIRST)
+                      : pieceType.equals(Knight.class) ? (square.file() + square.rank()) % 2 != 0
+                          ? getSquare(File.QUEEN_KNIGHT, Rank.FIRST)
+                          : getSquare(File.KING_KNIGHT, Rank.FIRST)
                           : pieceType.equals(Pawn.class) ? getSquare(square.file(), Rank.FIRST + 1)
                               : getSquare(square.file(), Rank.LAST);
       case BLACK -> pieceType.equals(King.class) ? getSquare(File.KING, Rank.LAST)
           : pieceType.equals(Queen.class) ? getSquare(File.QUEEN, Rank.LAST)
-              : pieceType.equals(Rook.class) ? (square.file() + square.rank()) % 2 == 0 ? getSquare(
-                  File.KING_ROOK, Rank.LAST) : getSquare(File.QUEEN_ROOK, Rank.LAST)
-                  : pieceType.equals(Bishop.class) ? (square.file() + square.rank()) % 2 == 0
-                      ? getSquare(File.KING_BISHOP, Rank.LAST)
-                      : getSquare(File.QUEEN_BISHOP, Rank.LAST)
-                      : pieceType.equals(Knight.class) ? (square.file() + square.rank()) % 2 == 0
-                          ? getSquare(File.QUEEN_KNIGHT, Rank.LAST)
-                          : getSquare(File.KING_KNIGHT, Rank.LAST)
+              : pieceType.equals(Rook.class) ? (square.file() + square.rank()) % 2 != 0 ? getSquare(
+                  File.QUEEN_ROOK, Rank.LAST) : getSquare(File.KING_ROOK, Rank.LAST)
+                  : pieceType.equals(Bishop.class) ? (square.file() + square.rank()) % 2 != 0
+                      ? getSquare(File.QUEEN_BISHOP, Rank.LAST)
+                      : getSquare(File.KING_BISHOP, Rank.LAST)
+                      : pieceType.equals(Knight.class) ? (square.file() + square.rank()) % 2 != 0
+                          ? getSquare(File.KING_KNIGHT, Rank.LAST)
+                          : getSquare(File.QUEEN_KNIGHT, Rank.LAST)
                           : pieceType.equals(Pawn.class) ? getSquare(square.file(), Rank.LAST - 1)
                               : getSquare(square.file(), Rank.FIRST);
     };

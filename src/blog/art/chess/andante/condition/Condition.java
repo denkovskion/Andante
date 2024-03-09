@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.position;
+package blog.art.chess.andante.condition;
 
 import blog.art.chess.andante.move.AndernachMove;
 import blog.art.chess.andante.move.Capture;
@@ -35,6 +35,8 @@ import blog.art.chess.andante.move.VariantMove;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.orthodox.King;
+import blog.art.chess.andante.position.Board;
+import blog.art.chess.andante.position.Square;
 
 public enum Condition {
   ANDERNACH {
