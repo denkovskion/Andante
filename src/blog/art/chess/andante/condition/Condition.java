@@ -24,14 +24,14 @@
 
 package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.move.AndernachMove;
+import blog.art.chess.andante.move.Action;
+import blog.art.chess.andante.move.AndernachAction;
 import blog.art.chess.andante.move.Capture;
-import blog.art.chess.andante.move.CirceMove;
+import blog.art.chess.andante.move.CirceAction;
 import blog.art.chess.andante.move.EnPassant;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.move.PromotionCapture;
 import blog.art.chess.andante.move.QuietMove;
-import blog.art.chess.andante.move.VariantMove;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.orthodox.King;
@@ -41,61 +41,47 @@ import blog.art.chess.andante.position.Square;
 public enum Condition {
   ANDERNACH {
     @Override
-    public Move decorateMove(Board board, Move move) {
-      Move baseMove;
-      if (move instanceof VariantMove) {
-        baseMove = ((VariantMove) move).findBaseMove();
-      } else {
-        baseMove = move;
-      }
-      if (baseMove instanceof Capture || baseMove instanceof PromotionCapture) {
-        Piece piece = board.get(((QuietMove) baseMove).getOrigin());
+    public Action generateAction(Board board, Move move) {
+      if (move instanceof Capture || move instanceof PromotionCapture
+          || move instanceof EnPassant) {
+        Piece piece = board.get(((QuietMove) move).getOrigin());
         if (!(piece instanceof King)) {
-          Square capture = ((QuietMove) baseMove).getTarget();
-          Square change = ((QuietMove) baseMove).getTarget();
+          Square change = ((QuietMove) move).getTarget();
           Colour origin = piece.getColour();
+          Square capture;
+          if (move instanceof EnPassant) {
+            capture = ((EnPassant) move).getStop();
+          } else {
+            capture = ((QuietMove) move).getTarget();
+          }
           Colour target = board.get(capture).getColour();
-          return new AndernachMove(move, change, origin, target);
+          return new AndernachAction(change, origin, target);
         }
-      } else if (baseMove instanceof EnPassant) {
-        Piece piece = board.get(((EnPassant) baseMove).getOrigin());
-        Square capture = ((EnPassant) baseMove).getStop();
-        Square change = ((EnPassant) baseMove).getTarget();
-        Colour origin = piece.getColour();
-        Colour target = board.get(capture).getColour();
-        return new AndernachMove(move, change, origin, target);
       }
-      return move;
+      return null;
     }
   }, CIRCE {
     @Override
-    public Move decorateMove(Board board, Move move) {
-      Move baseMove;
-      if (move instanceof VariantMove) {
-        baseMove = ((VariantMove) move).findBaseMove();
-      } else {
-        baseMove = move;
-      }
-      if (baseMove instanceof Capture || baseMove instanceof PromotionCapture) {
-        Square capture = ((QuietMove) baseMove).getTarget();
+    public Action generateAction(Board board, Move move) {
+      if (move instanceof Capture || move instanceof PromotionCapture
+          || move instanceof EnPassant) {
+        Square capture;
+        if (move instanceof EnPassant) {
+          capture = ((EnPassant) move).getStop();
+        } else {
+          capture = ((QuietMove) move).getTarget();
+        }
         Piece piece = board.get(capture);
         if (!(piece instanceof King)) {
           Square rebirth = board.findRebirthSquare(capture, piece.getClass(), piece.getColour());
           if (board.get(rebirth) == null) {
-            return new CirceMove(move, capture, rebirth);
+            return new CirceAction(capture, rebirth);
           }
         }
-      } else if (baseMove instanceof EnPassant) {
-        Square capture = ((EnPassant) baseMove).getStop();
-        Piece piece = board.get(capture);
-        Square rebirth = board.findRebirthSquare(capture, piece.getClass(), piece.getColour());
-        if (board.get(rebirth) == null) {
-          return new CirceMove(move, capture, rebirth);
-        }
       }
-      return move;
+      return null;
     }
   };
 
-  public abstract Move decorateMove(Board board, Move move);
+  public abstract Action generateAction(Board board, Move move);
 }

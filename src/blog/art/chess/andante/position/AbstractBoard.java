@@ -71,22 +71,21 @@ public abstract class AbstractBoard implements Board {
 
   @Override
   public List<Direction> getDirections(int baseFileOffset, int baseRankOffset) {
-    return getAllDirections().computeIfAbsent(
-        Set.of(new DefaultDirection(baseFileOffset, baseRankOffset)), this::computeDirections);
+    return getAllDirections().computeIfAbsent(Set.of(getDirection(baseFileOffset, baseRankOffset)),
+        this::computeDirections);
   }
 
   @Override
   public List<Direction> getDirections(int base1FileOffset, int base1RankOffset,
       int base2FileOffset, int base2RankOffset) {
-    return getAllDirections().computeIfAbsent(
-        Set.of(new DefaultDirection(base1FileOffset, base1RankOffset),
-            new DefaultDirection(base2FileOffset, base2RankOffset)), this::computeDirections);
+    return getAllDirections().computeIfAbsent(Set.of(getDirection(base1FileOffset, base1RankOffset),
+        getDirection(base2FileOffset, base2RankOffset)), this::computeDirections);
   }
 
   @Override
   public List<Direction> getDirections(int... baseOffsets) {
-    return getAllDirections().computeIfAbsent(IntStream.range(0, baseOffsets.length / 2).mapToObj(
-            halfNo -> new DefaultDirection(baseOffsets[halfNo * 2], baseOffsets[halfNo * 2 + 1]))
+    return getAllDirections().computeIfAbsent(IntStream.range(0, baseOffsets.length / 2)
+        .mapToObj(halfNo -> getDirection(baseOffsets[halfNo * 2], baseOffsets[halfNo * 2 + 1]))
         .collect(Collectors.toUnmodifiableSet()), this::computeDirections);
   }
 

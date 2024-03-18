@@ -85,7 +85,7 @@ public class Position {
   public boolean isLegal(List<Move> pseudoLegalMoves) {
     return board.getOrigins().stream().noneMatch(origin -> {
       Piece piece = board.get(origin);
-      return piece.getColour() == sideToMove && !generatePseudoLegalMoves(piece, origin,
+      return piece.getColour() == sideToMove && !piece.generateMoves(board, box, state, origin,
           pseudoLegalMoves);
     });
   }
@@ -96,7 +96,8 @@ public class Position {
     toggleSideToMove();
     int nChecks = board.getOrigins().stream().filter(origin -> {
       Piece piece = board.get(origin);
-      return piece.getColour() == sideToMove && !generatePseudoLegalMoves(piece, origin, null);
+      return piece.getColour() == sideToMove && !piece.generateMoves(board, box, state, origin,
+          null);
     }).map(result -> 1).reduce(0, Integer::sum);
     toggleSideToMove();
     state = memory.pop();
@@ -110,7 +111,7 @@ public class Position {
       board.getOrigins().forEach(origin -> {
         Piece piece = board.get(origin);
         if (piece.getColour() == sideToMove) {
-          generatePseudoLegalMoves(piece, origin, pseudoLegalMoves);
+          piece.generateMoves(board, box, state, origin, pseudoLegalMoves);
         }
       });
     }
@@ -119,11 +120,6 @@ public class Position {
       move.unmake(this);
       return result;
     });
-  }
-
-  protected boolean generatePseudoLegalMoves(Piece piece, Square origin,
-      List<Move> pseudoLegalMoves) {
-    return piece.generateMoves(board, box, state, origin, pseudoLegalMoves);
   }
 
   @Override

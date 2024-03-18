@@ -42,16 +42,36 @@ public class VariantPosition extends Position {
   }
 
   @Override
-  protected boolean generatePseudoLegalMoves(Piece piece, Square origin,
-      List<Move> pseudoLegalMoves) {
-    if (pseudoLegalMoves != null) {
-      List<Move> baseMoves = new ArrayList<>();
-      boolean legal = piece.generateMoves(board, box, state, origin, baseMoves);
-      variant.decorateMoves(board, baseMoves, pseudoLegalMoves);
-      return legal;
-    } else {
-      return piece.generateMoves(board, box, state, origin, null);
+  public boolean isLegal(List<Move> pseudoLegalMoves) {
+    boolean legal = board.getOrigins().stream().noneMatch(origin -> {
+      Piece piece = board.get(origin);
+      return piece.getColour() == sideToMove && !piece.generateMoves(board, box, state, origin,
+          pseudoLegalMoves);
+    });
+    if (pseudoLegalMoves != null && legal) {
+      variant.replaceMoves(board, pseudoLegalMoves);
     }
+    return legal;
+  }
+
+  @Override
+  public boolean isTerminal(List<Move> generatedPseudoLegalMoves) {
+    List<Move> pseudoLegalMoves =
+        generatedPseudoLegalMoves != null ? generatedPseudoLegalMoves : new ArrayList<>();
+    if (generatedPseudoLegalMoves == null) {
+      board.getOrigins().forEach(origin -> {
+        Piece piece = board.get(origin);
+        if (piece.getColour() == sideToMove) {
+          piece.generateMoves(board, box, state, origin, pseudoLegalMoves);
+        }
+      });
+      variant.replaceMoves(board, pseudoLegalMoves);
+    }
+    return pseudoLegalMoves.stream().noneMatch(move -> {
+      boolean result = move.make(this, null, null, null);
+      move.unmake(this);
+      return result;
+    });
   }
 
   @Override

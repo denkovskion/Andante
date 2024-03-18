@@ -29,5 +29,5 @@ import java.util.List;
 
 public interface Variant {
 
-  void decorateMoves(Board board, List<Move> baseMoves, List<Move> moves);
+  void replaceMoves(Board board, List<Move> moves);
 }

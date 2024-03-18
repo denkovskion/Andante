@@ -25,8 +25,11 @@
 package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.condition.Condition;
+import blog.art.chess.andante.move.Action;
 import blog.art.chess.andante.move.Move;
+import blog.art.chess.andante.move.VariantMove;
 import java.util.List;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.StringJoiner;
 import java.util.TreeSet;
@@ -40,14 +43,13 @@ public class DefaultVariant implements Variant {
   }
 
   @Override
-  public void decorateMoves(Board board, List<Move> baseMoves, List<Move> moves) {
-    for (Move baseMove : baseMoves) {
-      Move move = baseMove;
-      for (Condition condition : conditions) {
-        move = condition.decorateMove(board, move);
-      }
-      moves.add(move);
-    }
+  public void replaceMoves(Board board, List<Move> moves) {
+    moves.replaceAll(move -> {
+      List<Action> actions = conditions.stream()
+          .map(condition -> condition.generateAction(board, move)).filter(Objects::nonNull)
+          .toList();
+      return actions.isEmpty() ? move : new VariantMove(move, actions);
+    });
   }
 
   @Override

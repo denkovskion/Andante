@@ -34,12 +34,12 @@ public record MailboxDirection(int offset) implements Direction {
 
   @Override
   public int fileOffset() {
-    throw new IllegalStateException();
+    return offset / 10;
   }
 
   @Override
   public int rankOffset() {
-    throw new IllegalStateException();
+    return offset % 10;
   }
 
   @Override

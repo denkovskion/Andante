@@ -31,52 +31,43 @@ import blog.art.chess.andante.position.Square;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class AndernachMove extends VariantMove {
+public class CirceAction implements Action {
 
-  private final Square change;
-  private final Colour origin;
-  private final Colour target;
+  private final Square capture;
+  private final Square rebirth;
 
-  public AndernachMove(Move move, Square change, Colour origin, Colour target) {
-    super(move);
-    this.change = change;
-    this.origin = origin;
-    this.target = target;
+  public CirceAction(Square capture, Square rebirth) {
+    this.capture = capture;
+    this.rebirth = rebirth;
   }
 
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    move.preWrite(position, lanBuilder, locale);
-    lanBuilder.append("(").append(target.getCode(locale)).append(")");
+    lanBuilder.append("(").append(position.getBoard().get(capture).getCode(locale))
+        .append(position.getBoard().toCode(rebirth)).append(")");
   }
 
   @Override
-  protected void updatePieces(Position position) {
-    move.updatePieces(position);
-    position.getBoard().get(change).setColour(target);
+  public void updatePieces(Position position) {
+    position.getBoard().put(rebirth, position.getTable().pop());
   }
 
   @Override
-  protected void revertPieces(Position position) {
-    position.getBoard().get(change).setColour(origin);
-    move.revertPieces(position);
+  public void revertPieces(Position position) {
+    position.getTable().push(position.getBoard().remove(rebirth));
   }
 
   @Override
-  protected void updateState(Position position) {
-    move.updateState(position);
-    if ((position.getBoard().isRebirthSquare(change, Rook.class, Colour.WHITE)
-        || position.getBoard().isRebirthSquare(change, Rook.class, Colour.BLACK))
-        && position.getBoard().isRebirthSquare(change, position.getBoard().get(change).getClass(),
-        position.getBoard().get(change).getColour())) {
-      position.getState().removeNoCastling(change);
+  public void updateState(Position position) {
+    if (position.getBoard().isRebirthSquare(rebirth, Rook.class, Colour.WHITE)
+        || position.getBoard().isRebirthSquare(rebirth, Rook.class, Colour.BLACK)) {
+      position.getState().removeNoCastling(rebirth);
     }
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", AndernachMove.class.getSimpleName() + "[", "]").add(
-            "move=" + move).add("change=" + change).add("origin=" + origin).add("target=" + target)
-        .toString();
+    return new StringJoiner(", ", CirceAction.class.getSimpleName() + "[", "]").add(
+        "capture=" + capture).add("rebirth=" + rebirth).toString();
   }
 }

@@ -24,55 +24,58 @@
 
 package blog.art.chess.andante.move;
 
-import blog.art.chess.andante.piece.Colour;
-import blog.art.chess.andante.piece.orthodox.Rook;
 import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.Square;
+import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class CirceMove extends VariantMove {
+public class MoveDecorator extends Move {
 
-  private final Square capture;
-  private final Square rebirth;
+  protected final Move move;
 
-  public CirceMove(Move move, Square capture, Square rebirth) {
-    super(move);
-    this.capture = capture;
-    this.rebirth = rebirth;
+  public MoveDecorator(Move move) {
+    this.move = move;
   }
 
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     move.preWrite(position, lanBuilder, locale);
-    lanBuilder.append("(").append(position.getBoard().get(capture).getCode(locale))
-        .append(position.getBoard().toCode(rebirth)).append(")");
+  }
+
+  @Override
+  public void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
+      StringBuilder lanBuilder) {
+    move.postWrite(position, generatedPseudoLegalMoves, lanBuilder);
+  }
+
+  @Override
+  protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
+    return move.preMake(position, lanBuilder, locale);
   }
 
   @Override
   protected void updatePieces(Position position) {
     move.updatePieces(position);
-    position.getBoard().put(rebirth, position.getTable().pop());
   }
 
   @Override
   protected void revertPieces(Position position) {
-    position.getTable().push(position.getBoard().remove(rebirth));
     move.revertPieces(position);
   }
 
   @Override
   protected void updateState(Position position) {
     move.updateState(position);
-    if (position.getBoard().isRebirthSquare(rebirth, Rook.class, Colour.WHITE)
-        || position.getBoard().isRebirthSquare(rebirth, Rook.class, Colour.BLACK)) {
-      position.getState().removeNoCastling(rebirth);
-    }
+  }
+
+  @Override
+  protected void revertState(Position position) {
+    move.revertState(position);
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", CirceMove.class.getSimpleName() + "[", "]").add("move=" + move)
-        .add("capture=" + capture).add("rebirth=" + rebirth).toString();
+    return new StringJoiner(", ", MoveDecorator.class.getSimpleName() + "[", "]").add(
+        "move=" + move).toString();
   }
 }

@@ -25,54 +25,15 @@
 package blog.art.chess.andante.move;
 
 import blog.art.chess.andante.position.Position;
-import java.util.List;
 import java.util.Locale;
-import java.util.StringJoiner;
 
-public class VariantMove extends MoveDecorator {
+public interface Action {
 
-  private final List<Action> actions;
+  void preWrite(Position position, StringBuilder lanBuilder, Locale locale);
 
-  public VariantMove(Move move, List<Action> actions) {
-    super(move);
-    this.actions = actions;
-  }
+  void updatePieces(Position position);
 
-  @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    move.preWrite(position, lanBuilder, locale);
-    for (Action action : actions) {
-      action.preWrite(position, lanBuilder, locale);
-    }
-  }
+  void revertPieces(Position position);
 
-  @Override
-  protected void updatePieces(Position position) {
-    move.updatePieces(position);
-    for (Action action : actions) {
-      action.updatePieces(position);
-    }
-  }
-
-  @Override
-  protected void revertPieces(Position position) {
-    for (Action action : actions) {
-      action.revertPieces(position);
-    }
-    move.revertPieces(position);
-  }
-
-  @Override
-  protected void updateState(Position position) {
-    move.updateState(position);
-    for (Action action : actions) {
-      action.updateState(position);
-    }
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", VariantMove.class.getSimpleName() + "[", "]").add("move=" + move)
-        .add("actions=" + actions).toString();
-  }
+  void updateState(Position position);
 }
