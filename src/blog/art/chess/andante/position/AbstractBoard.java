@@ -32,13 +32,13 @@ import blog.art.chess.andante.piece.orthodox.Knight;
 import blog.art.chess.andante.piece.orthodox.Pawn;
 import blog.art.chess.andante.piece.orthodox.Queen;
 import blog.art.chess.andante.piece.orthodox.Rook;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.StringJoiner;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.TreeSet;
 
 public abstract class AbstractBoard implements Board {
 
@@ -84,17 +84,24 @@ public abstract class AbstractBoard implements Board {
 
   @Override
   public List<Direction> getDirections(int... baseOffsets) {
-    return getAllDirections().computeIfAbsent(IntStream.range(0, baseOffsets.length / 2)
-        .mapToObj(halfNo -> getDirection(baseOffsets[halfNo * 2], baseOffsets[halfNo * 2 + 1]))
-        .collect(Collectors.toUnmodifiableSet()), this::computeDirections);
+    List<Direction> bases = new ArrayList<>();
+    for (int halfNo = 0; halfNo < baseOffsets.length / 2; halfNo++) {
+      bases.add(getDirection(baseOffsets[halfNo * 2], baseOffsets[halfNo * 2 + 1]));
+    }
+    return getAllDirections().computeIfAbsent(Set.copyOf(bases), this::computeDirections);
   }
 
   private List<Direction> computeDirections(Set<Direction> bases) {
-    return bases.stream().flatMap(
-        direction -> Stream.of(-direction.fileOffset(), direction.fileOffset()).flatMap(
-            fileOffset -> Stream.of(-direction.rankOffset(), direction.rankOffset()).flatMap(
-                rankOffset -> Stream.of(getDirection(fileOffset, rankOffset),
-                    getDirection(rankOffset, fileOffset))))).distinct().sorted().toList();
+    SortedSet<Direction> directions = new TreeSet<>();
+    for (Direction base : bases) {
+      for (int fileOffset : new int[]{-base.fileOffset(), base.fileOffset()}) {
+        for (int rankOffset : new int[]{-base.rankOffset(), base.rankOffset()}) {
+          directions.add(getDirection(fileOffset, rankOffset));
+          directions.add(getDirection(rankOffset, fileOffset));
+        }
+      }
+    }
+    return List.copyOf(directions);
   }
 
   @Override

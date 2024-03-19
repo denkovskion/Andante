@@ -26,7 +26,7 @@ package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.piece.Piece;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +34,10 @@ import java.util.Set;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 public class MailboxBoard extends AbstractBoard {
 
-  private final List<Piece> pieces = Stream.generate(() -> (Piece) null).limit(120)
-      .collect(Collectors.toCollection(ArrayList::new));
+  private final List<Piece> pieces = new ArrayList<>(Collections.nCopies(120, null));
 
   private static final List<Square> squares = IntStream.range(0, 120).mapToObj(number -> {
     Square square = new MailboxSquare(number);
@@ -70,8 +68,13 @@ public class MailboxBoard extends AbstractBoard {
 
   @Override
   public List<Square> getOrigins() {
-    return Arrays.stream(numbers).filter(number -> pieces.get(number) != null)
-        .mapToObj(squares::get).toList();
+    List<Square> origins = new ArrayList<>();
+    for (int number : numbers) {
+      if (pieces.get(number) != null) {
+        origins.add(squares.get(number));
+      }
+    }
+    return origins;
   }
 
   @Override

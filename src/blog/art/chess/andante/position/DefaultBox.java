@@ -26,6 +26,7 @@ package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -58,7 +59,13 @@ public class DefaultBox implements Box {
 
   @Override
   public List<Section> getSections(Colour colour) {
-    return pieces.keySet().stream().filter(entry -> entry.colour() == colour).toList();
+    List<Section> sections = new ArrayList<>();
+    for (Section section : pieces.keySet()) {
+      if (section.colour() == colour) {
+        sections.add(section);
+      }
+    }
+    return sections;
   }
 
   @Override

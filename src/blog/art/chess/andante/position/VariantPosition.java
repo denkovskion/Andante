@@ -43,15 +43,18 @@ public class VariantPosition extends Position {
 
   @Override
   public boolean isLegal(List<Move> pseudoLegalMoves) {
-    boolean legal = board.getOrigins().stream().noneMatch(origin -> {
+    for (Square origin : board.getOrigins()) {
       Piece piece = board.get(origin);
-      return piece.getColour() == sideToMove && !piece.generateMoves(board, box, state, origin,
-          pseudoLegalMoves);
-    });
-    if (pseudoLegalMoves != null && legal) {
+      if (piece.getColour() == sideToMove) {
+        if (!piece.generateMoves(board, box, state, origin, pseudoLegalMoves)) {
+          return false;
+        }
+      }
+    }
+    if (pseudoLegalMoves != null) {
       variant.replaceMoves(board, pseudoLegalMoves);
     }
-    return legal;
+    return true;
   }
 
   @Override
@@ -59,19 +62,22 @@ public class VariantPosition extends Position {
     List<Move> pseudoLegalMoves =
         generatedPseudoLegalMoves != null ? generatedPseudoLegalMoves : new ArrayList<>();
     if (generatedPseudoLegalMoves == null) {
-      board.getOrigins().forEach(origin -> {
+      for (Square origin : board.getOrigins()) {
         Piece piece = board.get(origin);
         if (piece.getColour() == sideToMove) {
           piece.generateMoves(board, box, state, origin, pseudoLegalMoves);
         }
-      });
+      }
       variant.replaceMoves(board, pseudoLegalMoves);
     }
-    return pseudoLegalMoves.stream().noneMatch(move -> {
+    for (Move move : pseudoLegalMoves) {
       boolean result = move.make(this, null, null, null);
       move.unmake(this);
-      return result;
-    });
+      if (result) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

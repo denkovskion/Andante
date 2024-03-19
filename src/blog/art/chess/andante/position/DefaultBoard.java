@@ -25,6 +25,7 @@
 package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.piece.Piece;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,7 @@ public class DefaultBoard extends AbstractBoard {
 
   @Override
   public List<Square> getOrigins() {
-    return List.copyOf(pieces.keySet());
+    return new ArrayList<>(pieces.keySet());
   }
 
   @Override

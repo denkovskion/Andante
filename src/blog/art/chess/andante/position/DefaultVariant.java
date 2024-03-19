@@ -28,8 +28,9 @@ import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.move.Action;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.move.VariantMove;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.ListIterator;
 import java.util.SortedSet;
 import java.util.StringJoiner;
 import java.util.TreeSet;
@@ -44,12 +45,19 @@ public class DefaultVariant implements Variant {
 
   @Override
   public void replaceMoves(Board board, List<Move> moves) {
-    moves.replaceAll(move -> {
-      List<Action> actions = conditions.stream()
-          .map(condition -> condition.generateAction(board, move)).filter(Objects::nonNull)
-          .toList();
-      return actions.isEmpty() ? move : new VariantMove(move, actions);
-    });
+    for (ListIterator<Move> iMove = moves.listIterator(); iMove.hasNext(); ) {
+      Move move = iMove.next();
+      List<Action> actions = new ArrayList<>();
+      for (Condition condition : conditions) {
+        Action action = condition.generateAction(board, move);
+        if (action != null) {
+          actions.add(action);
+        }
+      }
+      if (!actions.isEmpty()) {
+        iMove.set(new VariantMove(move, actions));
+      }
+    }
   }
 
   @Override
