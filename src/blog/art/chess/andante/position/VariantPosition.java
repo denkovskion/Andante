@@ -24,21 +24,27 @@
 
 package blog.art.chess.andante.position;
 
+import blog.art.chess.andante.condition.Condition;
+import blog.art.chess.andante.move.Action;
 import blog.art.chess.andante.move.Move;
+import blog.art.chess.andante.move.VariantMove;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.SortedSet;
 import java.util.StringJoiner;
+import java.util.TreeSet;
 
 public class VariantPosition extends Position {
 
-  private final Variant variant;
+  private final SortedSet<Condition> conditions;
 
   public VariantPosition(Board board, Box box, Table table, Colour sideToMove, State state,
-      Memory memory, Variant variant) {
+      Memory memory, Condition... conditions) {
     super(board, box, table, sideToMove, state, memory);
-    this.variant = variant;
+    this.conditions = new TreeSet<>(List.of(conditions));
   }
 
   @Override
@@ -52,7 +58,7 @@ public class VariantPosition extends Position {
       }
     }
     if (pseudoLegalMoves != null) {
-      variant.replaceMoves(board, pseudoLegalMoves);
+      replaceMoves(pseudoLegalMoves);
     }
     return true;
   }
@@ -68,7 +74,7 @@ public class VariantPosition extends Position {
           piece.generateMoves(board, box, state, origin, pseudoLegalMoves);
         }
       }
-      variant.replaceMoves(board, pseudoLegalMoves);
+      replaceMoves(pseudoLegalMoves);
     }
     for (Move move : pseudoLegalMoves) {
       boolean result = move.make(this, null, null, null);
@@ -80,10 +86,23 @@ public class VariantPosition extends Position {
     return true;
   }
 
+  private void replaceMoves(List<Move> moves) {
+    for (ListIterator<Move> iMove = moves.listIterator(); iMove.hasNext(); ) {
+      Move move = iMove.next();
+      List<Action> actions = new ArrayList<>();
+      for (Condition condition : conditions) {
+        condition.generateAction(board, move, actions);
+      }
+      if (!actions.isEmpty()) {
+        iMove.set(new VariantMove(move, actions));
+      }
+    }
+  }
+
   @Override
   public String toString() {
     return new StringJoiner(", ", VariantPosition.class.getSimpleName() + "[", "]").add(
             "board=" + board).add("box=" + box).add("table=" + table).add("sideToMove=" + sideToMove)
-        .add("state=" + state).add("memory=" + memory).add("variant=" + variant).toString();
+        .add("state=" + state).add("memory=" + memory).add("conditions=" + conditions).toString();
   }
 }

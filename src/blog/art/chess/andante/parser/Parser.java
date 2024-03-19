@@ -42,13 +42,11 @@ import blog.art.chess.andante.position.DefaultBox;
 import blog.art.chess.andante.position.DefaultMemory;
 import blog.art.chess.andante.position.DefaultState;
 import blog.art.chess.andante.position.DefaultTable;
-import blog.art.chess.andante.position.DefaultVariant;
 import blog.art.chess.andante.position.MailboxBoard;
 import blog.art.chess.andante.position.Memory;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.State;
 import blog.art.chess.andante.position.Table;
-import blog.art.chess.andante.position.Variant;
 import blog.art.chess.andante.position.VariantPosition;
 import blog.art.chess.andante.problem.Aim;
 import blog.art.chess.andante.problem.AnalysisOptions;
@@ -558,10 +556,9 @@ public class Parser {
             specification.getConditions().isAndernachChess() ? Condition.ANDERNACH : null,
             specification.getConditions().isCirce() ? Condition.CIRCE : null).filter(Objects::nonNull)
         .toArray(Condition[]::new);
-    Variant variant = new DefaultVariant(conditions);
     Position position =
         specification.getConditions().isAndernachChess() || specification.getConditions().isCirce()
-            ? new VariantPosition(board, box, table, sideToMove, state, memory, variant)
+            ? new VariantPosition(board, box, table, sideToMove, state, memory, conditions)
             : new Position(board, box, table, sideToMove, state, memory);
     Aim aim = specification.getStipulation().goal() == null ? null
         : switch (specification.getStipulation().goal()) {

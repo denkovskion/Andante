@@ -37,11 +37,12 @@ import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.orthodox.King;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Square;
+import java.util.List;
 
 public enum Condition {
   ANDERNACH {
     @Override
-    public Action generateAction(Board board, Move move) {
+    public void generateAction(Board board, Move move, List<Action> actions) {
       if (move instanceof Capture || move instanceof PromotionCapture
           || move instanceof EnPassant) {
         Piece piece = board.get(((QuietMove) move).getOrigin());
@@ -55,14 +56,13 @@ public enum Condition {
             capture = ((QuietMove) move).getTarget();
           }
           Colour target = board.get(capture).getColour();
-          return new AndernachAction(change, origin, target);
+          actions.add(new AndernachAction(change, origin, target));
         }
       }
-      return null;
     }
   }, CIRCE {
     @Override
-    public Action generateAction(Board board, Move move) {
+    public void generateAction(Board board, Move move, List<Action> actions) {
       if (move instanceof Capture || move instanceof PromotionCapture
           || move instanceof EnPassant) {
         Square capture;
@@ -75,13 +75,12 @@ public enum Condition {
         if (!(piece instanceof King)) {
           Square rebirth = board.findRebirthSquare(capture, piece.getClass(), piece.getColour());
           if (board.get(rebirth) == null) {
-            return new CirceAction(capture, rebirth);
+            actions.add(new CirceAction(capture, rebirth));
           }
         }
       }
-      return null;
     }
   };
 
-  public abstract Action generateAction(Board board, Move move);
+  public abstract void generateAction(Board board, Move move, List<Action> actions);
 }
