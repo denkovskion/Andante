@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.move;
 
+import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.position.Position;
 import java.util.List;
 import java.util.Locale;
@@ -65,6 +66,10 @@ public class NullMove extends Move {
   protected void revertState(Position position) {
     position.toggleSideToMove();
     position.setState(position.getMemory().pop());
+  }
+
+  @Override
+  public void accept(Condition condition, Position position, List<Action> actions) {
   }
 
   @Override

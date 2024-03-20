@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.move;
 
+import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.position.Position;
 import java.util.List;
 import java.util.Locale;
@@ -65,6 +66,8 @@ public abstract class Move {
   protected abstract void updateState(Position position);
 
   protected abstract void revertState(Position position);
+
+  public abstract void accept(Condition condition, Position position, List<Action> actions);
 
   @Override
   public String toString() {

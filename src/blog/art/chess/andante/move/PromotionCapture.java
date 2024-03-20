@@ -24,9 +24,11 @@
 
 package blog.art.chess.andante.move;
 
+import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
+import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
@@ -56,6 +58,11 @@ public class PromotionCapture extends Promotion {
     position.getBox().push(section, position.getBoard().remove(target));
     position.getBoard().put(target, position.getTable().pop());
     position.getBoard().put(origin, position.getTable().pop());
+  }
+
+  @Override
+  public void accept(Condition condition, Position position, List<Action> actions) {
+    condition.visit(this, position.getBoard(), actions);
   }
 
   @Override

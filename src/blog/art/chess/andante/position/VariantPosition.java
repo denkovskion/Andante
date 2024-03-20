@@ -91,7 +91,7 @@ public class VariantPosition extends Position {
       Move move = iMove.next();
       List<Action> actions = new ArrayList<>();
       for (Condition condition : conditions) {
-        condition.generateAction(board, move, actions);
+        move.accept(condition, this, actions);
       }
       if (!actions.isEmpty()) {
         iMove.set(new VariantMove(move, actions));

@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.move;
 
+import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.position.Position;
 import java.util.List;
 import java.util.Locale;
@@ -71,6 +72,11 @@ public class MoveDecorator extends Move {
   @Override
   protected void revertState(Position position) {
     move.revertState(position);
+  }
+
+  @Override
+  public void accept(Condition condition, Position position, List<Action> actions) {
+    move.accept(condition, position, actions);
   }
 
   @Override
