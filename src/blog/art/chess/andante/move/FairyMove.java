@@ -24,64 +24,52 @@
 
 package blog.art.chess.andante.move;
 
-import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.position.Position;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class MoveDecorator extends Move {
+public abstract class FairyMove extends NullMove {
 
-  protected final Move move;
+  protected final List<Action> actions = new ArrayList<>();
 
-  public MoveDecorator(Move move) {
-    this.move = move;
+  public List<Action> getActions() {
+    return actions;
   }
 
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    move.preWrite(position, lanBuilder, locale);
+    writePieces(position, lanBuilder, locale);
+    writeActions(position, lanBuilder, locale);
+  }
+
+  protected abstract void writePieces(Position position, StringBuilder lanBuilder, Locale locale);
+
+  private void writeActions(Position position, StringBuilder lanBuilder, Locale locale) {
+    for (Action action : actions) {
+      action.preWrite(position, lanBuilder, locale);
+    }
   }
 
   @Override
-  public void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
-      StringBuilder lanBuilder) {
-    move.postWrite(position, generatedPseudoLegalMoves, lanBuilder);
+  protected void makeActions(Position position) {
+    for (Action action : actions) {
+      action.updatePieces(position);
+      action.updateState(position);
+    }
   }
 
   @Override
-  protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
-    return move.preMake(position, lanBuilder, locale);
-  }
-
-  @Override
-  protected void updatePieces(Position position) {
-    move.updatePieces(position);
-  }
-
-  @Override
-  protected void revertPieces(Position position) {
-    move.revertPieces(position);
-  }
-
-  @Override
-  protected void updateState(Position position) {
-    move.updateState(position);
-  }
-
-  @Override
-  protected void revertState(Position position) {
-    move.revertState(position);
-  }
-
-  @Override
-  public void accept(Condition condition, Position position, List<Action> actions) {
-    move.accept(condition, position, actions);
+  protected void unmakeActions(Position position) {
+    for (Action action : actions) {
+      action.revertPieces(position);
+    }
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", MoveDecorator.class.getSimpleName() + "[", "]").add(
-        "move=" + move).toString();
+    return new StringJoiner(", ", FairyMove.class.getSimpleName() + "[", "]").add(
+        "actions=" + actions).toString();
   }
 }

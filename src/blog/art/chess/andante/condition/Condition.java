@@ -39,18 +39,20 @@ import java.util.List;
 public enum Condition {
   ANDERNACH {
     @Override
-    public void visit(Capture move, Board board, List<Action> actions) {
-      generateAction(move.getOrigin(), move.getTarget(), move.getTarget(), board, actions);
+    public void visit(Capture move, Board board) {
+      generateAction(move.getOrigin(), move.getTarget(), move.getTarget(), board,
+          move.getActions());
     }
 
     @Override
-    public void visit(PromotionCapture move, Board board, List<Action> actions) {
-      generateAction(move.getOrigin(), move.getTarget(), move.getTarget(), board, actions);
+    public void visit(PromotionCapture move, Board board) {
+      generateAction(move.getOrigin(), move.getTarget(), move.getTarget(), board,
+          move.getActions());
     }
 
     @Override
-    public void visit(EnPassant move, Board board, List<Action> actions) {
-      generateAction(move.getOrigin(), move.getTarget(), move.getStop(), board, actions);
+    public void visit(EnPassant move, Board board) {
+      generateAction(move.getOrigin(), move.getTarget(), move.getStop(), board, move.getActions());
     }
 
     private void generateAction(Square origin, Square target, Square capture, Board board,
@@ -63,18 +65,18 @@ public enum Condition {
     }
   }, CIRCE {
     @Override
-    public void visit(Capture move, Board board, List<Action> actions) {
-      generateAction(move.getTarget(), board, actions);
+    public void visit(Capture move, Board board) {
+      generateAction(move.getTarget(), board, move.getActions());
     }
 
     @Override
-    public void visit(PromotionCapture move, Board board, List<Action> actions) {
-      generateAction(move.getTarget(), board, actions);
+    public void visit(PromotionCapture move, Board board) {
+      generateAction(move.getTarget(), board, move.getActions());
     }
 
     @Override
-    public void visit(EnPassant move, Board board, List<Action> actions) {
-      generateAction(move.getStop(), board, actions);
+    public void visit(EnPassant move, Board board) {
+      generateAction(move.getStop(), board, move.getActions());
     }
 
     private void generateAction(Square capture, Board board, List<Action> actions) {
@@ -88,9 +90,9 @@ public enum Condition {
     }
   };
 
-  public abstract void visit(Capture move, Board board, List<Action> actions);
+  public abstract void visit(Capture move, Board board);
 
-  public abstract void visit(PromotionCapture move, Board board, List<Action> actions);
+  public abstract void visit(PromotionCapture move, Board board);
 
-  public abstract void visit(EnPassant move, Board board, List<Action> actions);
+  public abstract void visit(EnPassant move, Board board);
 }

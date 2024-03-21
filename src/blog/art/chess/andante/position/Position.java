@@ -24,12 +24,15 @@
 
 package blog.art.chess.andante.position;
 
+import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.StringJoiner;
+import java.util.TreeSet;
 
 public class Position {
 
@@ -39,15 +42,17 @@ public class Position {
   protected Colour sideToMove;
   protected State state;
   protected final Memory memory;
+  private final SortedSet<Condition> conditions;
 
-  public Position(Board board, Box box, Table table, Colour sideToMove, State state,
-      Memory memory) {
+  public Position(Board board, Box box, Table table, Colour sideToMove, State state, Memory memory,
+      Condition... conditions) {
     this.board = board;
     this.box = box;
     this.table = table;
     this.sideToMove = sideToMove;
     this.state = state;
     this.memory = memory;
+    this.conditions = new TreeSet<>(List.of(conditions));
   }
 
   public Board getBoard() {
@@ -82,6 +87,10 @@ public class Position {
     return memory;
   }
 
+  public SortedSet<Condition> getConditions() {
+    return conditions;
+  }
+
   public boolean isLegal(List<Move> pseudoLegalMoves) {
     for (Square origin : board.getOrigins()) {
       Piece piece = board.get(origin);
@@ -89,6 +98,11 @@ public class Position {
         if (!piece.generateMoves(board, box, state, origin, pseudoLegalMoves)) {
           return false;
         }
+      }
+    }
+    if (pseudoLegalMoves != null) {
+      for (Move move : pseudoLegalMoves) {
+        move.accept(this);
       }
     }
     return true;
@@ -122,6 +136,9 @@ public class Position {
           piece.generateMoves(board, box, state, origin, pseudoLegalMoves);
         }
       }
+      for (Move move : pseudoLegalMoves) {
+        move.accept(this);
+      }
     }
     for (Move move : pseudoLegalMoves) {
       boolean result = move.make(this, null, null, null);
@@ -137,6 +154,6 @@ public class Position {
   public String toString() {
     return new StringJoiner(", ", Position.class.getSimpleName() + "[", "]").add("board=" + board)
         .add("box=" + box).add("table=" + table).add("sideToMove=" + sideToMove)
-        .add("state=" + state).add("memory=" + memory).toString();
+        .add("state=" + state).add("memory=" + memory).add("conditions=" + conditions).toString();
   }
 }

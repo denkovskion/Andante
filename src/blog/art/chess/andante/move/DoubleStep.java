@@ -48,7 +48,7 @@ public class DoubleStep extends QuietMove {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", DoubleStep.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).add("stop=" + stop).toString();
+    return new StringJoiner(", ", DoubleStep.class.getSimpleName() + "[", "]").add("stop=" + stop)
+        .add("origin=" + origin).add("target=" + target).add("actions=" + actions).toString();
   }
 }

@@ -27,7 +27,6 @@ package blog.art.chess.andante.move;
 import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Square;
-import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
@@ -38,7 +37,14 @@ public class Capture extends QuietMove {
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
+  public void accept(Position position) {
+    for (Condition condition : position.getConditions()) {
+      condition.visit(this, position.getBoard());
+    }
+  }
+
+  @Override
+  protected void writePieces(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))
         .append(position.getBoard().toCode(origin)).append("x")
         .append(position.getBoard().toCode(target));
@@ -57,13 +63,8 @@ public class Capture extends QuietMove {
   }
 
   @Override
-  public void accept(Condition condition, Position position, List<Action> actions) {
-    condition.visit(this, position.getBoard(), actions);
-  }
-
-  @Override
   public String toString() {
     return new StringJoiner(", ", Capture.class.getSimpleName() + "[", "]").add("origin=" + origin)
-        .add("target=" + target).toString();
+        .add("target=" + target).add("actions=" + actions).toString();
   }
 }

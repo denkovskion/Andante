@@ -36,14 +36,14 @@ public class LongCastling extends Castling {
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
+  protected void writePieces(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append("0-0-0");
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", LongCastling.class.getSimpleName() + "[", "]").add(
-            "origin=" + origin).add("target=" + target).add("origin2=" + origin2)
-        .add("target2=" + target2).toString();
+            "origin2=" + origin2).add("target2=" + target2).add("origin=" + origin)
+        .add("target=" + target).add("actions=" + actions).toString();
   }
 }

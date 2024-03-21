@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class QuietMove extends NullMove {
+public class QuietMove extends FairyMove {
 
   protected final Square origin;
   protected final Square target;
@@ -52,7 +52,7 @@ public class QuietMove extends NullMove {
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
+  protected void writePieces(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))
         .append(position.getBoard().toCode(origin)).append("-")
         .append(position.getBoard().toCode(target));
@@ -115,6 +115,6 @@ public class QuietMove extends NullMove {
   @Override
   public String toString() {
     return new StringJoiner(", ", QuietMove.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).toString();
+        "origin=" + origin).add("target=" + target).add("actions=" + actions).toString();
   }
 }

@@ -79,7 +79,8 @@ public abstract class Castling extends QuietMove {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", Castling.class.getSimpleName() + "[", "]").add("origin=" + origin)
-        .add("target=" + target).add("origin2=" + origin2).add("target2=" + target2).toString();
+    return new StringJoiner(", ", Castling.class.getSimpleName() + "[", "]").add(
+            "origin2=" + origin2).add("target2=" + target2).add("origin=" + origin)
+        .add("target=" + target).add("actions=" + actions).toString();
   }
 }

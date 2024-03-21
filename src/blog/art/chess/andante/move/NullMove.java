@@ -24,13 +24,16 @@
 
 package blog.art.chess.andante.move;
 
-import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.position.Position;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
 public class NullMove extends Move {
+
+  @Override
+  public void accept(Position position) {
+  }
 
   @Override
   protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
@@ -69,7 +72,11 @@ public class NullMove extends Move {
   }
 
   @Override
-  public void accept(Condition condition, Position position, List<Action> actions) {
+  protected void makeActions(Position position) {
+  }
+
+  @Override
+  protected void unmakeActions(Position position) {
   }
 
   @Override

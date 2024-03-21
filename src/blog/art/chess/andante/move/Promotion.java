@@ -44,7 +44,7 @@ public class Promotion extends QuietMove {
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
+  protected void writePieces(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))
         .append(position.getBoard().toCode(origin)).append("-")
         .append(position.getBoard().toCode(target)).append("=")
@@ -66,6 +66,7 @@ public class Promotion extends QuietMove {
   @Override
   public String toString() {
     return new StringJoiner(", ", Promotion.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).add("section=" + section).toString();
+            "section=" + section).add("origin=" + origin).add("target=" + target)
+        .add("actions=" + actions).toString();
   }
 }

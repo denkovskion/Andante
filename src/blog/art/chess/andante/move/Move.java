@@ -24,7 +24,6 @@
 
 package blog.art.chess.andante.move;
 
-import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.position.Position;
 import java.util.List;
 import java.util.Locale;
@@ -32,14 +31,17 @@ import java.util.StringJoiner;
 
 public abstract class Move {
 
-  public boolean make(Position position, List<Move> pseudoLegalMoves, StringBuilder lanBuilder,
-      Locale locale) {
+  public abstract void accept(Position position);
+
+  public final boolean make(Position position, List<Move> pseudoLegalMoves,
+      StringBuilder lanBuilder, Locale locale) {
     if (lanBuilder != null) {
       preWrite(position, lanBuilder, locale);
     }
     boolean result = preMake(position, lanBuilder, locale);
     updatePieces(position);
     updateState(position);
+    makeActions(position);
     result = position.isLegal(pseudoLegalMoves) && result;
     if (lanBuilder != null) {
       postWrite(position, pseudoLegalMoves, lanBuilder);
@@ -47,7 +49,8 @@ public abstract class Move {
     return result;
   }
 
-  public void unmake(Position position) {
+  public final void unmake(Position position) {
+    unmakeActions(position);
     revertState(position);
     revertPieces(position);
   }
@@ -67,7 +70,9 @@ public abstract class Move {
 
   protected abstract void revertState(Position position);
 
-  public abstract void accept(Condition condition, Position position, List<Action> actions);
+  protected abstract void makeActions(Position position);
+
+  protected abstract void unmakeActions(Position position);
 
   @Override
   public String toString() {
