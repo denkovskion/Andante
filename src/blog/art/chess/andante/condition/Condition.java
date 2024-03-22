@@ -80,24 +80,24 @@ public enum Condition {
   }, CIRCE {
     @Override
     public void generateAction(Board board, Capture move) {
-      generateAction(board, move.getTarget(), move.getActions());
+      generateAction(board, move.getOrigin(), move.getTarget(), move.getActions());
     }
 
     @Override
     public void generateAction(Board board, PromotionCapture move) {
-      generateAction(board, move.getTarget(), move.getActions());
+      generateAction(board, move.getOrigin(), move.getTarget(), move.getActions());
     }
 
     @Override
     public void generateAction(Board board, EnPassant move) {
-      generateAction(board, move.getStop(), move.getActions());
+      generateAction(board, move.getOrigin(), move.getStop(), move.getActions());
     }
 
-    private void generateAction(Board board, Square capture, List<Action> actions) {
+    private void generateAction(Board board, Square origin, Square capture, List<Action> actions) {
       Piece piece = board.get(capture);
       if (!(piece instanceof King)) {
         Square rebirth = board.findRebirthSquare(capture, piece.getClass(), piece.getColour());
-        if (board.get(rebirth) == null) {
+        if (board.get(rebirth) == null || rebirth.equals(origin)) {
           actions.add(new CirceAction(capture, rebirth));
         }
       }
