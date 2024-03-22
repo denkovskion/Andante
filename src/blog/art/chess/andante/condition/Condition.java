@@ -30,6 +30,8 @@ import blog.art.chess.andante.move.Capture;
 import blog.art.chess.andante.move.CirceAction;
 import blog.art.chess.andante.move.EnPassant;
 import blog.art.chess.andante.move.PromotionCapture;
+import blog.art.chess.andante.move.QuietMove;
+import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.orthodox.King;
 import blog.art.chess.andante.position.Board;
@@ -39,47 +41,59 @@ import java.util.List;
 public enum Condition {
   ANDERNACH {
     @Override
-    public void visit(Capture move, Board board) {
-      generateAction(move.getOrigin(), move.getTarget(), move.getTarget(), board,
-          move.getActions());
+    public void generateAction(Board board, Capture move) {
+      generateAction(board, move.getOrigin(), move.getTarget(), move.getActions());
     }
 
     @Override
-    public void visit(PromotionCapture move, Board board) {
-      generateAction(move.getOrigin(), move.getTarget(), move.getTarget(), board,
-          move.getActions());
+    public void generateAction(Board board, PromotionCapture move) {
+      generateAction(board, move.getOrigin(), move.getTarget(), move.getActions());
     }
 
     @Override
-    public void visit(EnPassant move, Board board) {
-      generateAction(move.getOrigin(), move.getTarget(), move.getStop(), board, move.getActions());
+    public void generateAction(Board board, EnPassant move) {
+      generateAction(board, move.getOrigin(), move.getTarget(), move.getActions());
     }
 
-    private void generateAction(Square origin, Square target, Square capture, Board board,
-        List<Action> actions) {
-      Piece originPiece = board.get(origin);
-      if (!(originPiece instanceof King)) {
-        Piece capturePiece = board.get(capture);
-        actions.add(new AndernachAction(target, originPiece.getColour(), capturePiece.getColour()));
+    private void generateAction(Board board, Square origin, Square target, List<Action> actions) {
+      Piece piece = board.get(origin);
+      if (!(piece instanceof King)) {
+        Colour originColour = piece.getColour();
+        Colour targetColour = originColour.getOpposite();
+        actions.add(new AndernachAction(target, originColour, targetColour));
+      }
+    }
+  }, ANTI_ANDERNACH {
+    @Override
+    public void generateAction(Board board, QuietMove move) {
+      generateAction(board, move.getOrigin(), move.getTarget(), move.getActions());
+    }
+
+    private void generateAction(Board board, Square origin, Square target, List<Action> actions) {
+      Piece piece = board.get(origin);
+      if (!(piece instanceof King)) {
+        Colour originColour = piece.getColour();
+        Colour targetColour = originColour.getOpposite();
+        actions.add(new AndernachAction(target, originColour, targetColour));
       }
     }
   }, CIRCE {
     @Override
-    public void visit(Capture move, Board board) {
-      generateAction(move.getTarget(), board, move.getActions());
+    public void generateAction(Board board, Capture move) {
+      generateAction(board, move.getTarget(), move.getActions());
     }
 
     @Override
-    public void visit(PromotionCapture move, Board board) {
-      generateAction(move.getTarget(), board, move.getActions());
+    public void generateAction(Board board, PromotionCapture move) {
+      generateAction(board, move.getTarget(), move.getActions());
     }
 
     @Override
-    public void visit(EnPassant move, Board board) {
-      generateAction(move.getStop(), board, move.getActions());
+    public void generateAction(Board board, EnPassant move) {
+      generateAction(board, move.getStop(), move.getActions());
     }
 
-    private void generateAction(Square capture, Board board, List<Action> actions) {
+    private void generateAction(Board board, Square capture, List<Action> actions) {
       Piece piece = board.get(capture);
       if (!(piece instanceof King)) {
         Square rebirth = board.findRebirthSquare(capture, piece.getClass(), piece.getColour());
@@ -90,9 +104,15 @@ public enum Condition {
     }
   };
 
-  public abstract void visit(Capture move, Board board);
+  public void generateAction(Board board, QuietMove move) {
+  }
 
-  public abstract void visit(PromotionCapture move, Board board);
+  public void generateAction(Board board, Capture move) {
+  }
 
-  public abstract void visit(EnPassant move, Board board);
+  public void generateAction(Board board, PromotionCapture move) {
+  }
+
+  public void generateAction(Board board, EnPassant move) {
+  }
 }

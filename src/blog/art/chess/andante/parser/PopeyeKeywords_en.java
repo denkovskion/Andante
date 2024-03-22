@@ -40,6 +40,7 @@ public class PopeyeKeywords_en extends ListResourceBundle {
         {Popeye.Command.Stipulation.name(), "Stipulation"},
         {Popeye.Command.Pieces.name(), "Pieces"}, {Popeye.Condition.Circe.name(), "Circe"},
         {Popeye.Condition.AndernachChess.name(), "AndernachChess"},
+        {Popeye.Condition.AntiAndernachChess.name(), "AntiAndernachChess"},
         {Popeye.Option.Try.name(), "Try"}, {Popeye.Option.Defence.name(), "Defence"},
         {Popeye.Option.SetPlay.name(), "SetPlay"}, {Popeye.Option.NullMoves.name(), "NullMoves"},
         {Popeye.Option.WhiteToPlay.name(), "WhiteToPlay"},

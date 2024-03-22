@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.move;
 
+import blog.art.chess.andante.condition.Condition;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.orthodox.King;
 import blog.art.chess.andante.piece.orthodox.Rook;
@@ -49,6 +50,13 @@ public class QuietMove extends FairyMove {
 
   public Square getTarget() {
     return target;
+  }
+
+  @Override
+  public void accept(Position position) {
+    for (Condition condition : position.getConditions()) {
+      condition.generateAction(position.getBoard(), this);
+    }
   }
 
   @Override

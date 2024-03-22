@@ -137,6 +137,7 @@ public class Parser {
                   switch (condition) {
                     case Circe -> problem.getConditions().setCirce();
                     case AndernachChess -> problem.getConditions().setAndernachChess();
+                    case AntiAndernachChess -> problem.getConditions().setAntiAndernachChess();
                   }
                 } while (scanner.hasNext(conditionPattern));
               }
@@ -453,6 +454,11 @@ public class Parser {
   }
 
   private void verifyProblem(Popeye.Problem specification) {
+    if (specification.getConditions().isAndernachChess() && specification.getConditions()
+        .isAntiAndernachChess()) {
+      throw new UnsupportedOperationException(
+          "Task creation failure (not accepted condition: AndernachChess w/ AntiAndernachChess).");
+    }
     specification.getOptions().getNoCastling().stream().filter(square -> switch (square.file()) {
       case _a, _e, _h -> false;
       case _b, _c, _d, _f, _g -> true;
@@ -553,6 +559,7 @@ public class Parser {
     Memory memory = new DefaultMemory();
     Condition[] conditions = Stream.of(
             specification.getConditions().isAndernachChess() ? Condition.ANDERNACH : null,
+            specification.getConditions().isAntiAndernachChess() ? Condition.ANTI_ANDERNACH : null,
             specification.getConditions().isCirce() ? Condition.CIRCE : null).filter(Objects::nonNull)
         .toArray(Condition[]::new);
     Position position = new Position(board, box, table, sideToMove, state, memory, conditions);

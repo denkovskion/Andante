@@ -40,7 +40,7 @@ public class PromotionCapture extends Promotion {
   @Override
   public void accept(Position position) {
     for (Condition condition : position.getConditions()) {
-      condition.visit(this, position.getBoard());
+      condition.generateAction(position.getBoard(), this);
     }
   }
 

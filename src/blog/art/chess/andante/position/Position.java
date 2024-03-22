@@ -36,12 +36,12 @@ import java.util.TreeSet;
 
 public class Position {
 
-  protected final Board board;
-  protected final Box box;
-  protected final Table table;
-  protected Colour sideToMove;
-  protected State state;
-  protected final Memory memory;
+  private final Board board;
+  private final Box box;
+  private final Table table;
+  private Colour sideToMove;
+  private State state;
+  private final Memory memory;
   private final SortedSet<Condition> conditions;
 
   public Position(Board board, Box box, Table table, Colour sideToMove, State state, Memory memory,
@@ -68,11 +68,7 @@ public class Position {
   }
 
   public void toggleSideToMove() {
-    if (sideToMove == Colour.WHITE) {
-      sideToMove = Colour.BLACK;
-    } else if (sideToMove == Colour.BLACK) {
-      sideToMove = Colour.WHITE;
-    }
+    sideToMove = sideToMove.getOpposite();
   }
 
   public State getState() {

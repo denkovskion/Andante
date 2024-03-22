@@ -33,44 +33,45 @@ import java.util.StringJoiner;
 
 public class AndernachAction implements Action {
 
-  private final Square change;
-  private final Colour origin;
-  private final Colour target;
+  private final Square target;
+  private final Colour originColour;
+  private final Colour targetColour;
 
-  public AndernachAction(Square change, Colour origin, Colour target) {
-    this.change = change;
-    this.origin = origin;
+  public AndernachAction(Square target, Colour originColour, Colour targetColour) {
     this.target = target;
+    this.originColour = originColour;
+    this.targetColour = targetColour;
   }
 
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    lanBuilder.append("(").append(target.getCode(locale)).append(")");
+    lanBuilder.append("(").append(targetColour.getCode(locale)).append(")");
   }
 
   @Override
   public void updatePieces(Position position) {
-    position.getBoard().get(change).setColour(target);
+    position.getBoard().get(target).setColour(targetColour);
   }
 
   @Override
   public void revertPieces(Position position) {
-    position.getBoard().get(change).setColour(origin);
+    position.getBoard().get(target).setColour(originColour);
   }
 
   @Override
   public void updateState(Position position) {
-    if ((position.getBoard().isRebirthSquare(change, Rook.class, Colour.WHITE)
-        || position.getBoard().isRebirthSquare(change, Rook.class, Colour.BLACK))
-        && position.getBoard().isRebirthSquare(change, position.getBoard().get(change).getClass(),
-        position.getBoard().get(change).getColour())) {
-      position.getState().removeNoCastling(change);
+    if ((position.getBoard().isRebirthSquare(target, Rook.class, Colour.WHITE)
+        || position.getBoard().isRebirthSquare(target, Rook.class, Colour.BLACK))
+        && position.getBoard().isRebirthSquare(target, position.getBoard().get(target).getClass(),
+        position.getBoard().get(target).getColour())) {
+      position.getState().removeNoCastling(target);
     }
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", AndernachAction.class.getSimpleName() + "[", "]").add(
-        "change=" + change).add("origin=" + origin).add("target=" + target).toString();
+            "target=" + target).add("originColour=" + originColour).add("targetColour=" + targetColour)
+        .toString();
   }
 }

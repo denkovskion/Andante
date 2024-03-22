@@ -39,7 +39,7 @@ public class Capture extends QuietMove {
   @Override
   public void accept(Position position) {
     for (Condition condition : position.getConditions()) {
-      condition.visit(this, position.getBoard());
+      condition.generateAction(position.getBoard(), this);
     }
   }
 

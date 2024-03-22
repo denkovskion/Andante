@@ -189,12 +189,13 @@ class Popeye {
     }
   }
 
-  enum Condition {Circe, AndernachChess}
+  enum Condition {Circe, AndernachChess, AntiAndernachChess}
 
   static class Conditions {
 
     private boolean circe;
     private boolean andernachChess;
+    private boolean antiAndernachChess;
 
     public boolean isCirce() {
       return circe;
@@ -210,6 +211,14 @@ class Popeye {
 
     public void setAndernachChess() {
       this.andernachChess = true;
+    }
+
+    public boolean isAntiAndernachChess() {
+      return antiAndernachChess;
+    }
+
+    public void setAntiAndernachChess() {
+      this.antiAndernachChess = true;
     }
   }
 

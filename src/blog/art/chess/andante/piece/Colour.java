@@ -28,7 +28,19 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 public enum Colour {
-  WHITE, BLACK;
+  WHITE {
+    @Override
+    public Colour getOpposite() {
+      return BLACK;
+    }
+  }, BLACK {
+    @Override
+    public Colour getOpposite() {
+      return WHITE;
+    }
+  };
+
+  public abstract Colour getOpposite();
 
   public String getCode(Locale locale) {
     return ResourceBundle.getBundle("blog.art.chess.andante.piece.ColourCodes", locale)
