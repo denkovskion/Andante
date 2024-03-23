@@ -536,7 +536,8 @@ public class Parser {
       int nPawns = specification.getPieces().stream().collect(
           Collectors.toMap(Popeye.Piece::square, Function.identity(),
               (oldValue, newValue) -> newValue)).values().stream().mapToInt(piece ->
-          (piece.colour() == colour || specification.getConditions().isAndernachChess())
+          (piece.colour() == colour || specification.getConditions().isAndernachChess()
+              || specification.getConditions().isAntiAndernachChess())
               && piece.pieceType() == Popeye.PieceType.Pawn ? 1 : 0).sum();
       int maxPromotion = Math.min(maxMove, nPawns);
       return IntStream.range(0, promotionTypes.length).mapToObj(index -> Stream.generate(
