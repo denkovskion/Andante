@@ -22,26 +22,39 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.piece;
+package blog.art.chess.andante.piece.fairy;
 
-import blog.art.chess.andante.piece.fairy.Grasshopper;
-import blog.art.chess.andante.piece.fairy.Nightrider;
-import blog.art.chess.andante.piece.orthodox.Bishop;
-import blog.art.chess.andante.piece.orthodox.King;
-import blog.art.chess.andante.piece.orthodox.Knight;
-import blog.art.chess.andante.piece.orthodox.Pawn;
-import blog.art.chess.andante.piece.orthodox.Queen;
-import blog.art.chess.andante.piece.orthodox.Rook;
-import java.util.ListResourceBundle;
+import blog.art.chess.andante.move.Move;
+import blog.art.chess.andante.piece.Colour;
+import blog.art.chess.andante.piece.Piece;
+import blog.art.chess.andante.piece.category.Hopper;
+import blog.art.chess.andante.position.Board;
+import blog.art.chess.andante.position.Box;
+import blog.art.chess.andante.position.Direction;
+import blog.art.chess.andante.position.Square;
+import blog.art.chess.andante.position.State;
+import java.util.List;
+import java.util.StringJoiner;
 
-public class PieceCodes extends ListResourceBundle {
+public class Grasshopper extends Piece implements Hopper {
+
+  public Grasshopper(Colour colour) {
+    super(colour);
+  }
 
   @Override
-  protected Object[][] getContents() {
-    return new Object[][]{{King.class.getSimpleName(), "K"}, {Queen.class.getSimpleName(), "Q"},
-        {Rook.class.getSimpleName(), "R"}, {Bishop.class.getSimpleName(), "B"},
-        {Knight.class.getSimpleName(), "N"}, {Pawn.class.getSimpleName(), "P"},
-        {Grasshopper.class.getSimpleName(), Grasshopper.class.getSimpleName()},
-        {Nightrider.class.getSimpleName(), Nightrider.class.getSimpleName()}};
+  public List<Direction> getHops(Board board) {
+    return board.getDirections(0, 1, 1, 1);
+  }
+
+  @Override
+  public boolean generateMoves(Board board, Box box, State state, Square origin, List<Move> moves) {
+    return generateMoves(board, origin, moves);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", Grasshopper.class.getSimpleName() + "[", "]").add(
+        "colour=" + colour).toString();
   }
 }

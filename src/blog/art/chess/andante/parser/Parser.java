@@ -26,6 +26,8 @@ package blog.art.chess.andante.parser;
 
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
+import blog.art.chess.andante.piece.fairy.Grasshopper;
+import blog.art.chess.andante.piece.fairy.Nightrider;
 import blog.art.chess.andante.piece.orthodox.Bishop;
 import blog.art.chess.andante.piece.orthodox.King;
 import blog.art.chess.andante.piece.orthodox.Knight;
@@ -479,6 +481,12 @@ public class Parser {
     Board board = new Board();
     specification.getPieces().stream().map(this::convertPiece).forEach(board::put);
     Box box = new Box();
+    Popeye.PieceType[] promotionTypes = Stream.concat(
+            Stream.of(Popeye.PieceType.Queen, Popeye.PieceType.Rook, Popeye.PieceType.Bishop,
+                Popeye.PieceType.Knight),
+            specification.getPieces().stream().map(Popeye.Piece::pieceType).filter(
+                pieceType -> pieceType != Popeye.PieceType.King && pieceType != Popeye.PieceType.Pawn))
+        .distinct().sorted().toArray(Popeye.PieceType[]::new);
     Arrays.stream(Popeye.Colour.values()).flatMap(colour -> {
       int maxMove = switch (specification.getStipulation().stipulationType()) {
         case Direct -> switch (colour) {
@@ -497,11 +505,9 @@ public class Parser {
               piece -> piece.colour() == colour && piece.pieceType() == Popeye.PieceType.Pawn ? 1 : 0)
           .sum();
       int maxPromotion = Math.min(maxMove, nPawns);
-      Popeye.PieceType[] pieceTypes = new Popeye.PieceType[]{Popeye.PieceType.Queen,
-          Popeye.PieceType.Rook, Popeye.PieceType.Bishop, Popeye.PieceType.Knight};
-      return IntStream.range(0, pieceTypes.length).mapToObj(
-          index -> Stream.generate(() -> new Popeye.Promotion(colour, index + 1, pieceTypes[index]))
-              .limit(maxPromotion)).flatMap(Function.identity());
+      return IntStream.range(0, promotionTypes.length).mapToObj(index -> Stream.generate(
+              () -> new Popeye.Promotion(colour, index + 1, promotionTypes[index])).limit(maxPromotion))
+          .flatMap(Function.identity());
     }).map(this::convertPromotion).forEach(box::push);
     Table table = new Table();
     Colour sideToMove = switch (specification.getStipulation().stipulationType()) {
@@ -593,6 +599,8 @@ public class Parser {
       case Bishop -> new Bishop(convertColour(colour));
       case Knight -> new Knight(convertColour(colour));
       case Pawn -> new Pawn(convertColour(colour));
+      case Grasshopper -> new Grasshopper(convertColour(colour));
+      case Nightrider -> new Nightrider(convertColour(colour));
     };
   }
 

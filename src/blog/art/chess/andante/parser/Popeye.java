@@ -47,7 +47,7 @@ class Popeye {
 
   }
 
-  enum PieceType {King, Queen, Rook, Bishop, Knight, Pawn}
+  enum PieceType {King, Queen, Rook, Bishop, Knight, Pawn, Grasshopper, Nightrider}
 
   enum Colour {White, Black}
 
