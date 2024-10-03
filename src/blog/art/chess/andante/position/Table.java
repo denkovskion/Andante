@@ -25,24 +25,10 @@
 package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.piece.Piece;
-import java.util.Stack;
-import java.util.StringJoiner;
 
-public class Table {
+public interface Table {
 
-  private final Stack<Piece> pieces = new Stack<>();
+  Piece pop();
 
-  public Piece pop() {
-    return pieces.pop();
-  }
-
-  public void push(Piece piece) {
-    pieces.push(piece);
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", Table.class.getSimpleName() + "[", "]").add("pieces=" + pieces)
-        .toString();
-  }
+  void push(Piece piece);
 }

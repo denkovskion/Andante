@@ -26,7 +26,6 @@ package blog.art.chess.andante.move;
 
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Square;
-import java.util.Locale;
 import java.util.StringJoiner;
 
 public abstract class Castling extends QuietMove {
@@ -41,7 +40,7 @@ public abstract class Castling extends QuietMove {
   }
 
   @Override
-  protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
+  protected boolean preMake(Position position) {
     Move nullMove = new NullMove();
     boolean result = nullMove.make(position, null, null, null);
     nullMove.unmake(position);

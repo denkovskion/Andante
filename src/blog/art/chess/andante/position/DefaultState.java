@@ -24,11 +24,56 @@
 
 package blog.art.chess.andante.position;
 
-import blog.art.chess.andante.piece.Colour;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.TreeSet;
 
-public interface Section extends Comparable<Section> {
+public class DefaultState implements State {
 
-  Colour colour();
+  private final Set<Square> noCastling = new TreeSet<>();
+  private Square enPassant;
 
-  int order();
+  public DefaultState() {
+  }
+
+  private DefaultState(DefaultState state) {
+    this.noCastling.addAll(state.noCastling);
+    this.enPassant = state.enPassant;
+  }
+
+  @Override
+  public State copy() {
+    return new DefaultState(this);
+  }
+
+  @Override
+  public boolean isNoCastling(Square square) {
+    return noCastling.contains(square);
+  }
+
+  @Override
+  public void addNoCastling(Square square) {
+    noCastling.add(square);
+  }
+
+  @Override
+  public boolean isEnPassant(Square square) {
+    return square.equals(enPassant);
+  }
+
+  @Override
+  public void setEnPassant(Square enPassant) {
+    this.enPassant = enPassant;
+  }
+
+  @Override
+  public void resetEnPassant() {
+    this.enPassant = null;
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", DefaultState.class.getSimpleName() + "[", "]").add(
+        "noCastling=" + noCastling).add("enPassant=" + enPassant).toString();
+  }
 }

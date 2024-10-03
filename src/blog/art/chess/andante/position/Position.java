@@ -63,11 +63,7 @@ public class Position {
   }
 
   public void toggleSideToMove() {
-    if (sideToMove == Colour.WHITE) {
-      sideToMove = Colour.BLACK;
-    } else if (sideToMove == Colour.BLACK) {
-      sideToMove = Colour.WHITE;
-    }
+    sideToMove = sideToMove.getOpposite();
   }
 
   public State getState() {
@@ -83,43 +79,56 @@ public class Position {
   }
 
   public boolean isLegal(List<Move> pseudoLegalMoves) {
-    return board.getOrigins().stream().noneMatch(origin -> {
+    for (Square origin : board.findOrigins()) {
       Piece piece = board.get(origin);
-      return piece.getColour() == sideToMove && !piece.generateMoves(board, box, state, origin,
-          pseudoLegalMoves);
-    });
+      if (piece.getColour() == sideToMove) {
+        if (!piece.generateMoves(board, box, state, origin, pseudoLegalMoves)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   public int isCheck() {
-    memory.push(new State(state));
+    memory.push(state.copy());
     state.resetEnPassant();
     toggleSideToMove();
-    int nChecks = board.getOrigins().stream().filter(origin -> {
+    int nChecks = 0;
+    for (Square origin : board.findOrigins()) {
       Piece piece = board.get(origin);
-      return piece.getColour() == sideToMove && !piece.generateMoves(board, box, state, origin,
-          null);
-    }).map(result -> 1).reduce(0, Integer::sum);
+      if (piece.getColour() == sideToMove) {
+        if (!piece.generateMoves(board, box, state, origin, null)) {
+          nChecks++;
+        }
+      }
+    }
     toggleSideToMove();
     state = memory.pop();
     return nChecks;
   }
 
   public boolean isTerminal(List<Move> generatedPseudoLegalMoves) {
-    List<Move> pseudoLegalMoves =
-        generatedPseudoLegalMoves != null ? generatedPseudoLegalMoves : new ArrayList<>();
-    if (generatedPseudoLegalMoves == null) {
-      board.getOrigins().forEach(origin -> {
+    List<Move> pseudoLegalMoves;
+    if (generatedPseudoLegalMoves != null) {
+      pseudoLegalMoves = generatedPseudoLegalMoves;
+    } else {
+      pseudoLegalMoves = new ArrayList<>();
+      for (Square origin : board.findOrigins()) {
         Piece piece = board.get(origin);
         if (piece.getColour() == sideToMove) {
           piece.generateMoves(board, box, state, origin, pseudoLegalMoves);
         }
-      });
+      }
     }
-    return pseudoLegalMoves.stream().noneMatch(move -> {
+    for (Move move : pseudoLegalMoves) {
       boolean result = move.make(this, null, null, null);
       move.unmake(this);
-      return result;
-    });
+      if (result) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override

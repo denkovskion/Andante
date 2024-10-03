@@ -65,7 +65,7 @@ public class Pawn extends Piece {
             if (piece.getColour() != colour) {
               if (moves != null) {
                 if (board.isRebirthSquare(target, Piece.class, colour)) {
-                  for (Section section : box.getSections(colour)) {
+                  for (Section section : box.findSections(colour)) {
                     moves.add(new PromotionCapture(origin, target, section));
                   }
                 } else {
@@ -85,7 +85,7 @@ public class Pawn extends Piece {
         } else if (moves != null) {
           if (board.get(target) == null) {
             if (board.isRebirthSquare(target, Piece.class, colour)) {
-              for (Section section : box.getSections(colour)) {
+              for (Section section : box.findSections(colour)) {
                 moves.add(new Promotion(origin, target, section));
               }
             } else {

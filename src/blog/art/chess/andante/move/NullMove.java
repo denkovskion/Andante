@@ -25,7 +25,6 @@
 package blog.art.chess.andante.move;
 
 import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.State;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
@@ -33,7 +32,7 @@ import java.util.StringJoiner;
 public class NullMove extends Move {
 
   @Override
-  protected boolean preMake(Position position, StringBuilder lanBuilder, Locale locale) {
+  protected boolean preMake(Position position) {
     return true;
   }
 
@@ -57,7 +56,7 @@ public class NullMove extends Move {
 
   @Override
   protected void updateState(Position position) {
-    position.getMemory().push(new State(position.getState()));
+    position.getMemory().push(position.getState().copy());
     position.getState().resetEnPassant();
     position.toggleSideToMove();
   }

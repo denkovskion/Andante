@@ -24,11 +24,27 @@
 
 package blog.art.chess.andante.position;
 
-import blog.art.chess.andante.piece.Colour;
+import blog.art.chess.andante.piece.Piece;
+import java.util.Stack;
+import java.util.StringJoiner;
 
-public interface Section extends Comparable<Section> {
+public class DefaultTable implements Table {
 
-  Colour colour();
+  private final Stack<Piece> pieces = new Stack<>();
 
-  int order();
+  @Override
+  public Piece pop() {
+    return pieces.pop();
+  }
+
+  @Override
+  public void push(Piece piece) {
+    pieces.push(piece);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", DefaultTable.class.getSimpleName() + "[", "]").add(
+        "pieces=" + pieces).toString();
+  }
 }

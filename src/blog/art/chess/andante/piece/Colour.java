@@ -24,4 +24,18 @@
 
 package blog.art.chess.andante.piece;
 
-public enum Colour {WHITE, BLACK}
+public enum Colour {
+  WHITE {
+    @Override
+    public Colour getOpposite() {
+      return BLACK;
+    }
+  }, BLACK {
+    @Override
+    public Colour getOpposite() {
+      return WHITE;
+    }
+  };
+
+  public abstract Colour getOpposite();
+}

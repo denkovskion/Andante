@@ -24,13 +24,11 @@
 
 package blog.art.chess.andante.position;
 
-import java.util.Comparator;
+public interface Direction extends Comparable<Direction> {
 
-public record Direction(int fileOffset, int rankOffset) implements Comparable<Direction> {
+  int fileOffset();
 
-  @Override
-  public int compareTo(Direction o) {
-    return Comparator.comparingInt(Direction::fileOffset).thenComparingInt(Direction::rankOffset)
-        .compare(this, o);
-  }
+  int rankOffset();
+
+  int offset();
 }

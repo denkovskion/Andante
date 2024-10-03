@@ -66,8 +66,11 @@ public class King extends Piece implements Leaper {
                     origin2, Rook.class, colour) && !state.isNoCastling(origin2)) {
                   Square target = board.findTarget(origin, direction, 2);
                   Square target2 = board.findTarget(origin, direction, 1);
-                  moves.add(fileOffset > 0 ? new ShortCastling(origin, target, origin2, target2)
-                      : new LongCastling(origin, target, origin2, target2));
+                  if (fileOffset > 0) {
+                    moves.add(new ShortCastling(origin, target, origin2, target2));
+                  } else {
+                    moves.add(new LongCastling(origin, target, origin2, target2));
+                  }
                 }
                 break;
               } else {

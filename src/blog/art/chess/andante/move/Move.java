@@ -31,12 +31,12 @@ import java.util.StringJoiner;
 
 public abstract class Move {
 
-  public boolean make(Position position, List<Move> pseudoLegalMoves, StringBuilder lanBuilder,
-      Locale locale) {
+  public final boolean make(Position position, List<Move> pseudoLegalMoves,
+      StringBuilder lanBuilder, Locale locale) {
     if (lanBuilder != null) {
       preWrite(position, lanBuilder, locale);
     }
-    boolean result = preMake(position, lanBuilder, locale);
+    boolean result = preMake(position);
     updatePieces(position);
     updateState(position);
     result = position.isLegal(pseudoLegalMoves) && result;
@@ -46,7 +46,7 @@ public abstract class Move {
     return result;
   }
 
-  public void unmake(Position position) {
+  public final void unmake(Position position) {
     revertState(position);
     revertPieces(position);
   }
@@ -56,7 +56,7 @@ public abstract class Move {
   public abstract void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
       StringBuilder lanBuilder);
 
-  protected abstract boolean preMake(Position position, StringBuilder lanBuilder, Locale locale);
+  protected abstract boolean preMake(Position position);
 
   protected abstract void updatePieces(Position position);
 

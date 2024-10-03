@@ -36,6 +36,12 @@ import blog.art.chess.andante.piece.orthodox.Queen;
 import blog.art.chess.andante.piece.orthodox.Rook;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
+import blog.art.chess.andante.position.DefaultBoard;
+import blog.art.chess.andante.position.DefaultBox;
+import blog.art.chess.andante.position.DefaultMemory;
+import blog.art.chess.andante.position.DefaultState;
+import blog.art.chess.andante.position.DefaultTable;
+import blog.art.chess.andante.position.MailboxBoard;
 import blog.art.chess.andante.position.Memory;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.State;
@@ -478,9 +484,13 @@ public class Parser {
   }
 
   private Task convertProblem(Popeye.Problem specification) {
-    Board board = new Board();
+    Board board = specification.getPieces().stream().map(Popeye.Piece::pieceType).allMatch(
+        pieceType -> pieceType == Popeye.PieceType.King || pieceType == Popeye.PieceType.Queen
+            || pieceType == Popeye.PieceType.Rook || pieceType == Popeye.PieceType.Bishop
+            || pieceType == Popeye.PieceType.Knight || pieceType == Popeye.PieceType.Pawn)
+        ? new MailboxBoard() : new DefaultBoard();
     specification.getPieces().stream().map(this::convertPiece).forEach(board::put);
-    Box box = new Box();
+    Box box = new DefaultBox();
     Popeye.PieceType[] promotionTypes = Stream.concat(
             Stream.of(Popeye.PieceType.Queen, Popeye.PieceType.Rook, Popeye.PieceType.Bishop,
                 Popeye.PieceType.Knight),
@@ -509,20 +519,20 @@ public class Parser {
               () -> new Popeye.Promotion(colour, index + 1, promotionTypes[index])).limit(maxPromotion))
           .flatMap(Function.identity());
     }).map(this::convertPromotion).forEach(box::push);
-    Table table = new Table();
+    Table table = new DefaultTable();
     Colour sideToMove = switch (specification.getStipulation().stipulationType()) {
       case Direct, Self -> specification.getOptions().isHalfDuplex();
       case Help ->
           specification.getOptions().isHalfDuplex() == specification.getOptions().isWhiteToPlay();
     } ? Colour.BLACK : Colour.WHITE;
-    State state = new State();
+    State state = new DefaultState();
     specification.getOptions().getNoCastling().stream()
         .map(square -> board.getSquare(convertFile(square.file()), convertRank(square.rank())))
         .forEach(state::addNoCastling);
     specification.getOptions().getEnPassant().stream()
         .map(square -> board.getSquare(convertFile(square.file()), convertRank(square.rank())))
         .forEach(state::setEnPassant);
-    Memory memory = new Memory();
+    Memory memory = new DefaultMemory();
     Position position = new Position(board, box, table, sideToMove, state, memory);
     Aim aim = specification.getStipulation().goal() == null ? null
         : switch (specification.getStipulation().goal()) {

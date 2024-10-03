@@ -24,46 +24,17 @@
 
 package blog.art.chess.andante.position;
 
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.TreeSet;
+public interface State {
 
-public class State {
+  State copy();
 
-  private final Set<Square> noCastling = new TreeSet<>();
-  private Square enPassant;
+  boolean isNoCastling(Square square);
 
-  public State() {
-  }
+  void addNoCastling(Square square);
 
-  public State(State state) {
-    this.noCastling.addAll(state.noCastling);
-    this.enPassant = state.enPassant;
-  }
+  boolean isEnPassant(Square square);
 
-  public boolean isNoCastling(Square square) {
-    return noCastling.contains(square);
-  }
+  void setEnPassant(Square enPassant);
 
-  public void addNoCastling(Square square) {
-    noCastling.add(square);
-  }
-
-  public boolean isEnPassant(Square square) {
-    return square.equals(enPassant);
-  }
-
-  public void setEnPassant(Square enPassant) {
-    this.enPassant = enPassant;
-  }
-
-  public void resetEnPassant() {
-    this.enPassant = null;
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", State.class.getSimpleName() + "[", "]").add(
-        "noCastling=" + noCastling).add("enPassant=" + enPassant).toString();
-  }
+  void resetEnPassant();
 }

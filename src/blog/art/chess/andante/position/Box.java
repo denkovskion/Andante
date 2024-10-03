@@ -27,45 +27,20 @@ package blog.art.chess.andante.position;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.StringJoiner;
-import java.util.TreeMap;
 
-public class Box {
+public interface Box {
 
-  private final Map<Section, Stack<Piece>> pieces = new TreeMap<>();
+  Piece peek(Section section);
 
-  public Box() {
-  }
+  Piece pop(Section section);
 
-  public Piece peek(Section section) {
-    return pieces.get(section).peek();
-  }
+  void push(Section section, Piece piece);
 
-  public Piece pop(Section section) {
-    return pieces.get(section).pop();
-  }
-
-  public void push(Section section, Piece piece) {
-    pieces.computeIfAbsent(section, s -> new Stack<>()).push(piece);
-  }
-
-  public record Entry(Colour colour, int order, Piece piece) {
+  record Entry(Colour colour, int order, Piece piece) {
 
   }
 
-  public void push(Entry entry) {
-    push(new Section(entry.colour(), entry.order()), entry.piece());
-  }
+  void push(Entry entry);
 
-  public List<Section> getSections(Colour colour) {
-    return pieces.keySet().stream().filter(entry -> entry.colour() == colour).toList();
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", Box.class.getSimpleName() + "[", "]").add("pieces=" + pieces)
-        .toString();
-  }
+  List<Section> findSections(Colour colour);
 }

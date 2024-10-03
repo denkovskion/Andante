@@ -25,10 +25,52 @@
 package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.piece.Colour;
+import blog.art.chess.andante.piece.Piece;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.StringJoiner;
+import java.util.TreeMap;
 
-public interface Section extends Comparable<Section> {
+public class DefaultBox implements Box {
 
-  Colour colour();
+  private final Map<Section, Stack<Piece>> pieces = new TreeMap<>();
 
-  int order();
+  @Override
+  public Piece peek(Section section) {
+    return pieces.get(section).peek();
+  }
+
+  @Override
+  public Piece pop(Section section) {
+    return pieces.get(section).pop();
+  }
+
+  @Override
+  public void push(Section section, Piece piece) {
+    pieces.computeIfAbsent(section, s -> new Stack<>()).push(piece);
+  }
+
+  @Override
+  public void push(Entry entry) {
+    push(new DefaultSection(entry.colour(), entry.order()), entry.piece());
+  }
+
+  @Override
+  public List<Section> findSections(Colour colour) {
+    List<Section> sections = new ArrayList<>();
+    for (Section section : pieces.keySet()) {
+      if (section.colour() == colour) {
+        sections.add(section);
+      }
+    }
+    return sections;
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", DefaultBox.class.getSimpleName() + "[", "]").add(
+        "pieces=" + pieces).toString();
+  }
 }

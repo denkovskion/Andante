@@ -24,11 +24,26 @@
 
 package blog.art.chess.andante.position;
 
-import blog.art.chess.andante.piece.Colour;
+import java.util.Stack;
+import java.util.StringJoiner;
 
-public interface Section extends Comparable<Section> {
+public class DefaultMemory implements Memory {
 
-  Colour colour();
+  private final Stack<State> states = new Stack<>();
 
-  int order();
+  @Override
+  public State pop() {
+    return states.pop();
+  }
+
+  @Override
+  public void push(State state) {
+    states.push(state);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", DefaultMemory.class.getSimpleName() + "[", "]").add(
+        "states=" + states).toString();
+  }
 }

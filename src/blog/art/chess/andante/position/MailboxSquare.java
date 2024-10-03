@@ -24,11 +24,26 @@
 
 package blog.art.chess.andante.position;
 
-import blog.art.chess.andante.piece.Colour;
+import java.util.Comparator;
 
-public interface Section extends Comparable<Section> {
+public record MailboxSquare(int number) implements Square {
 
-  Colour colour();
+  public MailboxSquare(int file, int rank) {
+    this(10 * (file + 1) + rank);
+  }
 
-  int order();
+  @Override
+  public int file() {
+    return number / 10 - 1;
+  }
+
+  @Override
+  public int rank() {
+    return number % 10;
+  }
+
+  @Override
+  public int compareTo(Square o) {
+    return Comparator.comparingInt(Square::number).compare(this, o);
+  }
 }

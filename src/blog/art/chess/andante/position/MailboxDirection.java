@@ -24,11 +24,26 @@
 
 package blog.art.chess.andante.position;
 
-import blog.art.chess.andante.piece.Colour;
+import java.util.Comparator;
 
-public interface Section extends Comparable<Section> {
+public record MailboxDirection(int offset) implements Direction {
 
-  Colour colour();
+  public MailboxDirection(int fileOffset, int rankOffset) {
+    this(10 * fileOffset + rankOffset);
+  }
 
-  int order();
+  @Override
+  public int fileOffset() {
+    return offset / 10;
+  }
+
+  @Override
+  public int rankOffset() {
+    return offset % 10;
+  }
+
+  @Override
+  public int compareTo(Direction o) {
+    return Comparator.comparingInt(Direction::offset).compare(this, o);
+  }
 }
