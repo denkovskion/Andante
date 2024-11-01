@@ -29,8 +29,6 @@ import blog.art.chess.andante.move.NullMove;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.solution.Play;
 import blog.art.chess.andante.solution.SolutionWriter;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -93,9 +91,7 @@ public abstract class BattleProblem extends Problem {
         }
         branches.add(new SolutionWriter.Branch(Play.SET, null, variations));
         if (logMoves) {
-          System.err.print(
-              "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " depth=" + depth
-                  + " move=" + move);
+          System.err.print(logPrefix() + " depth=" + depth + " move=" + move);
           if (score >= 0) {
             System.err.println(" score=" + score);
           } else {
@@ -141,9 +137,7 @@ public abstract class BattleProblem extends Problem {
             branches.add(new SolutionWriter.Branch(Play.TRY, lanBuilder.toString(), variations));
           }
           if (logMoves) {
-            System.err.print(
-                "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " depth=" + depth
-                    + " move=" + move);
+            System.err.print(logPrefix() + " depth=" + depth + " move=" + move);
             if (score >= -includeTries) {
               System.err.println(" score=" + score);
             } else {

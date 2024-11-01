@@ -25,6 +25,8 @@
 package blog.art.chess.andante.problem;
 
 import blog.art.chess.andante.position.Position;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.StringJoiner;
 
 public abstract class Problem {
@@ -47,6 +49,10 @@ public abstract class Problem {
       result = aim == Aim.MATE;
     }
     return result;
+  }
+
+  public static String logPrefix() {
+    return "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS);
   }
 
   @Override

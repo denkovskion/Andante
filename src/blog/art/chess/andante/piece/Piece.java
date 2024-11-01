@@ -46,6 +46,10 @@ public abstract class Piece {
     return colour;
   }
 
+  public boolean isRoyal() {
+    return false;
+  }
+
   public abstract boolean generateMoves(Board board, Box box, State state, Square origin,
       List<Move> moves);
 

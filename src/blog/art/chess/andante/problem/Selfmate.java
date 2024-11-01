@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class SelfProblem extends BattleProblem {
+public class Selfmate extends BattleProblem {
 
-  public SelfProblem(Position position, Aim aim, int nMoves) {
+  public Selfmate(Position position, Aim aim, int nMoves) {
     super(position, aim, nMoves);
   }
 
@@ -125,7 +125,7 @@ public class SelfProblem extends BattleProblem {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", SelfProblem.class.getSimpleName() + "[", "]").add(
+    return new StringJoiner(", ", Selfmate.class.getSimpleName() + "[", "]").add(
         "position=" + position).add("aim=" + aim).add("nMoves=" + nMoves).toString();
   }
 }

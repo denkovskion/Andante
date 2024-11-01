@@ -63,6 +63,9 @@ public class Pawn extends Piece {
           Piece piece = board.get(target);
           if (piece != null) {
             if (piece.getColour() != colour) {
+              if (piece.isRoyal()) {
+                return false;
+              }
               if (moves != null) {
                 if (board.isRebirthSquare(target, Piece.class, colour)) {
                   for (Section section : box.findSections(colour)) {
@@ -72,13 +75,13 @@ public class Pawn extends Piece {
                   moves.add(new Capture(origin, target));
                 }
               }
-              if (piece instanceof King) {
-                return false;
-              }
             }
-          } else if (moves != null) {
-            if (state.isEnPassant(target)) {
-              Square stop = board.findTarget(target, board.getDirection(0, -rankOffset), 1);
+          } else if (state.isEnPassant(target)) {
+            Square stop = board.findTarget(target, board.getDirection(0, -rankOffset), 1);
+            if (board.get(stop).isRoyal()) {
+              return false;
+            }
+            if (moves != null) {
               moves.add(new EnPassant(origin, target, stop));
             }
           }
@@ -91,7 +94,7 @@ public class Pawn extends Piece {
             } else {
               moves.add(new QuietMove(origin, target));
               if (board.isRebirthSquare(origin, Pawn.class, colour)) {
-                target = board.findTarget(target, direction, 1);
+                target = board.findTarget(origin, direction, 2);
                 if (board.get(target) == null) {
                   Square stop = board.findTarget(origin, direction, 1);
                   moves.add(new DoubleStep(origin, target, stop));

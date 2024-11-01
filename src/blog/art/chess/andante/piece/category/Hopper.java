@@ -29,7 +29,6 @@ import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.move.QuietMove;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
-import blog.art.chess.andante.piece.orthodox.King;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Direction;
 import blog.art.chess.andante.position.Square;
@@ -53,11 +52,11 @@ public interface Hopper {
               Piece piece = board.get(target);
               if (piece != null) {
                 if (piece.getColour() != getColour()) {
+                  if (piece.isRoyal()) {
+                    return false;
+                  }
                   if (moves != null) {
                     moves.add(new Capture(origin, target));
-                  }
-                  if (piece instanceof King) {
-                    return false;
                   }
                 }
               } else {

@@ -29,19 +29,17 @@ import blog.art.chess.andante.move.NullMove;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.solution.Play;
 import blog.art.chess.andante.solution.SolutionWriter;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class HelpProblem extends Problem {
+public class Helpmate extends Problem {
 
   private final boolean halfMove;
   private final Aim aim;
 
-  public HelpProblem(Position position, Aim aim, int nMoves, boolean halfMove) {
+  public Helpmate(Position position, Aim aim, int nMoves, boolean halfMove) {
     super(position, nMoves);
     this.halfMove = halfMove;
     this.aim = aim;
@@ -96,9 +94,8 @@ public class HelpProblem extends Problem {
           }
         }
         if (logMoves) {
-          System.err.println(
-              "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " depth=" + depth
-                  + " move=" + move + " branches.size()=" + branchesMax.size());
+          System.err.println(logPrefix() + " depth=" + depth + " move=" + move + " branches.size()="
+              + branchesMax.size());
         }
       } else {
         if (includeSetPlay) {
@@ -123,8 +120,8 @@ public class HelpProblem extends Problem {
           }
           if (logMoves) {
             System.err.println(
-                "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " depth=" + depth
-                    + " move=" + move + " branches.size()=" + branchesMax.size());
+                logPrefix() + " depth=" + depth + " move=" + move + " branches.size()="
+                    + branchesMax.size());
           }
         }
         move.unmake(position);
@@ -165,8 +162,8 @@ public class HelpProblem extends Problem {
           }
           if (logMoves) {
             System.err.println(
-                "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " depth=" + depth
-                    + " move=" + move + " branches.size()=" + branchesMin.size());
+                logPrefix() + " depth=" + depth + " move=" + move + " branches.size()="
+                    + branchesMin.size());
           }
         } else {
           if (includeSetPlay) {
@@ -192,8 +189,8 @@ public class HelpProblem extends Problem {
             }
             if (logMoves) {
               System.err.println(
-                  "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " depth="
-                      + depth + " move=" + move + " branches.size()=" + branchesMin.size());
+                  logPrefix() + " depth=" + depth + " move=" + move + " branches.size()="
+                      + branchesMin.size());
             }
           }
           move.unmake(position);
@@ -201,10 +198,12 @@ public class HelpProblem extends Problem {
       }
     }
     if (nLegalMoves == 0) {
-      if (evaluateTerminalNode(position, aim)) {
-        min = 1;
-      } else {
-        min = 0;
+      if (includeActualPlay) {
+        if (evaluateTerminalNode(position, aim)) {
+          min = 1;
+        } else {
+          min = 0;
+        }
       }
     }
     return min;
@@ -212,7 +211,7 @@ public class HelpProblem extends Problem {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", HelpProblem.class.getSimpleName() + "[", "]").add(
+    return new StringJoiner(", ", Helpmate.class.getSimpleName() + "[", "]").add(
             "position=" + position).add("aim=" + aim).add("nMoves=" + nMoves)
         .add("halfMove=" + halfMove).toString();
   }

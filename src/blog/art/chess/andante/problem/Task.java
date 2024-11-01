@@ -26,7 +26,6 @@ package blog.art.chess.andante.problem;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.StringJoiner;
 
@@ -45,17 +44,14 @@ public class Task {
   public void solve() {
     System.out.println("-".repeat(72));
     if (displayOptions.internalModel()) {
-      System.err.println(
-          "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " task=" + this);
+      System.err.println(Problem.logPrefix() + " task=" + this);
     }
-    System.err.println(
-        "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " problem.solve(...)");
+    System.err.println(Problem.logPrefix() + " problem.solve(...)");
     Instant begin = Instant.now();
     problem.solve(analysisOptions, displayOptions);
     Instant end = Instant.now();
-    System.err.println(
-        "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " duration="
-            + Duration.between(begin, end).truncatedTo(ChronoUnit.MILLIS));
+    System.err.println(Problem.logPrefix() + " duration=" + Duration.between(begin, end)
+        .truncatedTo(ChronoUnit.MILLIS));
   }
 
   @Override

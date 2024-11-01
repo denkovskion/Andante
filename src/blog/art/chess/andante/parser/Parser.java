@@ -50,22 +50,20 @@ import blog.art.chess.andante.problem.Aim;
 import blog.art.chess.andante.problem.AnalysisOptions;
 import blog.art.chess.andante.problem.BattlePlayOptions;
 import blog.art.chess.andante.problem.BattleProblem;
-import blog.art.chess.andante.problem.DirectProblem;
+import blog.art.chess.andante.problem.Directmate;
 import blog.art.chess.andante.problem.DisplayOptions;
 import blog.art.chess.andante.problem.HelpPlayOptions;
-import blog.art.chess.andante.problem.HelpProblem;
+import blog.art.chess.andante.problem.Helpmate;
 import blog.art.chess.andante.problem.LogOptions;
 import blog.art.chess.andante.problem.MateSearch;
 import blog.art.chess.andante.problem.Perft;
 import blog.art.chess.andante.problem.Problem;
-import blog.art.chess.andante.problem.SelfProblem;
+import blog.art.chess.andante.problem.Selfmate;
 import blog.art.chess.andante.problem.Task;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -404,17 +402,15 @@ public class Parser {
       return problems.stream().peek(this::validateProblem).peek(this::verifyProblem)
           .map(this::convertProblem).toList();
     } catch (IllegalArgumentException | UnsupportedOperationException e) {
-      System.err.println(
-          "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " " + e.getMessage());
+      System.err.println(Problem.logPrefix() + " " + e.getMessage());
     } catch (NoSuchElementException e) {
       System.err.println(
-          "Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS) + " Parse failure (" + (
-              line != null ? "invalid line: \"" + line + "\""
-                  : token != null ? "last valid token: \"" + token + "\"" : "unsupported format")
+          Problem.logPrefix() + " Parse failure (" + (line != null ? "invalid line: \"" + line
+              + "\"" : token != null ? "last valid token: \"" + token + "\"" : "unsupported format")
               + ").");
     } catch (IOException e) {
-      System.err.println("Andante@" + ZonedDateTime.now().truncatedTo(ChronoUnit.SECONDS)
-          + " Read failure (invalid file: \"" + inputFile + "\").");
+      System.err.println(
+          Problem.logPrefix() + " Read failure (invalid file: \"" + inputFile + "\").");
     }
     return Collections.emptyList();
   }
@@ -550,11 +546,11 @@ public class Parser {
     Problem problem = switch (specification.getStipulation().stipulationType()) {
       case Direct ->
           specification.getStipulation().goal() == null ? new MateSearch(position, nMoves)
-              : new DirectProblem(position, aim, nMoves);
-      case Self -> new SelfProblem(position, aim, nMoves);
+              : new Directmate(position, aim, nMoves);
+      case Self -> new Selfmate(position, aim, nMoves);
       case Help ->
           specification.getStipulation().goal() == null ? new Perft(position, nMoves, halfMove)
-              : new HelpProblem(position, aim, nMoves, halfMove);
+              : new Helpmate(position, aim, nMoves, halfMove);
     };
     boolean setPlay = specification.getOptions().isSetPlay();
     int nRefutations = Math.max(specification.getOptions().getDefence(),
@@ -570,7 +566,7 @@ public class Parser {
     AnalysisOptions analysisOptions =
         problem instanceof BattleProblem ? new BattlePlayOptions(setPlay, nRefutations, variations,
             threats, shortVariations)
-            : problem instanceof HelpProblem ? new HelpPlayOptions(setPlay, tempoTries)
+            : problem instanceof Helpmate ? new HelpPlayOptions(setPlay, tempoTries)
                 : new AnalysisOptions() {
                   @Override
                   public String toString() {
@@ -581,7 +577,7 @@ public class Parser {
     boolean internalModel = !specification.getOptions().isNoBoard();
     boolean internalProgress = specification.getOptions().isMoveNumbers();
     DisplayOptions displayOptions =
-        problem instanceof BattleProblem || problem instanceof HelpProblem ? new LogOptions(
+        problem instanceof BattleProblem || problem instanceof Helpmate ? new LogOptions(
             outputLanguage, internalModel, internalProgress) : new DisplayOptions() {
           @Override
           public String toString() {

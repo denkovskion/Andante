@@ -45,6 +45,11 @@ public class King extends Piece implements Leaper {
   }
 
   @Override
+  public boolean isRoyal() {
+    return true;
+  }
+
+  @Override
   public List<Direction> getLeaps(Board board) {
     return board.getDirections(0, 1, 1, 1);
   }
@@ -62,8 +67,9 @@ public class King extends Piece implements Leaper {
             if (origin2 != null) {
               Piece piece2 = board.get(origin2);
               if (piece2 != null) {
-                if (piece2 instanceof Rook && piece2.getColour() == colour && board.isRebirthSquare(
-                    origin2, Rook.class, colour) && !state.isNoCastling(origin2)) {
+                if (board.isRebirthSquare(origin2, Rook.class, colour) && board.isRebirthSquare(
+                    origin2, piece2.getClass(), piece2.getColour()) && !state.isNoCastling(
+                    origin2)) {
                   Square target = board.findTarget(origin, direction, 2);
                   Square target2 = board.findTarget(origin, direction, 1);
                   if (fileOffset > 0) {

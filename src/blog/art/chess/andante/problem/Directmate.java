@@ -30,9 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class DirectProblem extends BattleProblem {
+public class Directmate extends BattleProblem {
 
-  public DirectProblem(Position position, Aim aim, int nMoves) {
+  public Directmate(Position position, Aim aim, int nMoves) {
     super(position, aim, nMoves);
   }
 
@@ -119,7 +119,7 @@ public class DirectProblem extends BattleProblem {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", DirectProblem.class.getSimpleName() + "[", "]").add(
+    return new StringJoiner(", ", Directmate.class.getSimpleName() + "[", "]").add(
         "position=" + position).add("aim=" + aim).add("nMoves=" + nMoves).toString();
   }
 }
