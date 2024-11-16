@@ -24,9 +24,6 @@
 
 package blog.art.chess.andante.move;
 
-import blog.art.chess.andante.piece.Colour;
-import blog.art.chess.andante.piece.orthodox.King;
-import blog.art.chess.andante.piece.orthodox.Rook;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Square;
 import java.util.List;
@@ -82,26 +79,9 @@ public class QuietMove extends NullMove {
   }
 
   @Override
-  protected void updateState(Position position) {
-    position.getMemory().push(position.getState().copy());
-    addNoCastling(position);
-    setEnPassant(position);
-    position.toggleSideToMove();
-  }
-
-  protected void addNoCastling(Position position) {
-    for (Square square : new Square[]{origin, target}) {
-      if (position.getBoard().isRebirthSquare(square, King.class, Colour.WHITE)
-          || position.getBoard().isRebirthSquare(square, Rook.class, Colour.WHITE)
-          || position.getBoard().isRebirthSquare(square, King.class, Colour.BLACK)
-          || position.getBoard().isRebirthSquare(square, Rook.class, Colour.BLACK)) {
-        position.getState().addNoCastling(square);
-      }
-    }
-  }
-
-  protected void setEnPassant(Position position) {
-    position.getState().resetEnPassant();
+  protected void removeCastlings(Position position) {
+    position.getState().removeCastling(origin);
+    position.getState().removeCastling(target);
   }
 
   @Override

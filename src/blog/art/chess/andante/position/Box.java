@@ -36,11 +36,7 @@ public interface Box {
 
   void push(Section section, Piece piece);
 
-  record Entry(Colour colour, int order, Piece piece) {
-
-  }
-
-  void push(Entry entry);
+  Section getSection(Colour colour, int order);
 
   List<Section> findSections(Colour colour);
 }

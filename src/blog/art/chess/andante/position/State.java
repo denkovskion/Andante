@@ -28,9 +28,11 @@ public interface State {
 
   State copy();
 
-  boolean isNoCastling(Square square);
+  boolean isCastling(Square square);
 
-  void addNoCastling(Square square);
+  void addCastling(Square square);
+
+  void removeCastling(Square square);
 
   boolean isEnPassant(Square square);
 

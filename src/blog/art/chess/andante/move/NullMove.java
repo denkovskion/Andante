@@ -55,14 +55,22 @@ public class NullMove extends Move {
   }
 
   @Override
-  protected void updateState(Position position) {
+  protected final void updateState(Position position) {
     position.getMemory().push(position.getState().copy());
-    position.getState().resetEnPassant();
+    removeCastlings(position);
+    setEnPassant(position);
     position.toggleSideToMove();
   }
 
+  protected void removeCastlings(Position position) {
+  }
+
+  protected void setEnPassant(Position position) {
+    position.getState().resetEnPassant();
+  }
+
   @Override
-  protected void revertState(Position position) {
+  protected final void revertState(Position position) {
     position.toggleSideToMove();
     position.setState(position.getMemory().pop());
   }

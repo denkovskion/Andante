@@ -30,14 +30,14 @@ import java.util.TreeSet;
 
 public class DefaultState implements State {
 
-  private final Set<Square> noCastling = new TreeSet<>();
+  private final Set<Square> castlings = new TreeSet<>();
   private Square enPassant;
 
   public DefaultState() {
   }
 
   private DefaultState(DefaultState state) {
-    this.noCastling.addAll(state.noCastling);
+    this.castlings.addAll(state.castlings);
     this.enPassant = state.enPassant;
   }
 
@@ -47,13 +47,18 @@ public class DefaultState implements State {
   }
 
   @Override
-  public boolean isNoCastling(Square square) {
-    return noCastling.contains(square);
+  public boolean isCastling(Square square) {
+    return castlings.contains(square);
   }
 
   @Override
-  public void addNoCastling(Square square) {
-    noCastling.add(square);
+  public void addCastling(Square square) {
+    castlings.add(square);
+  }
+
+  @Override
+  public void removeCastling(Square square) {
+    castlings.remove(square);
   }
 
   @Override
@@ -74,6 +79,6 @@ public class DefaultState implements State {
   @Override
   public String toString() {
     return new StringJoiner(", ", DefaultState.class.getSimpleName() + "[", "]").add(
-        "noCastling=" + noCastling).add("enPassant=" + enPassant).toString();
+        "castlings=" + castlings).add("enPassant=" + enPassant).toString();
   }
 }

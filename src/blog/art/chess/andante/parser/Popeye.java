@@ -55,10 +55,6 @@ class Popeye {
 
   }
 
-  record Promotion(Colour colour, int order, PieceType pieceType) {
-
-  }
-
   enum StipulationType {Direct, Help, Self}
 
   static final EnumMap<StipulationType, String> stipulationTypeCodes = new EnumMap<>(

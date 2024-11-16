@@ -53,8 +53,8 @@ public class DefaultBox implements Box {
   }
 
   @Override
-  public void push(Entry entry) {
-    push(new DefaultSection(entry.colour(), entry.order()), entry.piece());
+  public Section getSection(Colour colour, int order) {
+    return new DefaultSection(colour, order);
   }
 
   @Override

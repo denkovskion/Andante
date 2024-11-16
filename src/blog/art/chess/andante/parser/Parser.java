@@ -485,7 +485,9 @@ public class Parser {
             || pieceType == Popeye.PieceType.Rook || pieceType == Popeye.PieceType.Bishop
             || pieceType == Popeye.PieceType.Knight || pieceType == Popeye.PieceType.Pawn)
         ? new MailboxBoard() : new DefaultBoard();
-    specification.getPieces().stream().map(this::convertPiece).forEach(board::put);
+    specification.getPieces().forEach(piece -> board.put(
+        board.getSquare(convertFile(piece.square().file()), convertRank(piece.square().rank())),
+        convertPieceTypeAndColour(piece.pieceType(), piece.colour())));
     Box box = new DefaultBox();
     Popeye.PieceType[] promotionTypes = Stream.concat(
             Stream.of(Popeye.PieceType.Queen, Popeye.PieceType.Rook, Popeye.PieceType.Bishop,
@@ -493,7 +495,7 @@ public class Parser {
             specification.getPieces().stream().map(Popeye.Piece::pieceType).filter(
                 pieceType -> pieceType != Popeye.PieceType.King && pieceType != Popeye.PieceType.Pawn))
         .distinct().sorted().toArray(Popeye.PieceType[]::new);
-    Arrays.stream(Popeye.Colour.values()).flatMap(colour -> {
+    Arrays.stream(Popeye.Colour.values()).forEach(colour -> {
       int maxMove = switch (specification.getStipulation().stipulationType()) {
         case Direct -> switch (colour) {
           case White -> specification.getOptions().isHalfDuplex();
@@ -511,10 +513,10 @@ public class Parser {
               piece -> piece.colour() == colour && piece.pieceType() == Popeye.PieceType.Pawn ? 1 : 0)
           .sum();
       int maxPromotion = Math.min(maxMove, nPawns);
-      return IntStream.range(0, promotionTypes.length).mapToObj(index -> Stream.generate(
-              () -> new Popeye.Promotion(colour, index + 1, promotionTypes[index])).limit(maxPromotion))
-          .flatMap(Function.identity());
-    }).map(this::convertPromotion).forEach(box::push);
+      IntStream.range(0, promotionTypes.length).forEach(index -> IntStream.range(0, maxPromotion)
+          .forEach(promotionNo -> box.push(box.getSection(convertColour(colour), index + 1),
+              convertPieceTypeAndColour(promotionTypes[index], colour))));
+    });
     Table table = new DefaultTable();
     Colour sideToMove = switch (specification.getStipulation().stipulationType()) {
       case Direct, Self -> specification.getOptions().isHalfDuplex();
@@ -522,12 +524,19 @@ public class Parser {
           specification.getOptions().isHalfDuplex() == specification.getOptions().isWhiteToPlay();
     } ? Colour.BLACK : Colour.WHITE;
     State state = new DefaultState();
-    specification.getOptions().getNoCastling().stream()
-        .map(square -> board.getSquare(convertFile(square.file()), convertRank(square.rank())))
-        .forEach(state::addNoCastling);
-    specification.getOptions().getEnPassant().stream()
-        .map(square -> board.getSquare(convertFile(square.file()), convertRank(square.rank())))
-        .forEach(state::setEnPassant);
+    specification.getPieces().stream().collect(
+            Collectors.toMap(Popeye.Piece::square, Function.identity(),
+                (oldValue, newValue) -> newValue)).values().stream().filter(piece ->
+            (piece.pieceType() == Popeye.PieceType.King && piece.square().file() == Popeye.File._e
+                || piece.pieceType() == Popeye.PieceType.Rook && (
+                piece.square().file() == Popeye.File._a || piece.square().file() == Popeye.File._h))
+                && (piece.colour() == Popeye.Colour.White && piece.square().rank() == Popeye.Rank._1
+                || piece.colour() == Popeye.Colour.Black && piece.square().rank() == Popeye.Rank._8))
+        .filter(piece -> !specification.getOptions().getNoCastling().contains(piece.square()))
+        .forEach(piece -> state.addCastling(board.getSquare(convertFile(piece.square().file()),
+            convertRank(piece.square().rank()))));
+    specification.getOptions().getEnPassant().forEach(square -> state.setEnPassant(
+        board.getSquare(convertFile(square.file()), convertRank(square.rank()))));
     Memory memory = new DefaultMemory();
     Position position = new Position(board, box, table, sideToMove, state, memory);
     Aim aim = specification.getStipulation().goal() == null ? null
@@ -585,16 +594,6 @@ public class Parser {
           }
         };
     return new Task(problem, analysisOptions, displayOptions);
-  }
-
-  private Board.Entry convertPiece(Popeye.Piece piece) {
-    return new Board.Entry(convertFile(piece.square().file()), convertRank((piece.square().rank())),
-        convertPieceTypeAndColour(piece.pieceType(), piece.colour()));
-  }
-
-  private Box.Entry convertPromotion(Popeye.Promotion promotion) {
-    return new Box.Entry(convertColour(promotion.colour()), promotion.order(),
-        convertPieceTypeAndColour(promotion.pieceType(), promotion.colour()));
   }
 
   private Piece convertPieceTypeAndColour(Popeye.PieceType pieceType, Popeye.Colour colour) {

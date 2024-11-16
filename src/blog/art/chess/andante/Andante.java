@@ -31,7 +31,7 @@ import java.util.Arrays;
 public class Andante {
 
   public static void main(String[] args) {
-    System.out.println("Andante [develop] [2024-11-01] Copyright 2024 Ivan Denkovski");
+    System.out.println("Andante [develop] [2024-11-16] Copyright 2024 Ivan Denkovski");
     new Parser(Arrays.stream(args).findFirst().orElse(null)).readAllTasks().forEach(Task::solve);
   }
 }

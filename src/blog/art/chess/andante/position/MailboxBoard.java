@@ -70,6 +70,14 @@ public class MailboxBoard extends StandardBoard {
   }
 
   @Override
+  public Square getSquare(int file, int rank) {
+    if (file < File.FIRST || file > File.LAST || rank < Rank.FIRST || rank > Rank.LAST) {
+      throw new IndexOutOfBoundsException();
+    }
+    return new MailboxSquare(file, rank);
+  }
+
+  @Override
   public List<Square> findOrigins() {
     List<Square> origins = new ArrayList<>();
     for (int number : numbers) {
@@ -83,14 +91,6 @@ public class MailboxBoard extends StandardBoard {
   @Override
   public Square findTarget(Square origin, Direction direction, int distance) {
     return squares.get(origin.number() + direction.offset() * distance);
-  }
-
-  @Override
-  public Square getSquare(int file, int rank) {
-    if (file < File.FIRST || file > File.LAST || rank < Rank.FIRST || rank > Rank.LAST) {
-      throw new IndexOutOfBoundsException();
-    }
-    return new MailboxSquare(file, rank);
   }
 
   @Override

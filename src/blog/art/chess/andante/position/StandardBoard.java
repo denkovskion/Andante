@@ -62,11 +62,6 @@ public abstract class StandardBoard implements Board {
     static final int LAST = 8;
   }
 
-  @Override
-  public void put(Entry entry) {
-    put(getSquare(entry.file(), entry.rank()), entry.piece());
-  }
-
   protected abstract Map<Set<Direction>, List<Direction>> getAllDirections();
 
   @Override

@@ -34,19 +34,13 @@ public interface Board {
 
   void put(Square square, Piece piece);
 
-  record Entry(int file, int rank, Piece piece) {
-
-  }
-
-  void put(Entry entry);
-
   Piece remove(Square square);
+
+  Square getSquare(int file, int rank);
 
   List<Square> findOrigins();
 
   Square findTarget(Square origin, Direction direction, int distance);
-
-  Square getSquare(int file, int rank);
 
   Direction getDirection(int fileOffset, int rankOffset);
 
