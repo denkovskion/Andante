@@ -22,40 +22,28 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.piece.fairy;
+package blog.art.chess.andante.move.fairy;
 
-import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.piece.Colour;
-import blog.art.chess.andante.piece.Piece;
-import blog.art.chess.andante.piece.category.Hopper;
-import blog.art.chess.andante.position.Board;
-import blog.art.chess.andante.position.Box;
-import blog.art.chess.andante.position.Direction;
+import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Square;
-import blog.art.chess.andante.position.State;
-import java.util.List;
 import java.util.StringJoiner;
 
-public class Grasshopper extends Piece implements Hopper {
+public class CirceCaptureCastling extends CirceCapture {
 
-  public Grasshopper(Colour colour) {
-    super(colour);
+  public CirceCaptureCastling(Square origin, Square target, Square rebirth) {
+    super(origin, target, rebirth);
   }
 
   @Override
-  public List<Direction> getHops(Board board) {
-    return board.getDirections(0, 1, 1, 1);
-  }
-
-  @Override
-  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
-      List<Move> moves) {
-    return generateMoves(board, circe, origin, moves);
+  protected void updateCastlings(Position position) {
+    position.getState().removeCastling(origin);
+    position.getState().removeCastling(target);
+    position.getState().addCastling(rebirth);
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", Grasshopper.class.getSimpleName() + "[", "]").add(
-        "colour=" + colour).toString();
+    return new StringJoiner(", ", CirceCaptureCastling.class.getSimpleName() + "[", "]").add(
+        "origin=" + origin).add("target=" + target).add("rebirth=" + rebirth).toString();
   }
 }

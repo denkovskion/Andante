@@ -22,37 +22,42 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move;
+package blog.art.chess.andante.move.fairy;
 
+import blog.art.chess.andante.move.EnPassant;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Square;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class EnPassant extends QuietMove {
+public class CirceEnPassant extends EnPassant {
 
-  protected final Square stop;
+  protected final Square rebirth;
 
-  public EnPassant(Square origin, Square target, Square stop) {
-    super(origin, target);
-    this.stop = stop;
+  public CirceEnPassant(Square origin, Square target, Square stop, Square rebirth) {
+    super(origin, target, stop);
+    this.rebirth = rebirth;
   }
 
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))
         .append(position.getBoard().toCode(origin)).append("x")
-        .append(position.getBoard().toCode(target)).append(" e.p.");
+        .append(position.getBoard().toCode(target)).append(" e.p.").append("(")
+        .append(position.getBoard().get(stop).getCode(locale))
+        .append(position.getBoard().toCode(rebirth)).append(")");
   }
 
   @Override
   protected void updatePieces(Position position) {
     position.getTable().push(position.getBoard().remove(stop));
     position.getBoard().put(target, position.getBoard().remove(origin));
+    position.getBoard().put(rebirth, position.getTable().pop());
   }
 
   @Override
   protected void revertPieces(Position position) {
+    position.getTable().push(position.getBoard().remove(rebirth));
     position.getBoard().put(origin, position.getBoard().remove(target));
     position.getBoard().put(stop, position.getTable().pop());
   }
@@ -62,11 +67,13 @@ public class EnPassant extends QuietMove {
     position.getState().removeCastling(origin);
     position.getState().removeCastling(target);
     position.getState().removeCastling(stop);
+    position.getState().removeCastling(rebirth);
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", EnPassant.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).add("stop=" + stop).toString();
+    return new StringJoiner(", ", CirceEnPassant.class.getSimpleName() + "[", "]").add(
+            "origin=" + origin).add("target=" + target).add("stop=" + stop).add("rebirth=" + rebirth)
+        .toString();
   }
 }

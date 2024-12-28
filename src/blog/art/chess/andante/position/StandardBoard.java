@@ -130,6 +130,36 @@ public abstract class StandardBoard implements Board {
   }
 
   @Override
+  public Square findRebirthSquare(Class<? extends Piece> pieceType, Colour colour, Square origin) {
+    return switch (colour) {
+      case WHITE -> pieceType.equals(King.class) ? getSquare(File.KING, Rank.FIRST)
+          : pieceType.equals(Queen.class) ? getSquare(File.QUEEN, Rank.FIRST)
+              : pieceType.equals(Rook.class) ? (origin.file() + origin.rank()) % 2 != 0 ? getSquare(
+                  File.KING_ROOK, Rank.FIRST) : getSquare(File.QUEEN_ROOK, Rank.FIRST)
+                  : pieceType.equals(Bishop.class) ? (origin.file() + origin.rank()) % 2 != 0
+                      ? getSquare(File.KING_BISHOP, Rank.FIRST)
+                      : getSquare(File.QUEEN_BISHOP, Rank.FIRST)
+                      : pieceType.equals(Knight.class) ? (origin.file() + origin.rank()) % 2 != 0
+                          ? getSquare(File.QUEEN_KNIGHT, Rank.FIRST)
+                          : getSquare(File.KING_KNIGHT, Rank.FIRST)
+                          : pieceType.equals(Pawn.class) ? getSquare(origin.file(), Rank.FIRST + 1)
+                              : getSquare(origin.file(), Rank.LAST);
+      case BLACK -> pieceType.equals(King.class) ? getSquare(File.KING, Rank.LAST)
+          : pieceType.equals(Queen.class) ? getSquare(File.QUEEN, Rank.LAST)
+              : pieceType.equals(Rook.class) ? (origin.file() + origin.rank()) % 2 != 0 ? getSquare(
+                  File.QUEEN_ROOK, Rank.LAST) : getSquare(File.KING_ROOK, Rank.LAST)
+                  : pieceType.equals(Bishop.class) ? (origin.file() + origin.rank()) % 2 != 0
+                      ? getSquare(File.QUEEN_BISHOP, Rank.LAST)
+                      : getSquare(File.KING_BISHOP, Rank.LAST)
+                      : pieceType.equals(Knight.class) ? (origin.file() + origin.rank()) % 2 != 0
+                          ? getSquare(File.KING_KNIGHT, Rank.LAST)
+                          : getSquare(File.QUEEN_KNIGHT, Rank.LAST)
+                          : pieceType.equals(Pawn.class) ? getSquare(origin.file(), Rank.LAST - 1)
+                              : getSquare(origin.file(), Rank.FIRST);
+    };
+  }
+
+  @Override
   public String toCode(Square square) {
     return "" + (char) ('a' + square.file() - 1) + (char) ('1' + square.rank() - 1);
   }

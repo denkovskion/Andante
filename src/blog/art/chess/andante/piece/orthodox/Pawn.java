@@ -31,6 +31,12 @@ import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.move.Promotion;
 import blog.art.chess.andante.move.PromotionCapture;
 import blog.art.chess.andante.move.QuietMove;
+import blog.art.chess.andante.move.fairy.CirceCapture;
+import blog.art.chess.andante.move.fairy.CirceCaptureCastling;
+import blog.art.chess.andante.move.fairy.CirceEnPassant;
+import blog.art.chess.andante.move.fairy.CirceEnPassantCastling;
+import blog.art.chess.andante.move.fairy.CircePromotionCapture;
+import blog.art.chess.andante.move.fairy.CircePromotionCaptureCastling;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
@@ -50,7 +56,8 @@ public class Pawn extends Piece {
   }
 
   @Override
-  public boolean generateMoves(Board board, Box box, State state, Square origin, List<Move> moves) {
+  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
+      List<Move> moves) {
     int rankOffset = switch (colour) {
       case WHITE -> 1;
       case BLACK -> -1;
@@ -68,36 +75,79 @@ public class Pawn extends Piece {
               }
               if (moves != null) {
                 if (board.isRebirthSquare(target, Piece.class, colour)) {
+                  if (circe) {
+                    Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(),
+                        target);
+                    if (board.get(rebirth) == null || rebirth.equals(origin)) {
+                      if (piece.isCastling()) {
+                        for (Section section : box.findSections(colour)) {
+                          moves.add(
+                              new CircePromotionCaptureCastling(origin, target, section, rebirth));
+                        }
+                      } else {
+                        for (Section section : box.findSections(colour)) {
+                          moves.add(new CircePromotionCapture(origin, target, section, rebirth));
+                        }
+                      }
+                      continue;
+                    }
+                  }
                   for (Section section : box.findSections(colour)) {
                     moves.add(new PromotionCapture(origin, target, section));
                   }
                 } else {
+                  if (circe) {
+                    Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(),
+                        target);
+                    if (board.get(rebirth) == null || rebirth.equals(origin)) {
+                      if (piece.isCastling()) {
+                        moves.add(new CirceCaptureCastling(origin, target, rebirth));
+                      } else {
+                        moves.add(new CirceCapture(origin, target, rebirth));
+                      }
+                      continue;
+                    }
+                  }
                   moves.add(new Capture(origin, target));
                 }
               }
             }
           } else if (state.isEnPassant(target)) {
             Square stop = board.findTarget(target, board.getDirection(0, -rankOffset), 1);
-            if (board.get(stop).isRoyal()) {
+            piece = board.get(stop);
+            if (piece.isRoyal()) {
               return false;
             }
             if (moves != null) {
+              if (circe) {
+                Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), stop);
+                if (board.get(rebirth) == null || rebirth.equals(origin)) {
+                  if (piece.isCastling()) {
+                    moves.add(new CirceEnPassantCastling(origin, target, stop, rebirth));
+                  } else {
+                    moves.add(new CirceEnPassant(origin, target, stop, rebirth));
+                  }
+                  continue;
+                }
+              }
               moves.add(new EnPassant(origin, target, stop));
             }
           }
-        } else if (moves != null) {
-          if (board.get(target) == null) {
-            if (board.isRebirthSquare(target, Piece.class, colour)) {
-              for (Section section : box.findSections(colour)) {
-                moves.add(new Promotion(origin, target, section));
-              }
-            } else {
-              moves.add(new QuietMove(origin, target));
-              if (board.isRebirthSquare(origin, Pawn.class, colour)) {
-                target = board.findTarget(origin, direction, 2);
-                if (board.get(target) == null) {
-                  Square stop = board.findTarget(origin, direction, 1);
-                  moves.add(new DoubleStep(origin, target, stop));
+        } else {
+          if (moves != null) {
+            if (board.get(target) == null) {
+              if (board.isRebirthSquare(target, Piece.class, colour)) {
+                for (Section section : box.findSections(colour)) {
+                  moves.add(new Promotion(origin, target, section));
+                }
+              } else {
+                moves.add(new QuietMove(origin, target));
+                if (board.isRebirthSquare(origin, Pawn.class, colour)) {
+                  target = board.findTarget(origin, direction, 2);
+                  if (board.get(target) == null) {
+                    Square stop = board.findTarget(origin, direction, 1);
+                    moves.add(new DoubleStep(origin, target, stop));
+                  }
                 }
               }
             }

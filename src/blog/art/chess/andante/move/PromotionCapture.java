@@ -46,16 +46,16 @@ public class PromotionCapture extends Promotion {
 
   @Override
   protected void updatePieces(Position position) {
-    position.getTable().push(position.getBoard().remove(target));
     position.getTable().push(position.getBoard().remove(origin));
+    position.getTable().push(position.getBoard().remove(target));
     position.getBoard().put(target, position.getBox().pop(section));
   }
 
   @Override
   protected void revertPieces(Position position) {
     position.getBox().push(section, position.getBoard().remove(target));
-    position.getBoard().put(origin, position.getTable().pop());
     position.getBoard().put(target, position.getTable().pop());
+    position.getBoard().put(origin, position.getTable().pop());
   }
 
   @Override

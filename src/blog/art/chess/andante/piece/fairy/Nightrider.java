@@ -48,8 +48,9 @@ public class Nightrider extends Piece implements Rider {
   }
 
   @Override
-  public boolean generateMoves(Board board, Box box, State state, Square origin, List<Move> moves) {
-    return generateMoves(board, origin, moves);
+  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
+      List<Move> moves) {
+    return generateMoves(board, circe, origin, moves);
   }
 
   @Override

@@ -120,6 +120,21 @@ public class Parser {
                 .findAny().orElseThrow();
             switch (command) {
               case Remark -> scanner.nextLine();
+              case Condition -> {
+                Pattern conditionPattern = Pattern.compile(
+                    Arrays.stream(Popeye.Condition.values()).map(Enum::name)
+                        .map(keywords::getString).collect(Collectors.joining("|")),
+                    Pattern.CASE_INSENSITIVE);
+                do {
+                  String conditionToken = token = scanner.next(conditionPattern);
+                  Popeye.Condition condition = Arrays.stream(Popeye.Condition.values()).filter(
+                          value -> keywords.getString(value.name()).equalsIgnoreCase(conditionToken))
+                      .findAny().orElseThrow();
+                  if (condition == Popeye.Condition.Circe) {
+                    problem.getConditions().setCirce();
+                  }
+                } while (scanner.hasNext(conditionPattern));
+              }
               case Option -> {
                 Pattern optionPattern = Pattern.compile(
                     Arrays.stream(Popeye.Option.values()).map(Enum::name).map(keywords::getString)
@@ -538,7 +553,8 @@ public class Parser {
     specification.getOptions().getEnPassant().forEach(square -> state.setEnPassant(
         board.getSquare(convertFile(square.file()), convertRank(square.rank()))));
     Memory memory = new DefaultMemory();
-    Position position = new Position(board, box, table, sideToMove, state, memory);
+    boolean circe = specification.getConditions().isCirce();
+    Position position = new Position(board, box, table, sideToMove, state, memory, circe);
     Aim aim = specification.getStipulation().goal() == null ? null
         : switch (specification.getStipulation().goal()) {
           case Mate -> Aim.MATE;

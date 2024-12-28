@@ -30,7 +30,7 @@ import java.util.StringJoiner;
 
 public class DoubleStep extends QuietMove {
 
-  private final Square stop;
+  protected final Square stop;
 
   public DoubleStep(Square origin, Square target, Square stop) {
     super(origin, target);
@@ -38,7 +38,14 @@ public class DoubleStep extends QuietMove {
   }
 
   @Override
-  protected void setEnPassant(Position position) {
+  protected void updateCastlings(Position position) {
+    position.getState().removeCastling(origin);
+    position.getState().removeCastling(target);
+    position.getState().removeCastling(stop);
+  }
+
+  @Override
+  protected void updateEnPassant(Position position) {
     position.getState().setEnPassant(stop);
   }
 

@@ -50,8 +50,12 @@ public abstract class Piece {
     return false;
   }
 
-  public abstract boolean generateMoves(Board board, Box box, State state, Square origin,
-      List<Move> moves);
+  public boolean isCastling() {
+    return false;
+  }
+
+  public abstract boolean generateMoves(Board board, Box box, State state, boolean circe,
+      Square origin, List<Move> moves);
 
   public String getCode(Locale locale) {
     return ResourceBundle.getBundle("blog.art.chess.andante.piece.PieceCodes", locale)

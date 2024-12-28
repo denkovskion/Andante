@@ -53,5 +53,7 @@ public interface Board {
 
   boolean isRebirthSquare(Square square, Class<? extends Piece> pieceType, Colour colour);
 
+  Square findRebirthSquare(Class<? extends Piece> pieceType, Colour colour, Square origin);
+
   String toCode(Square square);
 }

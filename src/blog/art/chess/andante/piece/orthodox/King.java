@@ -50,13 +50,19 @@ public class King extends Piece implements Leaper {
   }
 
   @Override
+  public boolean isCastling() {
+    return true;
+  }
+
+  @Override
   public List<Direction> getLeaps(Board board) {
     return board.getDirections(0, 1, 1, 1);
   }
 
   @Override
-  public boolean generateMoves(Board board, Box box, State state, Square origin, List<Move> moves) {
-    if (!generateMoves(board, origin, moves)) {
+  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
+      List<Move> moves) {
+    if (!generateMoves(board, circe, origin, moves)) {
       return false;
     }
     if (moves != null) {

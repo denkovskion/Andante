@@ -43,13 +43,19 @@ public class Rook extends Piece implements Rider {
   }
 
   @Override
+  public boolean isCastling() {
+    return true;
+  }
+
+  @Override
   public List<Direction> getRides(Board board) {
     return board.getDirections(0, 1);
   }
 
   @Override
-  public boolean generateMoves(Board board, Box box, State state, Square origin, List<Move> moves) {
-    return generateMoves(board, origin, moves);
+  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
+      List<Move> moves) {
+    return generateMoves(board, circe, origin, moves);
   }
 
   @Override

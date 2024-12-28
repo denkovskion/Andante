@@ -22,51 +22,61 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move;
+package blog.art.chess.andante.move.fairy;
 
+import blog.art.chess.andante.move.PromotionCapture;
 import blog.art.chess.andante.position.Position;
+import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class EnPassant extends QuietMove {
+public class CircePromotionCapture extends PromotionCapture {
 
-  protected final Square stop;
+  protected final Square rebirth;
 
-  public EnPassant(Square origin, Square target, Square stop) {
-    super(origin, target);
-    this.stop = stop;
+  public CircePromotionCapture(Square origin, Square target, Section section, Square rebirth) {
+    super(origin, target, section);
+    this.rebirth = rebirth;
   }
 
   @Override
   public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))
         .append(position.getBoard().toCode(origin)).append("x")
-        .append(position.getBoard().toCode(target)).append(" e.p.");
+        .append(position.getBoard().toCode(target)).append("=")
+        .append(position.getBox().peek(section).getCode(locale)).append("(")
+        .append(position.getBoard().get(target).getCode(locale))
+        .append(position.getBoard().toCode(rebirth)).append(")");
   }
 
   @Override
   protected void updatePieces(Position position) {
-    position.getTable().push(position.getBoard().remove(stop));
-    position.getBoard().put(target, position.getBoard().remove(origin));
+    position.getTable().push(position.getBoard().remove(origin));
+    position.getTable().push(position.getBoard().remove(target));
+    position.getBoard().put(target, position.getBox().pop(section));
+    position.getBoard().put(rebirth, position.getTable().pop());
   }
 
   @Override
   protected void revertPieces(Position position) {
-    position.getBoard().put(origin, position.getBoard().remove(target));
-    position.getBoard().put(stop, position.getTable().pop());
+    position.getTable().push(position.getBoard().remove(rebirth));
+    position.getBox().push(section, position.getBoard().remove(target));
+    position.getBoard().put(target, position.getTable().pop());
+    position.getBoard().put(origin, position.getTable().pop());
   }
 
   @Override
   protected void updateCastlings(Position position) {
     position.getState().removeCastling(origin);
     position.getState().removeCastling(target);
-    position.getState().removeCastling(stop);
+    position.getState().removeCastling(rebirth);
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", EnPassant.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).add("stop=" + stop).toString();
+    return new StringJoiner(", ", CircePromotionCapture.class.getSimpleName() + "[", "]").add(
+            "origin=" + origin).add("target=" + target).add("section=" + section)
+        .add("rebirth=" + rebirth).toString();
   }
 }

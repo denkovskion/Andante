@@ -185,13 +185,33 @@ class Popeye {
     }
   }
 
-  enum Command {Remark, Option, Stipulation, Pieces}
+  enum Condition {Circe}
+
+  static class Conditions {
+
+    private boolean circe;
+
+    public boolean isCirce() {
+      return circe;
+    }
+
+    public void setCirce() {
+      this.circe = true;
+    }
+  }
+
+  enum Command {Remark, Condition, Option, Stipulation, Pieces}
 
   static class Problem {
 
+    private final Conditions conditions = new Conditions();
     private final Options options = new Options();
     private Stipulation stipulation;
     private final List<Piece> pieces = new ArrayList<>();
+
+    public Conditions getConditions() {
+      return conditions;
+    }
 
     Options getOptions() {
       return options;

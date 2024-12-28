@@ -79,7 +79,7 @@ public class QuietMove extends NullMove {
   }
 
   @Override
-  protected void removeCastlings(Position position) {
+  protected void updateCastlings(Position position) {
     position.getState().removeCastling(origin);
     position.getState().removeCastling(target);
   }
