@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024 Ivan Denkovski
+ * Copyright (c) 2024-2025 Ivan Denkovski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ import java.util.Arrays;
 public class Andante {
 
   public static void main(String[] args) {
-    System.out.println("Andante [develop] [2024-12-28] Copyright 2024 Ivan Denkovski");
+    System.out.println("Andante [develop] [2025-01-01] Copyright 2024-2025 Ivan Denkovski");
     new Parser(Arrays.stream(args).findFirst().orElse(null)).readAllTasks().forEach(Task::solve);
   }
 }
