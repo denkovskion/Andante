@@ -108,8 +108,7 @@ public class Helpmate extends Problem {
       for (Move move : pseudoLegalMovesMax) {
         List<Move> pseudoLegalMovesMin = new ArrayList<>();
         StringBuilder lanBuilder = new StringBuilder();
-        move.preWrite(position, lanBuilder, locale);
-        if (move.make(position, pseudoLegalMovesMin, null, null)) {
+        if (move.make(position, pseudoLegalMovesMin, lanBuilder, locale)) {
           List<SolutionWriter.Branch> branchesMin = new ArrayList<>();
           if (analyseMin(position, aim, depth - 1, pseudoLegalMovesMin, branchesMin, locale,
               includeTempoTries, false, true, false) != 0) {
@@ -176,8 +175,7 @@ public class Helpmate extends Problem {
         for (Move move : pseudoLegalMovesMin) {
           List<Move> pseudoLegalMovesMax = new ArrayList<>();
           StringBuilder lanBuilder = new StringBuilder();
-          move.preWrite(position, lanBuilder, locale);
-          if (move.make(position, pseudoLegalMovesMax, null, null)) {
+          if (move.make(position, pseudoLegalMovesMax, lanBuilder, locale)) {
             nLegalMoves++;
             List<SolutionWriter.Branch> branchesMax = new ArrayList<>();
             if (analyseMax(position, aim, depth, pseudoLegalMovesMax, branchesMax, locale,

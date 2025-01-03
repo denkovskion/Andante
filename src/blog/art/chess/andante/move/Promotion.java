@@ -40,7 +40,7 @@ public class Promotion extends QuietMove {
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
+  protected void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))
         .append(position.getBoard().toCode(origin)).append("-")
         .append(position.getBoard().toCode(target)).append("=")

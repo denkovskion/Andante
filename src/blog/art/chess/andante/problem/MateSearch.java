@@ -54,6 +54,7 @@ public class MateSearch extends Problem {
           for (int depth = 1; depth <= nMoves; depth++) {
             int score = searchMin(position, depth, pseudoLegalMovesMin);
             if (score > 0) {
+              move.postWrite(position, pseudoLegalMovesMin, lanBuilder);
               points.add(new SolutionWriter.Point("+M" + depth, lanBuilder.toString()));
               break;
             }

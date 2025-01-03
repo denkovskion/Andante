@@ -41,17 +41,16 @@ public class QuietMove extends NullMove {
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
+  protected void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))
         .append(position.getBoard().toCode(origin)).append("-")
         .append(position.getBoard().toCode(target));
   }
 
   @Override
-  public void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
-      StringBuilder lanBuilder) {
+  public void postWrite(Position position, List<Move> pseudoLegalMoves, StringBuilder lanBuilder) {
     int nChecks = position.isCheck();
-    boolean terminal = position.isTerminal(generatedPseudoLegalMoves);
+    boolean terminal = position.isTerminal(pseudoLegalMoves);
     if (terminal) {
       if (nChecks > 0) {
         if (nChecks > 1) {

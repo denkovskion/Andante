@@ -37,13 +37,12 @@ public class NullMove extends Move {
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
+  protected void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append((String) null);
   }
 
   @Override
-  public void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
-      StringBuilder lanBuilder) {
+  public void postWrite(Position position, List<Move> pseudoLegalMoves, StringBuilder lanBuilder) {
   }
 
   @Override

@@ -27,7 +27,6 @@ package blog.art.chess.andante.position;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -110,19 +109,7 @@ public class Position {
     return nChecks;
   }
 
-  public boolean isTerminal(List<Move> generatedPseudoLegalMoves) {
-    List<Move> pseudoLegalMoves;
-    if (generatedPseudoLegalMoves != null) {
-      pseudoLegalMoves = generatedPseudoLegalMoves;
-    } else {
-      pseudoLegalMoves = new ArrayList<>();
-      for (Square origin : board.findOrigins()) {
-        Piece piece = board.get(origin);
-        if (piece.getColour() == sideToMove) {
-          piece.generateMoves(board, box, state, circe, origin, pseudoLegalMoves);
-        }
-      }
-    }
+  public boolean isTerminal(List<Move> pseudoLegalMoves) {
     for (Move move : pseudoLegalMoves) {
       boolean result = move.make(this, null, null, null);
       move.unmake(this);

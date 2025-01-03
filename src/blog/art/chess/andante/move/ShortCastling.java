@@ -36,7 +36,7 @@ public class ShortCastling extends Castling {
   }
 
   @Override
-  public void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
+  protected void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append("0-0");
   }
 

@@ -39,11 +39,7 @@ public abstract class Move {
     boolean result = preMake(position);
     updatePieces(position);
     updateState(position);
-    result = position.isLegal(pseudoLegalMoves) && result;
-    if (lanBuilder != null) {
-      postWrite(position, pseudoLegalMoves, lanBuilder);
-    }
-    return result;
+    return result && position.isLegal(pseudoLegalMoves);
   }
 
   public final void unmake(Position position) {
@@ -51,9 +47,9 @@ public abstract class Move {
     revertPieces(position);
   }
 
-  public abstract void preWrite(Position position, StringBuilder lanBuilder, Locale locale);
+  protected abstract void preWrite(Position position, StringBuilder lanBuilder, Locale locale);
 
-  public abstract void postWrite(Position position, List<Move> generatedPseudoLegalMoves,
+  public abstract void postWrite(Position position, List<Move> pseudoLegalMoves,
       StringBuilder lanBuilder);
 
   protected abstract boolean preMake(Position position);
