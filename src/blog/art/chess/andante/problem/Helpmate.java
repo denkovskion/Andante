@@ -113,7 +113,7 @@ public class Helpmate extends Problem {
           if (analyseMin(position, aim, depth - 1, pseudoLegalMovesMin, branchesMin, locale,
               includeTempoTries, false, true, false) != 0) {
             max++;
-            move.postWrite(position, pseudoLegalMovesMin, lanBuilder);
+            Move.postWrite(position, pseudoLegalMovesMin, lanBuilder);
             branchesMax.add(
                 new SolutionWriter.Branch(Play.HELP_2ND, lanBuilder.toString(), branchesMin));
           }
@@ -181,7 +181,7 @@ public class Helpmate extends Problem {
             if (analyseMax(position, aim, depth, pseudoLegalMovesMax, branchesMax, locale,
                 includeTempoTries, false, true, false) != 0) {
               min++;
-              move.postWrite(position, pseudoLegalMovesMax, lanBuilder);
+              Move.postWrite(position, pseudoLegalMovesMax, lanBuilder);
               branchesMin.add(
                   new SolutionWriter.Branch(Play.HELP_1ST, lanBuilder.toString(), branchesMax));
             }

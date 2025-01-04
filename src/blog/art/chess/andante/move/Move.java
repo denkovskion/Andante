@@ -49,8 +49,25 @@ public abstract class Move {
 
   protected abstract void preWrite(Position position, StringBuilder lanBuilder, Locale locale);
 
-  public abstract void postWrite(Position position, List<Move> pseudoLegalMoves,
-      StringBuilder lanBuilder);
+  public static void postWrite(Position position, List<Move> pseudoLegalMoves,
+      StringBuilder lanBuilder) {
+    int nChecks = position.isCheck();
+    boolean terminal = position.isTerminal(pseudoLegalMoves);
+    if (terminal) {
+      if (nChecks > 0) {
+        if (nChecks > 1) {
+          lanBuilder.append("+".repeat(nChecks));
+        }
+        lanBuilder.append("#");
+      } else {
+        lanBuilder.append("=");
+      }
+    } else {
+      if (nChecks > 0) {
+        lanBuilder.append("+".repeat(nChecks));
+      }
+    }
+  }
 
   protected abstract boolean preMake(Position position);
 

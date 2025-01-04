@@ -26,7 +26,6 @@ package blog.art.chess.andante.move;
 
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Square;
-import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
@@ -45,26 +44,6 @@ public class QuietMove extends NullMove {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))
         .append(position.getBoard().toCode(origin)).append("-")
         .append(position.getBoard().toCode(target));
-  }
-
-  @Override
-  public void postWrite(Position position, List<Move> pseudoLegalMoves, StringBuilder lanBuilder) {
-    int nChecks = position.isCheck();
-    boolean terminal = position.isTerminal(pseudoLegalMoves);
-    if (terminal) {
-      if (nChecks > 0) {
-        if (nChecks > 1) {
-          lanBuilder.append("+".repeat(nChecks));
-        }
-        lanBuilder.append("#");
-      } else {
-        lanBuilder.append("=");
-      }
-    } else {
-      if (nChecks > 0) {
-        lanBuilder.append("+".repeat(nChecks));
-      }
-    }
   }
 
   @Override

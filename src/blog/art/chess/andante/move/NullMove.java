@@ -25,7 +25,6 @@
 package blog.art.chess.andante.move;
 
 import blog.art.chess.andante.position.Position;
-import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
@@ -39,10 +38,6 @@ public class NullMove extends Move {
   @Override
   protected void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append((String) null);
-  }
-
-  @Override
-  public void postWrite(Position position, List<Move> pseudoLegalMoves, StringBuilder lanBuilder) {
   }
 
   @Override

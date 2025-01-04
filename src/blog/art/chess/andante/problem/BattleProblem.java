@@ -114,7 +114,7 @@ public abstract class BattleProblem extends Problem {
               List<SolutionWriter.Branch> variations = new ArrayList<>();
               analyseMin(position, aim, depth - score + 1, pseudoLegalMovesMin, variations, locale,
                   true, includeThreats, includeShortVariations, false);
-              move.postWrite(position, pseudoLegalMovesMin, lanBuilder);
+              Move.postWrite(position, pseudoLegalMovesMin, lanBuilder);
               if (markKeys) {
                 branches.add(
                     new SolutionWriter.Branch(Play.KEY, lanBuilder.toString(), variations));
@@ -123,7 +123,7 @@ public abstract class BattleProblem extends Problem {
                     variations));
               }
             } else {
-              move.postWrite(position, pseudoLegalMovesMin, lanBuilder);
+              Move.postWrite(position, pseudoLegalMovesMin, lanBuilder);
               if (markKeys) {
                 branches.add(new SolutionWriter.Branch(Play.KEY, lanBuilder.toString(),
                     Collections.emptyList()));
@@ -136,7 +136,7 @@ public abstract class BattleProblem extends Problem {
             List<SolutionWriter.Branch> variations = new ArrayList<>();
             analyseMin(position, aim, depth, pseudoLegalMovesMin, variations, locale,
                 includeVariations, includeThreats, includeShortVariations, false);
-            move.postWrite(position, pseudoLegalMovesMin, lanBuilder);
+            Move.postWrite(position, pseudoLegalMovesMin, lanBuilder);
             branches.add(new SolutionWriter.Branch(Play.TRY, lanBuilder.toString(), variations));
           }
           if (logMoves) {
@@ -161,7 +161,7 @@ public abstract class BattleProblem extends Problem {
         List<Move> pseudoLegalMovesMax = new ArrayList<>();
         StringBuilder lanBuilder = new StringBuilder();
         if (move.make(position, pseudoLegalMovesMax, lanBuilder, locale)) {
-          move.postWrite(position, pseudoLegalMovesMax, lanBuilder);
+          Move.postWrite(position, pseudoLegalMovesMax, lanBuilder);
           branches.add(new SolutionWriter.Branch(Play.REFUTATION, lanBuilder.toString(),
               Collections.emptyList()));
         }
@@ -197,13 +197,13 @@ public abstract class BattleProblem extends Problem {
                   includeVariations, includeThreats, includeShortVariations, false, 0, true, false,
                   false);
               if (threats == null || Collections.disjoint(continuations, threats)) {
-                move.postWrite(position, pseudoLegalMovesMax, lanBuilder);
+                Move.postWrite(position, pseudoLegalMovesMax, lanBuilder);
                 branches.add(new SolutionWriter.Branch(Play.VARIATION, lanBuilder.toString(),
                     continuations));
               }
             }
           } else if (!includeSetPlay) {
-            move.postWrite(position, pseudoLegalMovesMax, lanBuilder);
+            Move.postWrite(position, pseudoLegalMovesMax, lanBuilder);
             branches.add(new SolutionWriter.Branch(Play.REFUTATION, lanBuilder.toString(),
                 Collections.emptyList()));
           }
