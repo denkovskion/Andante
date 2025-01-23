@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.piece;
 
+import blog.art.chess.andante.piece.fairy.Amazon;
 import blog.art.chess.andante.piece.fairy.Grasshopper;
 import blog.art.chess.andante.piece.fairy.Nightrider;
 import blog.art.chess.andante.piece.orthodox.Bishop;
@@ -42,6 +43,7 @@ public class PieceCodes extends ListResourceBundle {
         {Rook.class.getSimpleName(), "R"}, {Bishop.class.getSimpleName(), "B"},
         {Knight.class.getSimpleName(), "N"}, {Pawn.class.getSimpleName(), "P"},
         {Grasshopper.class.getSimpleName(), Grasshopper.class.getSimpleName()},
-        {Nightrider.class.getSimpleName(), Nightrider.class.getSimpleName()}};
+        {Nightrider.class.getSimpleName(), Nightrider.class.getSimpleName()},
+        {Amazon.class.getSimpleName(), Amazon.class.getSimpleName()}};
   }
 }
