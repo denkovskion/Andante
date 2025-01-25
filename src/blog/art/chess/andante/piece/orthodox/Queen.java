@@ -36,7 +36,7 @@ import blog.art.chess.andante.position.State;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class Queen extends Piece implements Rider {
+public final class Queen extends Piece implements Rider {
 
   public Queen(Colour colour) {
     super(colour);

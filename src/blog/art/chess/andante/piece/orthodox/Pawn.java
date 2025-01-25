@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class Pawn extends Piece {
+public final class Pawn extends Piece {
 
   public Pawn(Colour colour) {
     super(colour);

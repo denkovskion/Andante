@@ -37,16 +37,10 @@ import blog.art.chess.andante.position.State;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class Amazon extends Piece implements Rider, Leaper {
+public final class Amazon extends Piece implements Rider, Leaper {
 
   public Amazon(Colour colour) {
     super(colour);
-  }
-
-  @Override
-  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
-      List<Move> moves) {
-    return generateMoves(board, circe, origin, moves);
   }
 
   @Override
@@ -63,6 +57,12 @@ public class Amazon extends Piece implements Rider, Leaper {
   public boolean generateMoves(Board board, boolean circe, Square origin, List<Move> moves) {
     return Rider.super.generateMoves(board, circe, origin, moves) && Leaper.super.generateMoves(
         board, circe, origin, moves);
+  }
+
+  @Override
+  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
+      List<Move> moves) {
+    return generateMoves(board, circe, origin, moves);
   }
 
   @Override

@@ -36,7 +36,7 @@ import blog.art.chess.andante.position.State;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class Knight extends Piece implements Leaper {
+public final class Knight extends Piece implements Leaper {
 
   public Knight(Colour colour) {
     super(colour);

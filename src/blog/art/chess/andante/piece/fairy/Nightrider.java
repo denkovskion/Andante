@@ -36,7 +36,7 @@ import blog.art.chess.andante.position.State;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class Nightrider extends Piece implements Rider {
+public final class Nightrider extends Piece implements Rider {
 
   public Nightrider(Colour colour) {
     super(colour);

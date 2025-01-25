@@ -36,7 +36,7 @@ import blog.art.chess.andante.position.State;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class Rook extends Piece implements Rider {
+public final class Rook extends Piece implements Rider {
 
   public Rook(Colour colour) {
     super(colour);

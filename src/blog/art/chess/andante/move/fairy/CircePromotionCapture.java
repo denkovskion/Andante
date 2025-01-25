@@ -24,14 +24,14 @@
 
 package blog.art.chess.andante.move.fairy;
 
-import blog.art.chess.andante.move.PromotionCapture;
+import blog.art.chess.andante.move.Promotion;
 import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class CircePromotionCapture extends PromotionCapture {
+public class CircePromotionCapture extends Promotion {
 
   protected final Square rebirth;
 

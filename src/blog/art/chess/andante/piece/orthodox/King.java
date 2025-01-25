@@ -38,7 +38,7 @@ import blog.art.chess.andante.position.State;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class King extends Piece implements Leaper {
+public final class King extends Piece implements Leaper {
 
   public King(Colour colour) {
     super(colour);

@@ -36,7 +36,7 @@ import blog.art.chess.andante.position.State;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class Grasshopper extends Piece implements Hopper {
+public final class Grasshopper extends Piece implements Hopper {
 
   public Grasshopper(Colour colour) {
     super(colour);
