@@ -50,7 +50,6 @@ import blog.art.chess.andante.position.Table;
 import blog.art.chess.andante.problem.Aim;
 import blog.art.chess.andante.problem.AnalysisOptions;
 import blog.art.chess.andante.problem.BattlePlayOptions;
-import blog.art.chess.andante.problem.BattleProblem;
 import blog.art.chess.andante.problem.Directmate;
 import blog.art.chess.andante.problem.DisplayOptions;
 import blog.art.chess.andante.problem.HelpPlayOptions;
@@ -71,6 +70,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -94,7 +94,6 @@ public class Parser {
     String token = null;
     try (Reader reader = inputFile != null ? new FileReader(inputFile)
         : new InputStreamReader(System.in); Scanner scanner = new Scanner(reader)) {
-      List<Popeye.Problem> problems = new ArrayList<>();
       Pattern beginProblemPattern = Pattern.compile(
           Stream.of(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN).map(
                   locale -> ResourceBundle.getBundle("blog.art.chess.andante.parser.PopeyeKeywords",
@@ -109,6 +108,7 @@ public class Parser {
         inputLanguage = keywords.getLocale();
         ResourceBundle pieceTypeCodes = ResourceBundle.getBundle(
             "blog.art.chess.andante.piece.PieceCodes", inputLanguage);
+        List<Popeye.Problem> problems = new ArrayList<>();
         while (true) {
           Popeye.Problem problem = new Popeye.Problem();
           Pattern commandPattern = Pattern.compile(
@@ -252,8 +252,9 @@ public class Parser {
                       .findAny().orElseThrow();
                   Pattern piecePattern = Pattern.compile(
                       String.format("(?<pieceType>%s)(?<squares>((%s)(%s))+)",
-                          Arrays.stream(Popeye.PieceType.values()).map(Enum::name)
-                              .map(pieceTypeCodes::getString).collect(Collectors.joining("|")),
+                          Arrays.stream(Popeye.PieceType.values())
+                              .map(value -> pieceTypeCodes.getString(value.name()))
+                              .collect(Collectors.joining("|")),
                           Arrays.stream(Popeye.File.values()).map(Popeye.fileCodes::get)
                               .collect(Collectors.joining("|")),
                           Arrays.stream(Popeye.Rank.values()).map(Popeye.rankCodes::get)
@@ -304,119 +305,90 @@ public class Parser {
             break;
           }
         }
+        return problems.stream().peek(this::validateProblem).peek(this::verifyProblem)
+            .map(this::convertProblem).toList();
       } else {
         inputLanguage = Locale.ROOT;
-        ResourceBundle pieceTypeCodes = ResourceBundle.getBundle(
-            "blog.art.chess.andante.piece.PieceCodes", inputLanguage);
+        List<Model.Position> positions = new ArrayList<>();
         while (scanner.hasNextLine()) {
           line = scanner.nextLine();
-          if (line.isBlank()) {
-            continue;
-          }
-          try (Scanner lineScanner = new Scanner(line.strip())) {
-            Popeye.Problem problem = new Popeye.Problem();
-            String piecePlacementToken = lineScanner.next(
-                "(((?!\\d{2,})[KQRBNPkqrbnp1-8]){1,8}/){7}((?!\\d{2,})[KQRBNPkqrbnp1-8]){1,8}");
-            try (Scanner piecePlacementScanner = new Scanner(piecePlacementToken.chars().mapToObj(
-                symbol -> Character.isDigit((char) symbol) ? "1".repeat(symbol - '0')
-                    : String.valueOf((char) symbol)).collect(Collectors.joining())).useDelimiter(
-                "/")) {
-              for (int iRank = Popeye.Rank._8.ordinal(); iRank >= Popeye.Rank._1.ordinal();
-                  iRank--) {
-                String symbols = piecePlacementScanner.next("[KQRBNPkqrbnp1]{8}");
-                for (int iFile = Popeye.File._a.ordinal(); iFile <= Popeye.File._h.ordinal();
-                    iFile++) {
-                  char symbol = symbols.charAt(iFile);
-                  if (Character.isLetter(symbol)) {
-                    Popeye.Colour colour =
-                        Character.isLowerCase(symbol) ? Popeye.Colour.Black : Popeye.Colour.White;
-                    Popeye.PieceType pieceType = Arrays.stream(Popeye.PieceType.values()).filter(
-                        value -> pieceTypeCodes.getString(value.name())
-                            .equalsIgnoreCase(String.valueOf(symbol))).findAny().orElseThrow();
-                    Popeye.Square square = new Popeye.Square(Popeye.File.values()[iFile],
-                        Popeye.Rank.values()[iRank]);
-                    problem.getPieces().add(new Popeye.Piece(square, pieceType, colour));
+          if (!line.isBlank()) {
+            try (Scanner lineScanner = new Scanner(line.strip())) {
+              Model.Position position = new Model.Position();
+              lineScanner.useDelimiter("");
+              int index = 0;
+              while (index != 64) {
+                if (index % 8 == 0 && index != 0) {
+                  lineScanner.next("/");
+                }
+                Pattern digitPattern = Pattern.compile(
+                    "[" + "12345678".substring(0, 8 - index % 8) + "]");
+                if (lineScanner.hasNext(digitPattern)) {
+                  String digitSymbol = lineScanner.next(digitPattern);
+                  int digit = Integer.parseInt(digitSymbol);
+                  index += digit;
+                  if (index % 8 == 0) {
+                    continue;
                   }
                 }
+                String pieceSymbols = "KQRBNPkqrbnp";
+                Pattern piecePattern = Pattern.compile("[" + pieceSymbols + "]");
+                String pieceSymbol = lineScanner.next(piecePattern);
+                Model.Piece piece = Model.Piece.values()[pieceSymbols.indexOf(pieceSymbol)];
+                position.getBoard().set(index, piece);
+                index++;
               }
-            }
-            String sideToMoveToken = lineScanner.next("[wb]");
-            String castlingToken = lineScanner.next("\\bK?Q?k?q?|-");
-            if (castlingToken.matches("\\bK?Q?k?q?")) {
-              if (castlingToken.indexOf('K') == -1) {
-                problem.getOptions().getNoCastling()
-                    .add(new Popeye.Square(Popeye.File._h, Popeye.Rank._1));
-              }
-              if (castlingToken.indexOf('Q') == -1) {
-                problem.getOptions().getNoCastling()
-                    .add(new Popeye.Square(Popeye.File._a, Popeye.Rank._1));
-              }
-              if (castlingToken.indexOf('K') == -1 && castlingToken.indexOf('Q') == -1) {
-                problem.getOptions().getNoCastling()
-                    .add(new Popeye.Square(Popeye.File._e, Popeye.Rank._1));
-              }
-              if (castlingToken.indexOf('k') == -1) {
-                problem.getOptions().getNoCastling()
-                    .add(new Popeye.Square(Popeye.File._h, Popeye.Rank._8));
-              }
-              if (castlingToken.indexOf('q') == -1) {
-                problem.getOptions().getNoCastling()
-                    .add(new Popeye.Square(Popeye.File._a, Popeye.Rank._8));
-              }
-              if (castlingToken.indexOf('k') == -1 && castlingToken.indexOf('q') == -1) {
-                problem.getOptions().getNoCastling()
-                    .add(new Popeye.Square(Popeye.File._e, Popeye.Rank._8));
-              }
-            } else {
-              Stream.of(Popeye.File._h, Popeye.File._a, Popeye.File._e).flatMap(
-                      file -> Stream.of(Popeye.Rank._1, Popeye.Rank._8)
-                          .map(rank -> new Popeye.Square(file, rank)))
-                  .forEach(square -> problem.getOptions().getNoCastling().add(square));
-            }
-            String enPassantToken = lineScanner.next("[a-h][36]|-");
-            if (enPassantToken.matches("[a-h][36]")) {
-              Popeye.File file = Arrays.stream(Popeye.File.values()).filter(
-                      value -> Popeye.fileCodes.get(value)
-                          .equalsIgnoreCase(String.valueOf(enPassantToken.charAt(0)))).findAny()
-                  .orElseThrow();
-              Popeye.Rank rank = Arrays.stream(Popeye.Rank.values()).filter(
-                      value -> Popeye.rankCodes.get(value)
-                          .equalsIgnoreCase(String.valueOf(enPassantToken.charAt(1)))).findAny()
-                  .orElseThrow();
-              problem.getOptions().getEnPassant().add(new Popeye.Square(file, rank));
-            }
-            String opcodeToken = lineScanner.next("acd|dm");
-            if (opcodeToken.equals("acd")) {
-              String operandToken = lineScanner.next("(0|[1-9]\\d*);$");
-              int nPlies = Integer.parseInt(operandToken.replace(";", ""));
-              int nMoves = (nPlies + 1) / 2;
-              problem.setStipulation(
-                  new Popeye.Stipulation(Popeye.StipulationType.Help, null, nMoves));
-              if (nPlies % 2 == 1) {
-                problem.getOptions().setWhiteToPlay();
-                if (sideToMoveToken.equals("b")) {
-                  problem.getOptions().setHalfDuplex();
-                }
+              lineScanner.next("\\s");
+              lineScanner.reset();
+              String colourSymbols = "wb";
+              Pattern colourPattern = Pattern.compile("[" + colourSymbols + "]");
+              String sideToMoveToken = lineScanner.next(colourPattern);
+              Model.Colour sideToMove = Model.Colour.values()[colourSymbols.indexOf(
+                  sideToMoveToken)];
+              position.setSideToMove(sideToMove);
+              String castlingSymbols = "KQkq";
+              Pattern castlingPattern = Pattern.compile(
+                  "\\b" + Arrays.stream(castlingSymbols.split(""))
+                      .map(castlingSymbol -> castlingSymbol + "?").collect(Collectors.joining()));
+              if (lineScanner.hasNext(castlingPattern)) {
+                String castlingToken = lineScanner.next(castlingPattern);
+                Arrays.stream(castlingToken.split("")).forEach(castlingSymbol -> {
+                  Model.Castling castling = Model.Castling.values()[castlingSymbols.indexOf(
+                      castlingSymbol)];
+                  position.getCastlings().add(castling);
+                });
               } else {
-                if (sideToMoveToken.equals("w")) {
-                  problem.getOptions().setHalfDuplex();
-                }
+                lineScanner.next("-");
               }
-            } else {
-              String operandToken = lineScanner.next("[1-9]\\d*;$");
-              int nMoves = Integer.parseInt(operandToken.replace(";", ""));
-              problem.setStipulation(
-                  new Popeye.Stipulation(Popeye.StipulationType.Direct, null, nMoves));
-              if (sideToMoveToken.equals("b")) {
-                problem.getOptions().setHalfDuplex();
+              Pattern enPassantPattern = Pattern.compile("[a-h][36]");
+              if (lineScanner.hasNext(enPassantPattern)) {
+                String enPassantToken = lineScanner.next(enPassantPattern);
+                int file = enPassantToken.charAt(0) - 'a' + 1;
+                int rank = enPassantToken.charAt(1) - '1' + 1;
+                position.setEnPassant(new Model.Square((8 - rank) * 8 + file - 1));
+              } else {
+                lineScanner.next("-");
               }
+              List<String> opcodeCodes = List.of("acd", "dm");
+              Pattern opcodePattern = Pattern.compile(String.join("|", opcodeCodes));
+              String opcodeToken = lineScanner.next(opcodePattern);
+              Model.Opcode opcode = Model.Opcode.values()[opcodeCodes.indexOf(opcodeToken)];
+              Pattern operandPattern = Pattern.compile(switch (opcode) {
+                case ACD -> "(?<operand>0|[1-9]\\d*);$";
+                case DM -> "(?<operand>[1-9]\\d*);$";
+              });
+              String operandToken = lineScanner.next(operandPattern);
+              Matcher operandMatcher = operandPattern.matcher(operandToken);
+              if (operandMatcher.matches()) {
+                int operand = Integer.parseInt(operandMatcher.group("operand"));
+                position.setOperation(new Model.Operation(opcode, operand));
+              }
+              positions.add(position);
             }
-            problems.add(problem);
           }
         }
+        return positions.stream().peek(this::validatePosition).map(this::convertPosition).toList();
       }
-      return problems.stream().peek(this::validateProblem).peek(this::verifyProblem)
-          .map(this::convertProblem).toList();
     } catch (IllegalArgumentException | UnsupportedOperationException e) {
       System.err.println(Problem.logPrefix() + " " + e.getMessage());
     } catch (NoSuchElementException e) {
@@ -433,7 +405,7 @@ public class Parser {
 
   private void validateProblem(Popeye.Problem specification) {
     if (specification.getStipulation() == null) {
-      throw new IllegalArgumentException("Task conversion failure (missing stipulation).");
+      throw new IllegalArgumentException("Problem conversion failure (missing stipulation).");
     }
     Arrays.stream(Popeye.Colour.values()).forEach(colour -> specification.getPieces().stream()
         .collect(Collectors.toMap(Popeye.Piece::square, Function.identity(),
@@ -441,9 +413,10 @@ public class Parser {
         .filter(piece -> piece.colour() == colour && piece.pieceType() == Popeye.PieceType.King)
         .reduce((oldValue, newValue) -> {
           throw new IllegalArgumentException(
-              "Task conversion failure (too many " + colour.toString().toLowerCase() + " kings).");
+              "Problem conversion failure (too many " + colour.toString().toLowerCase()
+                  + " kings).");
         }).orElseThrow(() -> new IllegalArgumentException(
-            "Task conversion failure (missing " + colour.toString().toLowerCase() + " king).")));
+            "Problem conversion failure (missing " + colour.toString().toLowerCase() + " king).")));
   }
 
   private void verifyProblem(Popeye.Problem specification) {
@@ -556,11 +529,10 @@ public class Parser {
     Memory memory = new DefaultMemory();
     boolean circe = specification.getConditions().isCirce();
     Position position = new Position(board, box, table, sideToMove, state, memory, circe);
-    Aim aim = specification.getStipulation().goal() == null ? null
-        : switch (specification.getStipulation().goal()) {
-          case Mate -> Aim.MATE;
-          case Stalemate -> Aim.STALEMATE;
-        };
+    Aim aim = switch (specification.getStipulation().goal()) {
+      case Mate -> Aim.MATE;
+      case Stalemate -> Aim.STALEMATE;
+    };
     int nMoves = switch (specification.getStipulation().stipulationType()) {
       case Direct, Self -> false;
       case Help -> specification.getOptions().isWhiteToPlay();
@@ -570,13 +542,9 @@ public class Parser {
       case Help -> specification.getOptions().isWhiteToPlay();
     };
     Problem problem = switch (specification.getStipulation().stipulationType()) {
-      case Direct ->
-          specification.getStipulation().goal() == null ? new MateSearch(position, nMoves)
-              : new Directmate(position, aim, nMoves);
+      case Direct -> new Directmate(position, aim, nMoves);
       case Self -> new Selfmate(position, aim, nMoves);
-      case Help ->
-          specification.getStipulation().goal() == null ? new Perft(position, nMoves, halfMove)
-              : new Helpmate(position, aim, nMoves, halfMove);
+      case Help -> new Helpmate(position, aim, nMoves, halfMove);
     };
     boolean setPlay = specification.getOptions().isSetPlay();
     int nRefutations = Math.max(specification.getOptions().getDefence(),
@@ -589,27 +557,15 @@ public class Parser {
             .isNoShortVariations();
     boolean tempoTries =
         specification.getOptions().isNullMoves() || specification.getOptions().isTry();
-    AnalysisOptions analysisOptions =
-        problem instanceof BattleProblem ? new BattlePlayOptions(setPlay, nRefutations, variations,
-            threats, shortVariations)
-            : problem instanceof Helpmate ? new HelpPlayOptions(setPlay, tempoTries)
-                : new AnalysisOptions() {
-                  @Override
-                  public String toString() {
-                    return "default";
-                  }
-                };
+    AnalysisOptions analysisOptions = switch (specification.getStipulation().stipulationType()) {
+      case Direct, Self ->
+          new BattlePlayOptions(setPlay, nRefutations, variations, threats, shortVariations);
+      case Help -> new HelpPlayOptions(setPlay, tempoTries);
+    };
     Locale outputLanguage = inputLanguage;
     boolean internalModel = !specification.getOptions().isNoBoard();
     boolean internalProgress = specification.getOptions().isMoveNumbers();
-    DisplayOptions displayOptions =
-        problem instanceof BattleProblem || problem instanceof Helpmate ? new LogOptions(
-            outputLanguage, internalModel, internalProgress) : new DisplayOptions() {
-          @Override
-          public String toString() {
-            return "default";
-          }
-        };
+    DisplayOptions displayOptions = new LogOptions(outputLanguage, internalModel, internalProgress);
     return new Task(problem, analysisOptions, displayOptions);
   }
 
@@ -657,6 +613,152 @@ public class Parser {
       case _6 -> 6;
       case _7 -> 7;
       case _8 -> 8;
+    };
+  }
+
+  private void validatePosition(Model.Position specification) {
+    Stream.of(Model.Piece.WhiteKing, Model.Piece.BlackKing).forEach(
+        king -> specification.getBoard().stream().filter(Objects::nonNull)
+            .filter(piece -> piece == king).reduce((oldValue, newValue) -> {
+              throw new IllegalArgumentException(
+                  "Position conversion failure (too many " + String.join(" ",
+                      king.name().split("(?=[A-Z])")).toLowerCase() + "s).");
+            }).orElseThrow(() -> new IllegalArgumentException(
+                "Position conversion failure (missing " + String.join(" ",
+                    king.name().split("(?=[A-Z])")).toLowerCase() + ").")));
+    if (!specification.getCastlings().stream().allMatch(castling -> switch (castling) {
+      case WhiteShort, WhiteLong -> specification.getBoard().get(60) == Model.Piece.WhiteKing;
+      case BlackShort, BlackLong -> specification.getBoard().get(4) == Model.Piece.BlackKing;
+    } && switch (castling) {
+      case WhiteShort -> specification.getBoard().get(63) == Model.Piece.WhiteRook;
+      case WhiteLong -> specification.getBoard().get(56) == Model.Piece.WhiteRook;
+      case BlackShort -> specification.getBoard().get(7) == Model.Piece.BlackRook;
+      case BlackLong -> specification.getBoard().get(0) == Model.Piece.BlackRook;
+    })) {
+      throw new IllegalArgumentException(
+          "Position conversion failure (not accepted castling rights).");
+    }
+    if (specification.getEnPassant() != null) {
+      if (!switch (specification.getSideToMove()) {
+        case White ->
+            specification.getEnPassant().index() >= 16 && specification.getEnPassant().index() <= 23
+                && specification.getBoard().get(specification.getEnPassant().index()) == null
+                && specification.getBoard().get(specification.getEnPassant().index() - 8) == null
+                && specification.getBoard().get(specification.getEnPassant().index() + 8)
+                == Model.Piece.BlackPawn;
+        case Black ->
+            specification.getEnPassant().index() >= 40 && specification.getEnPassant().index() <= 47
+                && specification.getBoard().get(specification.getEnPassant().index()) == null
+                && specification.getBoard().get(specification.getEnPassant().index() + 8) == null
+                && specification.getBoard().get(specification.getEnPassant().index() - 8)
+                == Model.Piece.WhitePawn;
+      }) {
+        throw new IllegalArgumentException(
+            "Position conversion failure (not accepted en passant square).");
+      }
+    }
+  }
+
+  private Task convertPosition(Model.Position specification) {
+    Board board = new MailboxBoard();
+    IntStream.range(0, 64).filter(index -> specification.getBoard().get(index) != null).forEach(
+        index -> board.put(board.getSquare(index % 8 + 1, 8 - index / 8),
+            convertPiece(specification.getBoard().get(index))));
+    Box box = new DefaultBox();
+    Arrays.stream(Model.Colour.values()).forEach(colour -> {
+      int maxMove = switch (specification.getOperation().opcode()) {
+        case ACD -> specification.getSideToMove() == colour ?
+            (specification.getOperation().operand() + 1) / 2 + 1
+            : specification.getOperation().operand() / 2 + 1;
+        case DM ->
+            specification.getSideToMove() == colour ? specification.getOperation().operand() + 1
+                : specification.getOperation().operand();
+      };
+      int nPawns = specification.getBoard().stream().filter(Objects::nonNull)
+          .mapToInt(piece -> piece == switch (colour) {
+            case White -> Model.Piece.WhitePawn;
+            case Black -> Model.Piece.BlackPawn;
+          } ? 1 : 0).sum();
+      int maxPromotion = Math.min(maxMove, nPawns);
+      Model.Piece[] promotions = (switch (colour) {
+        case White ->
+            Stream.of(Model.Piece.WhiteQueen, Model.Piece.WhiteRook, Model.Piece.WhiteBishop,
+                Model.Piece.WhiteKnight);
+        case Black ->
+            Stream.of(Model.Piece.BlackQueen, Model.Piece.BlackRook, Model.Piece.BlackBishop,
+                Model.Piece.BlackKnight);
+      }).toArray(Model.Piece[]::new);
+      IntStream.range(0, promotions.length).forEach(index -> IntStream.range(0, maxPromotion)
+          .forEach(promotionNo -> box.push(box.getSection(convertColour(colour), index + 1),
+              convertPiece(promotions[index]))));
+    });
+    Table table = new DefaultTable();
+    Colour sideToMove = convertColour(specification.getSideToMove());
+    State state = new DefaultState();
+    specification.getCastlings().forEach(castling -> IntStream.of(switch (castling) {
+      case WhiteShort, WhiteLong -> 60;
+      case BlackShort, BlackLong -> 4;
+    }, switch (castling) {
+      case WhiteShort -> 63;
+      case WhiteLong -> 56;
+      case BlackShort -> 7;
+      case BlackLong -> 0;
+    }).forEach(index -> state.addCastling(board.getSquare(index % 8 + 1, 8 - index / 8))));
+    if (specification.getEnPassant() != null) {
+      state.setEnPassant(board.getSquare(specification.getEnPassant().index() % 8 + 1,
+          8 - specification.getEnPassant().index() / 8));
+    }
+    Memory memory = new DefaultMemory();
+    boolean circe = false;
+    Position position = new Position(board, box, table, sideToMove, state, memory, circe);
+    int nMoves = switch (specification.getOperation().opcode()) {
+      case ACD -> specification.getOperation().operand() / 2;
+      case DM -> specification.getOperation().operand();
+    };
+    boolean halfMove = switch (specification.getOperation().opcode()) {
+      case ACD -> specification.getOperation().operand() % 2 == 1;
+      case DM -> false;
+    };
+    Problem problem = switch (specification.getOperation().opcode()) {
+      case ACD -> new Perft(position, nMoves, halfMove);
+      case DM -> new MateSearch(position, nMoves);
+    };
+    AnalysisOptions analysisOptions = new AnalysisOptions() {
+      @Override
+      public String toString() {
+        return "default";
+      }
+    };
+    DisplayOptions displayOptions = new DisplayOptions() {
+      @Override
+      public String toString() {
+        return "default";
+      }
+    };
+    return new Task(problem, analysisOptions, displayOptions);
+  }
+
+  private Piece convertPiece(Model.Piece piece) {
+    return switch (piece) {
+      case WhiteKing -> new King(Colour.WHITE);
+      case WhiteQueen -> new Queen(Colour.WHITE);
+      case WhiteRook -> new Rook(Colour.WHITE);
+      case WhiteBishop -> new Bishop(Colour.WHITE);
+      case WhiteKnight -> new Knight(Colour.WHITE);
+      case WhitePawn -> new Pawn(Colour.WHITE);
+      case BlackKing -> new King(Colour.BLACK);
+      case BlackQueen -> new Queen(Colour.BLACK);
+      case BlackRook -> new Rook(Colour.BLACK);
+      case BlackBishop -> new Bishop(Colour.BLACK);
+      case BlackKnight -> new Knight(Colour.BLACK);
+      case BlackPawn -> new Pawn(Colour.BLACK);
+    };
+  }
+
+  private Colour convertColour(Model.Colour colour) {
+    return switch (colour) {
+      case White -> Colour.WHITE;
+      case Black -> Colour.BLACK;
     };
   }
 }

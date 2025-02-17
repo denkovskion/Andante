@@ -85,7 +85,6 @@ class Popeye {
     private boolean noBoard;
     private boolean noShortVariations;
     private boolean halfDuplex;
-
     private final List<Square> noCastling = new ArrayList<>();
 
     boolean isTry() {
@@ -104,11 +103,11 @@ class Popeye {
       this.defence = defence;
     }
 
-    public boolean isNullMoves() {
+    boolean isNullMoves() {
       return nullMoves;
     }
 
-    public void setNullMoves() {
+    void setNullMoves() {
       this.nullMoves = true;
     }
 
@@ -136,11 +135,11 @@ class Popeye {
       this.variation = true;
     }
 
-    public boolean isMoveNumbers() {
+    boolean isMoveNumbers() {
       return moveNumbers;
     }
 
-    public void setMoveNumbers() {
+    void setMoveNumbers() {
       this.moveNumbers = true;
     }
 
@@ -152,7 +151,7 @@ class Popeye {
       this.noThreat = true;
     }
 
-    public List<Square> getEnPassant() {
+    List<Square> getEnPassant() {
       return enPassant;
     }
 
@@ -180,7 +179,7 @@ class Popeye {
       this.halfDuplex = true;
     }
 
-    public List<Square> getNoCastling() {
+    List<Square> getNoCastling() {
       return noCastling;
     }
   }
@@ -191,11 +190,11 @@ class Popeye {
 
     private boolean circe;
 
-    public boolean isCirce() {
+    boolean isCirce() {
       return circe;
     }
 
-    public void setCirce() {
+    void setCirce() {
       this.circe = true;
     }
   }
@@ -209,7 +208,7 @@ class Popeye {
     private Stipulation stipulation;
     private final List<Piece> pieces = new ArrayList<>();
 
-    public Conditions getConditions() {
+    Conditions getConditions() {
       return conditions;
     }
 
