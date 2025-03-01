@@ -24,9 +24,8 @@
 
 package blog.art.chess.andante.piece.orthodox;
 
-import blog.art.chess.andante.move.LongCastling;
+import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.move.ShortCastling;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.category.Leaper;
@@ -60,9 +59,9 @@ public final class King extends Piece implements Leaper {
   }
 
   @Override
-  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
-      List<Move> moves) {
-    if (!generateMoves(board, circe, origin, moves)) {
+  public boolean generateMoves(Board board, Box box, State state, Square origin,
+      MoveFactory moveFactory, List<Move> moves) {
+    if (!generateMoves(board, origin, moveFactory, moves)) {
       return false;
     }
     if (moves != null) {
@@ -77,9 +76,9 @@ public final class King extends Piece implements Leaper {
                 Square target = board.findTarget(origin, direction, 2);
                 Square target2 = board.findTarget(origin, direction, 1);
                 if (fileOffset > 0) {
-                  moves.add(new ShortCastling(origin, target, origin2, target2));
+                  moves.add(moveFactory.newShortCastling(origin, target, origin2, target2));
                 } else {
-                  moves.add(new LongCastling(origin, target, origin2, target2));
+                  moves.add(moveFactory.newLongCastling(origin, target, origin2, target2));
                 }
                 break;
               } else if (board.get(origin2) != null) {

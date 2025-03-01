@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.piece.fairy;
 
+import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
@@ -54,15 +55,16 @@ public final class Amazon extends Piece implements Rider, Leaper {
   }
 
   @Override
-  public boolean generateMoves(Board board, boolean circe, Square origin, List<Move> moves) {
-    return Rider.super.generateMoves(board, circe, origin, moves) && Leaper.super.generateMoves(
-        board, circe, origin, moves);
+  public boolean generateMoves(Board board, Square origin, MoveFactory moveFactory,
+      List<Move> moves) {
+    return Rider.super.generateMoves(board, origin, moveFactory, moves)
+        && Leaper.super.generateMoves(board, origin, moveFactory, moves);
   }
 
   @Override
-  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
-      List<Move> moves) {
-    return generateMoves(board, circe, origin, moves);
+  public boolean generateMoves(Board board, Box box, State state, Square origin,
+      MoveFactory moveFactory, List<Move> moves) {
+    return generateMoves(board, origin, moveFactory, moves);
   }
 
   @Override

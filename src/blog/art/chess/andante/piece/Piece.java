@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.piece;
 
+import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
@@ -54,8 +55,8 @@ public abstract class Piece {
     return false;
   }
 
-  public abstract boolean generateMoves(Board board, Box box, State state, boolean circe,
-      Square origin, List<Move> moves);
+  public abstract boolean generateMoves(Board board, Box box, State state, Square origin,
+      MoveFactory moveFactory, List<Move> moves);
 
   public String getCode(Locale locale) {
     return ResourceBundle.getBundle("blog.art.chess.andante.piece.PieceCodes", locale)

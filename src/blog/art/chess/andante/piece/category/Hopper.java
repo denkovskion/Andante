@@ -24,11 +24,8 @@
 
 package blog.art.chess.andante.piece.category;
 
-import blog.art.chess.andante.move.Capture;
+import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.move.QuietMove;
-import blog.art.chess.andante.move.fairy.CirceCapture;
-import blog.art.chess.andante.move.fairy.CirceCaptureCastling;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
@@ -42,7 +39,8 @@ public interface Hopper {
 
   List<Direction> getHops(Board board);
 
-  default boolean generateMoves(Board board, boolean circe, Square origin, List<Move> moves) {
+  default boolean generateMoves(Board board, Square origin, MoveFactory moveFactory,
+      List<Move> moves) {
     for (Direction direction : getHops(board)) {
       int distance = 1;
       while (true) {
@@ -58,24 +56,12 @@ public interface Hopper {
                     return false;
                   }
                   if (moves != null) {
-                    if (circe) {
-                      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(),
-                          target);
-                      if (board.get(rebirth) == null || rebirth.equals(origin)) {
-                        if (piece.isCastling()) {
-                          moves.add(new CirceCaptureCastling(origin, target, rebirth));
-                        } else {
-                          moves.add(new CirceCapture(origin, target, rebirth));
-                        }
-                        break;
-                      }
-                    }
-                    moves.add(new Capture(origin, target));
+                    moves.add(moveFactory.createCapture(board, origin, target));
                   }
                 }
               } else {
                 if (moves != null) {
-                  moves.add(new QuietMove(origin, target));
+                  moves.add(moveFactory.newQuietMove(origin, target));
                 }
               }
             }

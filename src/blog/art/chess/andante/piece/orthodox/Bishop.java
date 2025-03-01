@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.piece.orthodox;
 
+import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
@@ -48,9 +49,9 @@ public final class Bishop extends Piece implements Rider {
   }
 
   @Override
-  public boolean generateMoves(Board board, Box box, State state, boolean circe, Square origin,
-      List<Move> moves) {
-    return generateMoves(board, circe, origin, moves);
+  public boolean generateMoves(Board board, Box box, State state, Square origin,
+      MoveFactory moveFactory, List<Move> moves) {
+    return generateMoves(board, origin, moveFactory, moves);
   }
 
   @Override

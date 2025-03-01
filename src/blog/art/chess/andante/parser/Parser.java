@@ -24,6 +24,8 @@
 
 package blog.art.chess.andante.parser;
 
+import blog.art.chess.andante.condition.CirceMoveFactory;
+import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.fairy.Amazon;
@@ -70,7 +72,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -104,7 +105,7 @@ public class Parser {
         ResourceBundle keywords = Stream.of(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN).map(
             locale -> ResourceBundle.getBundle("blog.art.chess.andante.parser.PopeyeKeywords",
                 locale)).filter(bundle -> bundle.getString(Popeye.Directive.BeginProblem.name())
-            .equalsIgnoreCase(beginProblemToken)).findFirst().orElseThrow();
+            .equalsIgnoreCase(beginProblemToken)).findAny().orElseThrow();
         inputLanguage = keywords.getLocale();
         ResourceBundle pieceTypeCodes = ResourceBundle.getBundle(
             "blog.art.chess.andante.piece.PieceCodes", inputLanguage);
@@ -426,7 +427,7 @@ public class Parser {
     } || switch (square.rank()) {
       case _1, _8 -> false;
       case _2, _3, _4, _5, _6, _7 -> true;
-    }).findFirst().ifPresent(square -> {
+    }).findAny().ifPresent(square -> {
       throw new UnsupportedOperationException(
           "Task creation failure (not accepted option: nocastling " + Popeye.fileCodes.get(
               square.file()) + Popeye.rankCodes.get(square.rank()) + ").");
@@ -498,9 +499,9 @@ public class Parser {
       } ? specification.getStipulation().nMoves() : specification.getStipulation().nMoves() + 1;
       int nPawns = specification.getPieces().stream().collect(
               Collectors.toMap(Popeye.Piece::square, Function.identity(),
-                  (oldValue, newValue) -> newValue)).values().stream().mapToInt(
-              piece -> piece.colour() == colour && piece.pieceType() == Popeye.PieceType.Pawn ? 1 : 0)
-          .sum();
+                  (oldValue, newValue) -> newValue)).values().stream()
+          .filter(piece -> piece.colour() == colour && piece.pieceType() == Popeye.PieceType.Pawn)
+          .mapToInt(piece -> 1).sum();
       int maxPromotion = Math.min(maxMove, nPawns);
       IntStream.range(0, promotionTypes.length).forEach(index -> IntStream.range(0, maxPromotion)
           .forEach(promotionNo -> box.push(box.getSection(convertColour(colour), index + 1),
@@ -521,14 +522,21 @@ public class Parser {
                 piece.square().file() == Popeye.File._a || piece.square().file() == Popeye.File._h))
                 && (piece.colour() == Popeye.Colour.White && piece.square().rank() == Popeye.Rank._1
                 || piece.colour() == Popeye.Colour.Black && piece.square().rank() == Popeye.Rank._8))
-        .filter(piece -> !specification.getOptions().getNoCastling().contains(piece.square()))
-        .forEach(piece -> state.addCastling(board.getSquare(convertFile(piece.square().file()),
-            convertRank(piece.square().rank()))));
+        .map(Popeye.Piece::square)
+        .filter(square -> !specification.getOptions().getNoCastling().contains(square)).forEach(
+            square -> state.addCastling(
+                board.getSquare(convertFile(square.file()), convertRank(square.rank()))));
     specification.getOptions().getEnPassant().forEach(square -> state.setEnPassant(
         board.getSquare(convertFile(square.file()), convertRank(square.rank()))));
     Memory memory = new DefaultMemory();
-    boolean circe = specification.getConditions().isCirce();
-    Position position = new Position(board, box, table, sideToMove, state, memory, circe);
+    MoveFactory moveFactory =
+        specification.getConditions().isCirce() ? new CirceMoveFactory() : new MoveFactory() {
+          @Override
+          public String toString() {
+            return "default";
+          }
+        };
+    Position position = new Position(board, box, table, sideToMove, state, memory, moveFactory);
     Aim aim = switch (specification.getStipulation().goal()) {
       case Mate -> Aim.MATE;
       case Stalemate -> Aim.STALEMATE;
@@ -617,15 +625,12 @@ public class Parser {
   }
 
   private void validatePosition(Model.Position specification) {
-    Stream.of(Model.Piece.WhiteKing, Model.Piece.BlackKing).forEach(
-        king -> specification.getBoard().stream().filter(Objects::nonNull)
-            .filter(piece -> piece == king).reduce((oldValue, newValue) -> {
-              throw new IllegalArgumentException(
-                  "Position conversion failure (too many " + String.join(" ",
-                      king.name().split("(?=[A-Z])")).toLowerCase() + "s).");
-            }).orElseThrow(() -> new IllegalArgumentException(
-                "Position conversion failure (missing " + String.join(" ",
-                    king.name().split("(?=[A-Z])")).toLowerCase() + ").")));
+    if (!Stream.of(Model.Piece.WhiteKing, Model.Piece.BlackKing).allMatch(king ->
+        specification.getBoard().stream().filter(piece -> piece == king).mapToInt(piece -> 1).sum()
+            == 1)) {
+      throw new IllegalArgumentException(
+          "Position conversion failure (not accepted number of kings).");
+    }
     if (!specification.getCastlings().stream().allMatch(castling -> switch (castling) {
       case WhiteShort, WhiteLong -> specification.getBoard().get(60) == Model.Piece.WhiteKing;
       case BlackShort, BlackLong -> specification.getBoard().get(4) == Model.Piece.BlackKing;
@@ -674,11 +679,10 @@ public class Parser {
             specification.getSideToMove() == colour ? specification.getOperation().operand() + 1
                 : specification.getOperation().operand();
       };
-      int nPawns = specification.getBoard().stream().filter(Objects::nonNull)
-          .mapToInt(piece -> piece == switch (colour) {
-            case White -> Model.Piece.WhitePawn;
-            case Black -> Model.Piece.BlackPawn;
-          } ? 1 : 0).sum();
+      int nPawns = specification.getBoard().stream().filter(piece -> piece == switch (colour) {
+        case White -> Model.Piece.WhitePawn;
+        case Black -> Model.Piece.BlackPawn;
+      }).mapToInt(piece -> 1).sum();
       int maxPromotion = Math.min(maxMove, nPawns);
       Model.Piece[] promotions = (switch (colour) {
         case White ->
@@ -709,8 +713,13 @@ public class Parser {
           8 - specification.getEnPassant().index() / 8));
     }
     Memory memory = new DefaultMemory();
-    boolean circe = false;
-    Position position = new Position(board, box, table, sideToMove, state, memory, circe);
+    MoveFactory moveFactory = new MoveFactory() {
+      @Override
+      public String toString() {
+        return "default";
+      }
+    };
+    Position position = new Position(board, box, table, sideToMove, state, memory, moveFactory);
     int nMoves = switch (specification.getOperation().opcode()) {
       case ACD -> specification.getOperation().operand() / 2;
       case DM -> specification.getOperation().operand();

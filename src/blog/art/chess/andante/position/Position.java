@@ -24,6 +24,7 @@
 
 package blog.art.chess.andante.position;
 
+import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
@@ -38,17 +39,17 @@ public class Position {
   private Colour sideToMove;
   private State state;
   private final Memory memory;
-  private final boolean circe;
+  private final MoveFactory moveFactory;
 
   public Position(Board board, Box box, Table table, Colour sideToMove, State state, Memory memory,
-      boolean circe) {
+      MoveFactory moveFactory) {
     this.board = board;
     this.box = box;
     this.table = table;
     this.sideToMove = sideToMove;
     this.state = state;
     this.memory = memory;
-    this.circe = circe;
+    this.moveFactory = moveFactory;
   }
 
   public Board getBoard() {
@@ -83,7 +84,7 @@ public class Position {
     for (Square origin : board.findOrigins()) {
       Piece piece = board.get(origin);
       if (piece.getColour() == sideToMove) {
-        if (!piece.generateMoves(board, box, state, circe, origin, pseudoLegalMoves)) {
+        if (!piece.generateMoves(board, box, state, origin, moveFactory, pseudoLegalMoves)) {
           return false;
         }
       }
@@ -99,7 +100,7 @@ public class Position {
     for (Square origin : board.findOrigins()) {
       Piece piece = board.get(origin);
       if (piece.getColour() == sideToMove) {
-        if (!piece.generateMoves(board, box, state, circe, origin, null)) {
+        if (!piece.generateMoves(board, box, state, origin, moveFactory, null)) {
           nChecks++;
         }
       }
@@ -124,6 +125,6 @@ public class Position {
   public String toString() {
     return new StringJoiner(", ", Position.class.getSimpleName() + "[", "]").add("board=" + board)
         .add("box=" + box).add("table=" + table).add("sideToMove=" + sideToMove)
-        .add("state=" + state).add("memory=" + memory).add("circe=" + circe).toString();
+        .add("state=" + state).add("memory=" + memory).add("moveFactory=" + moveFactory).toString();
   }
 }
