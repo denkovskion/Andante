@@ -41,6 +41,7 @@ public class PopeyeKeywords extends ListResourceBundle {
         {Popeye.Command.Stipulation.name(), Popeye.Command.Stipulation.name()},
         {Popeye.Command.Pieces.name(), Popeye.Command.Pieces.name()},
         {Popeye.Condition.Circe.name(), Popeye.Condition.Circe.name()},
+        {Popeye.Condition.NoCapture.name(), Popeye.Condition.NoCapture.name()},
         {Popeye.Option.Try.name(), Popeye.Option.Try.name()},
         {Popeye.Option.Defence.name(), Popeye.Option.Defence.name()},
         {Popeye.Option.SetPlay.name(), Popeye.Option.SetPlay.name()},

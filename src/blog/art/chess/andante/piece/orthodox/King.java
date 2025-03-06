@@ -64,31 +64,29 @@ public final class King extends Piece implements Leaper {
     if (!generateMoves(board, origin, moveFactory, moves)) {
       return false;
     }
-    if (moves != null) {
-      if (board.isRebirthSquare(origin, King.class, colour) && state.isCastling(origin)) {
-        for (int fileOffset : new int[]{-1, 1}) {
-          Direction direction = board.getDirection(fileOffset, 0);
-          int distance = 1;
-          while (true) {
-            Square origin2 = board.findTarget(origin, direction, distance);
-            if (origin2 != null) {
-              if (state.isCastling(origin2)) {
-                Square target = board.findTarget(origin, direction, 2);
-                Square target2 = board.findTarget(origin, direction, 1);
-                if (fileOffset > 0) {
-                  moves.add(moveFactory.newShortCastling(origin, target, origin2, target2));
-                } else {
-                  moves.add(moveFactory.newLongCastling(origin, target, origin2, target2));
-                }
-                break;
-              } else if (board.get(origin2) != null) {
-                break;
+    if (board.isRebirthSquare(origin, King.class, colour) && state.isCastling(origin)) {
+      for (int fileOffset : new int[]{-1, 1}) {
+        Direction direction = board.getDirection(fileOffset, 0);
+        int distance = 1;
+        while (true) {
+          Square origin2 = board.findTarget(origin, direction, distance);
+          if (origin2 != null) {
+            if (state.isCastling(origin2)) {
+              Square target = board.findTarget(origin, direction, 2);
+              Square target2 = board.findTarget(origin, direction, 1);
+              if (fileOffset > 0) {
+                moveFactory.newShortCastling(origin, target, origin2, target2, moves);
               } else {
-                distance++;
+                moveFactory.newLongCastling(origin, target, origin2, target2, moves);
               }
-            } else {
               break;
+            } else if (board.get(origin2) != null) {
+              break;
+            } else {
+              distance++;
             }
+          } else {
+            break;
           }
         }
       }

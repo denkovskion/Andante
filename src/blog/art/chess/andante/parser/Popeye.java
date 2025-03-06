@@ -184,11 +184,12 @@ class Popeye {
     }
   }
 
-  enum Condition {Circe}
+  enum Condition {Circe, NoCapture}
 
   static class Conditions {
 
     private boolean circe;
+    private boolean noCapture;
 
     boolean isCirce() {
       return circe;
@@ -196,6 +197,14 @@ class Popeye {
 
     void setCirce() {
       this.circe = true;
+    }
+
+    boolean isNoCapture() {
+      return noCapture;
+    }
+
+    void setNoCapture() {
+      this.noCapture = true;
     }
   }
 

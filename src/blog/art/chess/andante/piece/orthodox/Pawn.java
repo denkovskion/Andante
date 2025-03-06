@@ -61,14 +61,12 @@ public final class Pawn extends Piece {
             if (piece.isRoyal()) {
               return false;
             }
-            if (moves != null) {
-              if (board.isRebirthSquare(target, Piece.class, colour)) {
-                for (Section section : box.findSections(colour)) {
-                  moves.add(moveFactory.createPromotionCapture(board, origin, target, section));
-                }
-              } else {
-                moves.add(moveFactory.createCapture(board, origin, target));
+            if (board.isRebirthSquare(target, Piece.class, colour)) {
+              for (Section section : box.findSections(colour)) {
+                moveFactory.createPromotionCapture(board, origin, target, section, moves);
               }
+            } else {
+              moveFactory.createCapture(board, origin, target, moves);
             }
           }
         } else if (state.isEnPassant(target)) {
@@ -77,30 +75,26 @@ public final class Pawn extends Piece {
           if (piece.isRoyal()) {
             return false;
           }
-          if (moves != null) {
-            moves.add(moveFactory.createEnPassant(board, origin, target, stop));
-          }
+          moveFactory.createEnPassant(board, origin, target, stop, moves);
         }
       }
     }
-    if (moves != null) {
-      int fileOffset = 0;
-      Direction direction = board.getDirection(fileOffset, rankOffset);
-      Square target = board.findTarget(origin, direction, 1);
-      if (target != null) {
-        if (board.get(target) == null) {
-          if (board.isRebirthSquare(target, Piece.class, colour)) {
-            for (Section section : box.findSections(colour)) {
-              moves.add(moveFactory.newPromotion(origin, target, section));
-            }
-          } else {
-            moves.add(moveFactory.newQuietMove(origin, target));
-            if (board.isRebirthSquare(origin, Pawn.class, colour)) {
-              target = board.findTarget(origin, direction, 2);
-              if (board.get(target) == null) {
-                Square stop = board.findTarget(origin, direction, 1);
-                moves.add(moveFactory.newDoubleStep(origin, target, stop));
-              }
+    int fileOffset = 0;
+    Direction direction = board.getDirection(fileOffset, rankOffset);
+    Square target = board.findTarget(origin, direction, 1);
+    if (target != null) {
+      if (board.get(target) == null) {
+        if (board.isRebirthSquare(target, Piece.class, colour)) {
+          for (Section section : box.findSections(colour)) {
+            moveFactory.newPromotion(origin, target, section, moves);
+          }
+        } else {
+          moveFactory.newQuietMove(origin, target, moves);
+          if (board.isRebirthSquare(origin, Pawn.class, colour)) {
+            target = board.findTarget(origin, direction, 2);
+            if (board.get(target) == null) {
+              Square stop = board.findTarget(origin, direction, 1);
+              moveFactory.newDoubleStep(origin, target, stop, moves);
             }
           }
         }

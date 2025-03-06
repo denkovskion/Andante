@@ -55,14 +55,10 @@ public interface Hopper {
                   if (piece.isRoyal()) {
                     return false;
                   }
-                  if (moves != null) {
-                    moves.add(moveFactory.createCapture(board, origin, target));
-                  }
+                  moveFactory.createCapture(board, origin, target, moves);
                 }
               } else {
-                if (moves != null) {
-                  moves.add(moveFactory.newQuietMove(origin, target));
-                }
+                moveFactory.newQuietMove(origin, target, moves);
               }
             }
             break;

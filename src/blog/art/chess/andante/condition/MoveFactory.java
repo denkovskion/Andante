@@ -36,38 +36,59 @@ import blog.art.chess.andante.move.ShortCastling;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
+import java.util.List;
 
 public interface MoveFactory {
 
-  default Move newQuietMove(Square origin, Square target) {
-    return new QuietMove(origin, target);
+  default void newQuietMove(Square origin, Square target, List<Move> moves) {
+    if (moves != null) {
+      moves.add(new QuietMove(origin, target));
+    }
   }
 
-  default Move createCapture(Board board, Square origin, Square target) {
-    return new Capture(origin, target);
+  default void createCapture(Board board, Square origin, Square target, List<Move> moves) {
+    if (moves != null) {
+      moves.add(new Capture(origin, target));
+    }
   }
 
-  default Move newLongCastling(Square origin, Square target, Square origin2, Square target2) {
-    return new LongCastling(origin, target, origin2, target2);
+  default void newLongCastling(Square origin, Square target, Square origin2, Square target2,
+      List<Move> moves) {
+    if (moves != null) {
+      moves.add(new LongCastling(origin, target, origin2, target2));
+    }
   }
 
-  default Move newShortCastling(Square origin, Square target, Square origin2, Square target2) {
-    return new ShortCastling(origin, target, origin2, target2);
+  default void newShortCastling(Square origin, Square target, Square origin2, Square target2,
+      List<Move> moves) {
+    if (moves != null) {
+      moves.add(new ShortCastling(origin, target, origin2, target2));
+    }
   }
 
-  default Move newDoubleStep(Square origin, Square target, Square stop) {
-    return new DoubleStep(origin, target, stop);
+  default void newDoubleStep(Square origin, Square target, Square stop, List<Move> moves) {
+    if (moves != null) {
+      moves.add(new DoubleStep(origin, target, stop));
+    }
   }
 
-  default Move createEnPassant(Board board, Square origin, Square target, Square stop) {
-    return new EnPassant(origin, target, stop);
+  default void createEnPassant(Board board, Square origin, Square target, Square stop,
+      List<Move> moves) {
+    if (moves != null) {
+      moves.add(new EnPassant(origin, target, stop));
+    }
   }
 
-  default Move newPromotion(Square origin, Square target, Section section) {
-    return new Promotion(origin, target, section);
+  default void newPromotion(Square origin, Square target, Section section, List<Move> moves) {
+    if (moves != null) {
+      moves.add(new Promotion(origin, target, section));
+    }
   }
 
-  default Move createPromotionCapture(Board board, Square origin, Square target, Section section) {
-    return new PromotionCapture(origin, target, section);
+  default void createPromotionCapture(Board board, Square origin, Square target, Section section,
+      List<Move> moves) {
+    if (moves != null) {
+      moves.add(new PromotionCapture(origin, target, section));
+    }
   }
 }

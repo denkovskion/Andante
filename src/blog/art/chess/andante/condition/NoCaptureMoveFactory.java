@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024-2025 Ivan Denkovski
+ * Copyright (c) 2025 Ivan Denkovski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,48 +22,33 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.piece.category;
+package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.piece.Colour;
-import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
-import blog.art.chess.andante.position.Direction;
+import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.List;
+import java.util.StringJoiner;
 
-public interface Rider {
+public class NoCaptureMoveFactory implements MoveFactory {
 
-  Colour getColour();
+  @Override
+  public void createCapture(Board board, Square origin, Square target, List<Move> moves) {
+  }
 
-  List<Direction> getRides(Board board);
-
-  default boolean generateMoves(Board board, Square origin, MoveFactory moveFactory,
+  @Override
+  public void createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    for (Direction direction : getRides(board)) {
-      int distance = 1;
-      while (true) {
-        Square target = board.findTarget(origin, direction, distance);
-        if (target != null) {
-          Piece piece = board.get(target);
-          if (piece != null) {
-            if (piece.getColour() != getColour()) {
-              if (piece.isRoyal()) {
-                return false;
-              }
-              moveFactory.createCapture(board, origin, target, moves);
-            }
-            break;
-          } else {
-            moveFactory.newQuietMove(origin, target, moves);
-            distance++;
-          }
-        } else {
-          break;
-        }
-      }
-    }
-    return true;
+  }
+
+  @Override
+  public void createPromotionCapture(Board board, Square origin, Square target, Section section,
+      List<Move> moves) {
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", NoCaptureMoveFactory.class.getSimpleName() + "[", "]").toString();
   }
 }

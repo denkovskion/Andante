@@ -26,6 +26,7 @@ package blog.art.chess.andante.parser;
 
 import blog.art.chess.andante.condition.CirceMoveFactory;
 import blog.art.chess.andante.condition.MoveFactory;
+import blog.art.chess.andante.condition.NoCaptureMoveFactory;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.fairy.Amazon;
@@ -132,8 +133,9 @@ public class Parser {
                   Popeye.Condition condition = Arrays.stream(Popeye.Condition.values()).filter(
                           value -> keywords.getString(value.name()).equalsIgnoreCase(conditionToken))
                       .findAny().orElseThrow();
-                  if (condition == Popeye.Condition.Circe) {
-                    problem.getConditions().setCirce();
+                  switch (condition) {
+                    case Circe -> problem.getConditions().setCirce();
+                    case NoCapture -> problem.getConditions().setNoCapture();
                   }
                 } while (scanner.hasNext(conditionPattern));
               }
@@ -421,6 +423,10 @@ public class Parser {
   }
 
   private void verifyProblem(Popeye.Problem specification) {
+    if (specification.getConditions().isCirce() && specification.getConditions().isNoCapture()) {
+      throw new UnsupportedOperationException(
+          "Task creation failure (not accepted condition: Circe w/ NoCapture).");
+    }
     specification.getOptions().getNoCastling().stream().filter(square -> switch (square.file()) {
       case _a, _e, _h -> false;
       case _b, _c, _d, _f, _g -> true;
@@ -529,13 +535,14 @@ public class Parser {
     specification.getOptions().getEnPassant().forEach(square -> state.setEnPassant(
         board.getSquare(convertFile(square.file()), convertRank(square.rank()))));
     Memory memory = new DefaultMemory();
-    MoveFactory moveFactory =
-        specification.getConditions().isCirce() ? new CirceMoveFactory() : new MoveFactory() {
-          @Override
-          public String toString() {
-            return "default";
-          }
-        };
+    MoveFactory moveFactory = specification.getConditions().isCirce() ? new CirceMoveFactory()
+        : specification.getConditions().isNoCapture() ? new NoCaptureMoveFactory()
+            : new MoveFactory() {
+              @Override
+              public String toString() {
+                return "default";
+              }
+            };
     Position position = new Position(board, box, table, sideToMove, state, memory, moveFactory);
     Aim aim = switch (specification.getStipulation().goal()) {
       case Mate -> Aim.MATE;
