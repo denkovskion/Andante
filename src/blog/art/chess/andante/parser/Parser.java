@@ -24,6 +24,8 @@
 
 package blog.art.chess.andante.parser;
 
+import blog.art.chess.andante.condition.AntiCirceCaptureRebirthMoveFactory;
+import blog.art.chess.andante.condition.AntiCirceMoveFactory;
 import blog.art.chess.andante.condition.CirceMoveFactory;
 import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.condition.NoCaptureMoveFactory;
@@ -73,6 +75,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -136,6 +139,20 @@ public class Parser {
                   switch (condition) {
                     case Circe -> problem.getConditions().setCirce();
                     case NoCapture -> problem.getConditions().setNoCapture();
+                    case AntiCirce -> {
+                      problem.getConditions().setAntiCirce(Popeye.AntiCirce.Calvet);
+                      Pattern antiCircePattern = Pattern.compile(
+                          Arrays.stream(Popeye.AntiCirce.values()).map(Enum::name)
+                              .map(keywords::getString).collect(Collectors.joining("|")),
+                          Pattern.CASE_INSENSITIVE);
+                      if (scanner.hasNext(antiCircePattern)) {
+                        String antiCirceToken = token = scanner.next(antiCircePattern);
+                        Popeye.AntiCirce antiCirce = Arrays.stream(Popeye.AntiCirce.values())
+                            .filter(value -> keywords.getString(value.name())
+                                .equalsIgnoreCase(antiCirceToken)).findAny().orElseThrow();
+                        problem.getConditions().setAntiCirce(antiCirce);
+                      }
+                    }
                   }
                 } while (scanner.hasNext(conditionPattern));
               }
@@ -423,10 +440,14 @@ public class Parser {
   }
 
   private void verifyProblem(Popeye.Problem specification) {
-    if (specification.getConditions().isCirce() && specification.getConditions().isNoCapture()) {
-      throw new UnsupportedOperationException(
-          "Task creation failure (not accepted condition: Circe w/ NoCapture).");
-    }
+    Stream.of(specification.getConditions().isCirce() ? "circe" : null,
+            specification.getConditions().isNoCapture() ? "nocapture" : null,
+            specification.getConditions().getAntiCirce() != null ? "anticirce" : null)
+        .filter(Objects::nonNull).reduce((oldValue, newValue) -> {
+          throw new UnsupportedOperationException(
+              "Task creation failure (not accepted condition: " + oldValue + " w/ " + newValue + ").");
+        }).ifPresent(value -> {
+        });
     specification.getOptions().getNoCastling().stream().filter(square -> switch (square.file()) {
       case _a, _e, _h -> false;
       case _b, _c, _d, _f, _g -> true;
@@ -537,12 +558,11 @@ public class Parser {
     Memory memory = new DefaultMemory();
     MoveFactory moveFactory = specification.getConditions().isCirce() ? new CirceMoveFactory()
         : specification.getConditions().isNoCapture() ? new NoCaptureMoveFactory()
-            : new MoveFactory() {
-              @Override
-              public String toString() {
-                return "default";
-              }
-            };
+            : specification.getConditions().getAntiCirce() != null
+                ? switch (specification.getConditions().getAntiCirce()) {
+              case Calvet -> new AntiCirceCaptureRebirthMoveFactory();
+              case Cheylan -> new AntiCirceMoveFactory();
+            } : new MoveFactory();
     Position position = new Position(board, box, table, sideToMove, state, memory, moveFactory);
     Aim aim = switch (specification.getStipulation().goal()) {
       case Mate -> Aim.MATE;

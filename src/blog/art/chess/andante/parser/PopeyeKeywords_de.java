@@ -39,8 +39,9 @@ public class PopeyeKeywords_de extends ListResourceBundle {
         {Popeye.Command.Option.name(), "Option"}, {Popeye.Command.Stipulation.name(), "Forderung"},
         {Popeye.Command.Pieces.name(), "Steine"}, {Popeye.Condition.Circe.name(), "Circe"},
         {Popeye.Condition.NoCapture.name(), "Ohneschlag"},
-        {Popeye.Option.Try.name(), "Verfuehrung"}, {Popeye.Option.Defence.name(), "Widerlegung"},
-        {Popeye.Option.SetPlay.name(), "Satzspiel"}, {Popeye.Option.NullMoves.name(), "NullZuege"},
+        {Popeye.Condition.AntiCirce.name(), "AntiCirce"}, {Popeye.Option.Try.name(), "Verfuehrung"},
+        {Popeye.Option.Defence.name(), "Widerlegung"}, {Popeye.Option.SetPlay.name(), "Satzspiel"},
+        {Popeye.Option.NullMoves.name(), "NullZuege"},
         {Popeye.Option.WhiteToPlay.name(), "WeissBeginnt"},
         {Popeye.Option.Variation.name(), "Varianten"},
         {Popeye.Option.MoveNumbers.name(), "Zugnummern"},
@@ -48,6 +49,7 @@ public class PopeyeKeywords_de extends ListResourceBundle {
         {Popeye.Option.EnPassant.name(), "EnPassant"}, {Popeye.Option.NoBoard.name(), "OhneBrett"},
         {Popeye.Option.NoShortVariations.name(), "OhneKurzVarianten"},
         {Popeye.Option.HalfDuplex.name(), "HalbDuplex"},
-        {Popeye.Option.NoCastling.name(), "KeineRochade"}};
+        {Popeye.Option.NoCastling.name(), "KeineRochade"},
+        {Popeye.AntiCirce.Calvet.name(), "Calvet"}, {Popeye.AntiCirce.Cheylan.name(), "Cheylan"}};
   }
 }

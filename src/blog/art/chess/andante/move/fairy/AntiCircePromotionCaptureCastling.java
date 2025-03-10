@@ -22,37 +22,31 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.condition;
+package blog.art.chess.andante.move.fairy;
 
-import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.position.Board;
-import blog.art.chess.andante.position.Box;
+import blog.art.chess.andante.position.Position;
 import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
-import java.util.List;
 import java.util.StringJoiner;
 
-public class NoCaptureMoveFactory extends MoveFactory {
+public class AntiCircePromotionCaptureCastling extends AntiCircePromotionCapture {
 
-  @Override
-  public boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    return !board.get(target).isRoyal();
+  public AntiCircePromotionCaptureCastling(Square origin, Square target, Section section,
+      Square rebirth) {
+    super(origin, target, section, rebirth);
   }
 
   @Override
-  public boolean createEnPassant(Board board, Square origin, Square target, Square stop,
-      List<Move> moves) {
-    return !board.get(stop).isRoyal();
-  }
-
-  @Override
-  public boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
-      Section section, List<Move> moves) {
-    return !board.get(target).isRoyal();
+  protected void updateCastlings(Position position) {
+    position.getState().removeCastling(origin);
+    position.getState().removeCastling(target);
+    position.getState().addCastling(rebirth);
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", NoCaptureMoveFactory.class.getSimpleName() + "[", "]").toString();
+    return new StringJoiner(", ", AntiCircePromotionCaptureCastling.class.getSimpleName() + "[",
+        "]").add("origin=" + origin).add("target=" + target).add("section=" + section)
+        .add("rebirth=" + rebirth).toString();
   }
 }

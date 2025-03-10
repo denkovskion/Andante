@@ -33,62 +33,85 @@ import blog.art.chess.andante.move.Promotion;
 import blog.art.chess.andante.move.PromotionCapture;
 import blog.art.chess.andante.move.QuietMove;
 import blog.art.chess.andante.move.ShortCastling;
+import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
+import blog.art.chess.andante.position.Box;
 import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.List;
+import java.util.StringJoiner;
 
-public interface MoveFactory {
+public class MoveFactory {
 
-  default void newQuietMove(Square origin, Square target, List<Move> moves) {
+  public void newQuietMove(Square origin, Square target, List<Move> moves) {
     if (moves != null) {
       moves.add(new QuietMove(origin, target));
     }
   }
 
-  default void createCapture(Board board, Square origin, Square target, List<Move> moves) {
+  public boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
+    Piece piece = board.get(target);
+    if (piece.isRoyal()) {
+      return false;
+    }
     if (moves != null) {
       moves.add(new Capture(origin, target));
     }
+    return true;
   }
 
-  default void newLongCastling(Square origin, Square target, Square origin2, Square target2,
+  public void newLongCastling(Square origin, Square target, Square origin2, Square target2,
       List<Move> moves) {
     if (moves != null) {
       moves.add(new LongCastling(origin, target, origin2, target2));
     }
   }
 
-  default void newShortCastling(Square origin, Square target, Square origin2, Square target2,
+  public void newShortCastling(Square origin, Square target, Square origin2, Square target2,
       List<Move> moves) {
     if (moves != null) {
       moves.add(new ShortCastling(origin, target, origin2, target2));
     }
   }
 
-  default void newDoubleStep(Square origin, Square target, Square stop, List<Move> moves) {
+  public void newDoubleStep(Square origin, Square target, Square stop, List<Move> moves) {
     if (moves != null) {
       moves.add(new DoubleStep(origin, target, stop));
     }
   }
 
-  default void createEnPassant(Board board, Square origin, Square target, Square stop,
+  public boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
+    Piece piece = board.get(stop);
+    if (piece.isRoyal()) {
+      return false;
+    }
     if (moves != null) {
       moves.add(new EnPassant(origin, target, stop));
     }
+    return true;
   }
 
-  default void newPromotion(Square origin, Square target, Section section, List<Move> moves) {
+  public void newPromotion(Square origin, Square target, Section section, List<Move> moves) {
     if (moves != null) {
       moves.add(new Promotion(origin, target, section));
     }
   }
 
-  default void createPromotionCapture(Board board, Square origin, Square target, Section section,
-      List<Move> moves) {
+  public boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
+      Section section, List<Move> moves) {
+    Piece piece = board.get(target);
+    if (piece.isRoyal()) {
+      return false;
+    }
     if (moves != null) {
       moves.add(new PromotionCapture(origin, target, section));
     }
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", MoveFactory.class.getSimpleName() + "[", "]").toString();
   }
 }

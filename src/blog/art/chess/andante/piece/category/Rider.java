@@ -49,10 +49,9 @@ public interface Rider {
           Piece piece = board.get(target);
           if (piece != null) {
             if (piece.getColour() != getColour()) {
-              if (piece.isRoyal()) {
+              if (!moveFactory.createCapture(board, origin, target, moves)) {
                 return false;
               }
-              moveFactory.createCapture(board, origin, target, moves);
             }
             break;
           } else {

@@ -47,10 +47,9 @@ public interface Leaper {
         Piece piece = board.get(target);
         if (piece != null) {
           if (piece.getColour() != getColour()) {
-            if (piece.isRoyal()) {
+            if (!moveFactory.createCapture(board, origin, target, moves)) {
               return false;
             }
-            moveFactory.createCapture(board, origin, target, moves);
           }
         } else {
           moveFactory.newQuietMove(origin, target, moves);

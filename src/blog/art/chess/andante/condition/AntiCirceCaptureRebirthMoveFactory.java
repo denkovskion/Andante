@@ -24,16 +24,13 @@
 
 package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.move.Capture;
-import blog.art.chess.andante.move.EnPassant;
 import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.move.PromotionCapture;
-import blog.art.chess.andante.move.fairy.CirceCapture;
-import blog.art.chess.andante.move.fairy.CirceCaptureCastling;
-import blog.art.chess.andante.move.fairy.CirceEnPassant;
-import blog.art.chess.andante.move.fairy.CirceEnPassantCastling;
-import blog.art.chess.andante.move.fairy.CircePromotionCapture;
-import blog.art.chess.andante.move.fairy.CircePromotionCaptureCastling;
+import blog.art.chess.andante.move.fairy.AntiCirceCapture;
+import blog.art.chess.andante.move.fairy.AntiCirceCaptureCastling;
+import blog.art.chess.andante.move.fairy.AntiCirceEnPassant;
+import blog.art.chess.andante.move.fairy.AntiCirceEnPassantCastling;
+import blog.art.chess.andante.move.fairy.AntiCircePromotionCapture;
+import blog.art.chess.andante.move.fairy.AntiCircePromotionCaptureCastling;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
@@ -42,24 +39,22 @@ import blog.art.chess.andante.position.Square;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class CirceMoveFactory extends MoveFactory {
+public class AntiCirceCaptureRebirthMoveFactory extends MoveFactory {
 
   @Override
   public boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
-      return false;
-    }
-    if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-      if (board.get(rebirth) == null || rebirth.equals(origin)) {
+    Piece piece = board.get(origin);
+    Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
+    if (board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(target)) {
+      if (board.get(target).isRoyal()) {
+        return false;
+      }
+      if (moves != null) {
         if (piece.isCastling()) {
-          moves.add(new CirceCaptureCastling(origin, target, rebirth));
+          moves.add(new AntiCirceCaptureCastling(origin, target, rebirth));
         } else {
-          moves.add(new CirceCapture(origin, target, rebirth));
+          moves.add(new AntiCirceCapture(origin, target, rebirth));
         }
-      } else {
-        moves.add(new Capture(origin, target));
       }
     }
     return true;
@@ -68,21 +63,18 @@ public class CirceMoveFactory extends MoveFactory {
   @Override
   public boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    Piece piece = board.get(stop);
-    if (piece.isRoyal()) {
-      return false;
-    }
-    if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), stop);
-      if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop))
-          && !rebirth.equals(target)) {
+    Piece piece = board.get(origin);
+    Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
+    if (board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop)) {
+      if (board.get(stop).isRoyal()) {
+        return false;
+      }
+      if (moves != null) {
         if (piece.isCastling()) {
-          moves.add(new CirceEnPassantCastling(origin, target, stop, rebirth));
+          moves.add(new AntiCirceEnPassantCastling(origin, target, stop, rebirth));
         } else {
-          moves.add(new CirceEnPassant(origin, target, stop, rebirth));
+          moves.add(new AntiCirceEnPassant(origin, target, stop, rebirth));
         }
-      } else {
-        moves.add(new EnPassant(origin, target, stop));
       }
     }
     return true;
@@ -91,20 +83,18 @@ public class CirceMoveFactory extends MoveFactory {
   @Override
   public boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
-      return false;
-    }
-    if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-      if (board.get(rebirth) == null || rebirth.equals(origin)) {
+    Piece piece = box.peek(section);
+    Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
+    if (board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(target)) {
+      if (board.get(target).isRoyal()) {
+        return false;
+      }
+      if (moves != null) {
         if (piece.isCastling()) {
-          moves.add(new CircePromotionCaptureCastling(origin, target, section, rebirth));
+          moves.add(new AntiCircePromotionCaptureCastling(origin, target, section, rebirth));
         } else {
-          moves.add(new CircePromotionCapture(origin, target, section, rebirth));
+          moves.add(new AntiCircePromotionCapture(origin, target, section, rebirth));
         }
-      } else {
-        moves.add(new PromotionCapture(origin, target, section));
       }
     }
     return true;
@@ -112,6 +102,7 @@ public class CirceMoveFactory extends MoveFactory {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", CirceMoveFactory.class.getSimpleName() + "[", "]").toString();
+    return new StringJoiner(", ", AntiCirceCaptureRebirthMoveFactory.class.getSimpleName() + "[",
+        "]").toString();
   }
 }

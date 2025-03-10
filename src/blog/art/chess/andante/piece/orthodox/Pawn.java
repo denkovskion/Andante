@@ -58,24 +58,24 @@ public final class Pawn extends Piece {
         Piece piece = board.get(target);
         if (piece != null) {
           if (piece.getColour() != colour) {
-            if (piece.isRoyal()) {
-              return false;
-            }
             if (board.isRebirthSquare(target, Piece.class, colour)) {
               for (Section section : box.findSections(colour)) {
-                moveFactory.createPromotionCapture(board, origin, target, section, moves);
+                if (!moveFactory.createPromotionCapture(board, box, origin, target, section,
+                    moves)) {
+                  return false;
+                }
               }
             } else {
-              moveFactory.createCapture(board, origin, target, moves);
+              if (!moveFactory.createCapture(board, origin, target, moves)) {
+                return false;
+              }
             }
           }
         } else if (state.isEnPassant(target)) {
           Square stop = board.findTarget(target, board.getDirection(0, -rankOffset), 1);
-          piece = board.get(stop);
-          if (piece.isRoyal()) {
+          if (!moveFactory.createEnPassant(board, origin, target, stop, moves)) {
             return false;
           }
-          moveFactory.createEnPassant(board, origin, target, stop, moves);
         }
       }
     }

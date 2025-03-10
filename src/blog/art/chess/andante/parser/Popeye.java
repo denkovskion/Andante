@@ -184,12 +184,15 @@ class Popeye {
     }
   }
 
-  enum Condition {Circe, NoCapture}
+  enum Condition {Circe, NoCapture, AntiCirce}
+
+  enum AntiCirce {Calvet, Cheylan}
 
   static class Conditions {
 
     private boolean circe;
     private boolean noCapture;
+    private AntiCirce antiCirce;
 
     boolean isCirce() {
       return circe;
@@ -205,6 +208,14 @@ class Popeye {
 
     void setNoCapture() {
       this.noCapture = true;
+    }
+
+    AntiCirce getAntiCirce() {
+      return antiCirce;
+    }
+
+    void setAntiCirce(AntiCirce antiCirce) {
+      this.antiCirce = antiCirce;
     }
   }
 

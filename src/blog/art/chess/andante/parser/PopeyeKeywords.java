@@ -42,6 +42,7 @@ public class PopeyeKeywords extends ListResourceBundle {
         {Popeye.Command.Pieces.name(), Popeye.Command.Pieces.name()},
         {Popeye.Condition.Circe.name(), Popeye.Condition.Circe.name()},
         {Popeye.Condition.NoCapture.name(), Popeye.Condition.NoCapture.name()},
+        {Popeye.Condition.AntiCirce.name(), Popeye.Condition.AntiCirce.name()},
         {Popeye.Option.Try.name(), Popeye.Option.Try.name()},
         {Popeye.Option.Defence.name(), Popeye.Option.Defence.name()},
         {Popeye.Option.SetPlay.name(), Popeye.Option.SetPlay.name()},
@@ -54,6 +55,8 @@ public class PopeyeKeywords extends ListResourceBundle {
         {Popeye.Option.NoBoard.name(), Popeye.Option.NoBoard.name()},
         {Popeye.Option.NoShortVariations.name(), Popeye.Option.NoShortVariations.name()},
         {Popeye.Option.HalfDuplex.name(), Popeye.Option.HalfDuplex.name()},
-        {Popeye.Option.NoCastling.name(), Popeye.Option.NoCastling.name()}};
+        {Popeye.Option.NoCastling.name(), Popeye.Option.NoCastling.name()},
+        {Popeye.AntiCirce.Calvet.name(), Popeye.AntiCirce.Calvet.name()},
+        {Popeye.AntiCirce.Cheylan.name(), Popeye.AntiCirce.Cheylan.name()}};
   }
 }

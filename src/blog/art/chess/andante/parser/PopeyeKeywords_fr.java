@@ -38,7 +38,8 @@ public class PopeyeKeywords_fr extends ListResourceBundle {
         {Popeye.Command.Remark.name(), "Remarque"}, {Popeye.Command.Condition.name(), "Condition"},
         {Popeye.Command.Option.name(), "Option"}, {Popeye.Command.Stipulation.name(), "Enonce"},
         {Popeye.Command.Pieces.name(), "Pieces"}, {Popeye.Condition.Circe.name(), "Circe"},
-        {Popeye.Condition.NoCapture.name(), "SansPrises"}, {Popeye.Option.Try.name(), "Essais"},
+        {Popeye.Condition.NoCapture.name(), "SansPrises"},
+        {Popeye.Condition.AntiCirce.name(), "AntiCirce"}, {Popeye.Option.Try.name(), "Essais"},
         {Popeye.Option.Defence.name(), "Defense"}, {Popeye.Option.SetPlay.name(), "Apparent"},
         {Popeye.Option.NullMoves.name(), "CoupsVides"},
         {Popeye.Option.WhiteToPlay.name(), "ApparentSeul"},
@@ -48,6 +49,7 @@ public class PopeyeKeywords_fr extends ListResourceBundle {
         {Popeye.Option.NoBoard.name(), "SansEchiquier"},
         {Popeye.Option.NoShortVariations.name(), "SansVariantesCourtes"},
         {Popeye.Option.HalfDuplex.name(), "DemiDuplex"},
-        {Popeye.Option.NoCastling.name(), "SansRoquer"}};
+        {Popeye.Option.NoCastling.name(), "SansRoquer"}, {Popeye.AntiCirce.Calvet.name(), "Calvet"},
+        {Popeye.AntiCirce.Cheylan.name(), "Cheylan"}};
   }
 }
