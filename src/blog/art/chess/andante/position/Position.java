@@ -26,6 +26,7 @@ package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.move.Move;
+import blog.art.chess.andante.move.NullMove;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import java.util.List;
@@ -64,6 +65,10 @@ public class Position {
     return table;
   }
 
+  public Colour getSideToMove() {
+    return sideToMove;
+  }
+
   public void toggleSideToMove() {
     sideToMove = sideToMove.getOpposite();
   }
@@ -93,9 +98,8 @@ public class Position {
   }
 
   public int isCheck() {
-    memory.push(state.copy());
-    state.resetEnPassant();
-    toggleSideToMove();
+    Move nullMove = new NullMove();
+    nullMove.make(this, null, null, null);
     int nChecks = 0;
     for (Square origin : board.findOrigins()) {
       Piece piece = board.get(origin);
@@ -105,8 +109,7 @@ public class Position {
         }
       }
     }
-    toggleSideToMove();
-    state = memory.pop();
+    nullMove.unmake(this);
     return nChecks;
   }
 
