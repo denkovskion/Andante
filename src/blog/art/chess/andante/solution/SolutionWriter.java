@@ -120,7 +120,7 @@ public class SolutionWriter {
   }
 
   public static String toOrderedAndFormatted(List<Point> points) {
-    return points.stream().sorted(Comparator.comparing(Point::score).thenComparing(Point::move))
+    return points.stream().sorted(Comparator.comparing(Point::score))
         .map(point -> point.score() + "\t" + point.move())
         .collect(Collectors.joining(System.lineSeparator()));
   }

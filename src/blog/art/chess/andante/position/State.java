@@ -36,7 +36,7 @@ public interface State {
 
   boolean isEnPassant(Square square);
 
-  void setEnPassant(Square enPassant);
+  void setEnPassant(Square square);
 
   void resetEnPassant();
 }

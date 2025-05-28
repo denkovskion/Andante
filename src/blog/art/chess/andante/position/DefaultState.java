@@ -67,8 +67,8 @@ public class DefaultState implements State {
   }
 
   @Override
-  public void setEnPassant(Square enPassant) {
-    this.enPassant = enPassant;
+  public void setEnPassant(Square square) {
+    this.enPassant = square;
   }
 
   @Override
