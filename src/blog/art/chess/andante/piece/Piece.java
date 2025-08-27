@@ -37,7 +37,7 @@ import java.util.StringJoiner;
 
 public abstract class Piece {
 
-  protected final Colour colour;
+  protected Colour colour;
 
   public Piece(Colour colour) {
     this.colour = colour;
@@ -45,6 +45,10 @@ public abstract class Piece {
 
   public Colour getColour() {
     return colour;
+  }
+
+  public void toggleColour() {
+    colour = colour.getOpposite();
   }
 
   public boolean isRoyal() {

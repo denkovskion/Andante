@@ -34,10 +34,13 @@ import java.util.StringJoiner;
 public class AntiCircePromotionCapture extends Promotion {
 
   protected final Square rebirth;
+  protected final boolean castling;
 
-  public AntiCircePromotionCapture(Square origin, Square target, Section section, Square rebirth) {
+  public AntiCircePromotionCapture(Square origin, Square target, Section section, Square rebirth,
+      boolean castling) {
     super(origin, target, section);
     this.rebirth = rebirth;
+    this.castling = castling;
   }
 
   @Override
@@ -68,13 +71,17 @@ public class AntiCircePromotionCapture extends Promotion {
   protected void updateCastlings(Position position) {
     position.getState().removeCastling(origin);
     position.getState().removeCastling(target);
-    position.getState().removeCastling(rebirth);
+    if (castling) {
+      position.getState().addCastling(rebirth);
+    } else {
+      position.getState().removeCastling(rebirth);
+    }
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", AntiCircePromotionCapture.class.getSimpleName() + "[", "]").add(
             "origin=" + origin).add("target=" + target).add("section=" + section)
-        .add("rebirth=" + rebirth).toString();
+        .add("rebirth=" + rebirth).add("castling=" + castling).toString();
   }
 }

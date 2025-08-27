@@ -22,30 +22,26 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move.fairy;
+package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.Square;
 import java.util.StringJoiner;
 
-public class AntiCirceEnPassantCastling extends AntiCirceEnPassant {
+public class DefaultAntiCirceMoveFactory implements AntiCirceMoveFactory {
 
-  public AntiCirceEnPassantCastling(Square origin, Square target, Square stop, Square rebirth) {
-    super(origin, target, stop, rebirth);
+  protected final boolean calvet;
+
+  public DefaultAntiCirceMoveFactory(boolean calvet) {
+    this.calvet = calvet;
   }
 
   @Override
-  protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
-    position.getState().removeCastling(stop);
-    position.getState().addCastling(rebirth);
+  public boolean isCalvet() {
+    return calvet;
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", AntiCirceEnPassantCastling.class.getSimpleName() + "[", "]").add(
-            "origin=" + origin).add("target=" + target).add("stop=" + stop).add("rebirth=" + rebirth)
-        .toString();
+    return new StringJoiner(", ", DefaultAntiCirceMoveFactory.class.getSimpleName() + "[", "]").add(
+        "calvet=" + calvet).toString();
   }
 }

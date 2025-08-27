@@ -22,31 +22,14 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move.fairy;
+package blog.art.chess.andante.piece;
 
-import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.Section;
-import blog.art.chess.andante.position.Square;
-import java.util.StringJoiner;
+import java.util.ListResourceBundle;
 
-public class AntiCircePromotionCaptureCastling extends AntiCircePromotionCapture {
-
-  public AntiCircePromotionCaptureCastling(Square origin, Square target, Section section,
-      Square rebirth) {
-    super(origin, target, section, rebirth);
-  }
+public class ColourCodes_en extends ListResourceBundle {
 
   @Override
-  protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
-    position.getState().addCastling(rebirth);
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", AntiCircePromotionCaptureCastling.class.getSimpleName() + "[",
-        "]").add("origin=" + origin).add("target=" + target).add("section=" + section)
-        .add("rebirth=" + rebirth).toString();
+  protected Object[][] getContents() {
+    return new Object[][]{{Colour.WHITE.name(), "W"}, {Colour.BLACK.name(), "B"}};
   }
 }

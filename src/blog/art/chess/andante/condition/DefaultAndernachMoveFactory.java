@@ -22,28 +22,15 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move.fairy;
+package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.Square;
 import java.util.StringJoiner;
 
-public class AntiCirceCaptureCastling extends AntiCirceCapture {
-
-  public AntiCirceCaptureCastling(Square origin, Square target, Square rebirth) {
-    super(origin, target, rebirth);
-  }
-
-  @Override
-  protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
-    position.getState().addCastling(rebirth);
-  }
+public class DefaultAndernachMoveFactory implements AndernachMoveFactory {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", AntiCirceCaptureCastling.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).add("rebirth=" + rebirth).toString();
+    return new StringJoiner(", ", DefaultAndernachMoveFactory.class.getSimpleName() + "[",
+        "]").toString();
   }
 }

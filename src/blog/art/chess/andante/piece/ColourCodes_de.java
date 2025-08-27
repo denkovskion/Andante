@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024-2025 Ivan Denkovski
+ * Copyright (c) 2025 Ivan Denkovski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,26 +24,12 @@
 
 package blog.art.chess.andante.piece;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.ListResourceBundle;
 
-public enum Colour {
-  WHITE {
-    @Override
-    public Colour getOpposite() {
-      return BLACK;
-    }
-  }, BLACK {
-    @Override
-    public Colour getOpposite() {
-      return WHITE;
-    }
-  };
+public class ColourCodes_de extends ListResourceBundle {
 
-  public abstract Colour getOpposite();
-
-  public String getCode(Locale locale) {
-    return ResourceBundle.getBundle("blog.art.chess.andante.piece.ColourCodes", locale)
-        .getString(name());
+  @Override
+  protected Object[][] getContents() {
+    return new Object[][]{{Colour.WHITE.name(), "W"}, {Colour.BLACK.name(), "S"}};
   }
 }

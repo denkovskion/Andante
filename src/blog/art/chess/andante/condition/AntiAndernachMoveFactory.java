@@ -24,15 +24,12 @@
 
 package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.move.Capture;
 import blog.art.chess.andante.move.DoubleStep;
-import blog.art.chess.andante.move.EnPassant;
-import blog.art.chess.andante.move.LongCastling;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.move.Promotion;
-import blog.art.chess.andante.move.PromotionCapture;
 import blog.art.chess.andante.move.QuietMove;
-import blog.art.chess.andante.move.ShortCastling;
+import blog.art.chess.andante.move.fairy.AntiAndernachPromotion;
+import blog.art.chess.andante.move.fairy.AntiAndernachQuietMove;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
@@ -40,74 +37,49 @@ import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.List;
 
-public interface MoveFactory {
+public interface AntiAndernachMoveFactory extends MoveFactory {
 
+  @Override
   default void newQuietMove(Board board, Square origin, Square target, List<Move> moves) {
     if (moves != null) {
-      moves.add(new QuietMove(origin, target));
+      Piece piece = board.get(origin);
+      if (!piece.isRoyal()) {
+        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+            piece.getColour().getOpposite(), target).equals(target);
+        moves.add(new AntiAndernachQuietMove(origin, target, castling));
+      } else {
+        moves.add(new QuietMove(origin, target));
+      }
     }
   }
 
-  default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
-      return false;
-    }
-    if (moves != null) {
-      moves.add(new Capture(origin, target));
-    }
-    return true;
-  }
-
-  default void newLongCastling(Square origin, Square target, Square origin2, Square target2,
-      List<Move> moves) {
-    if (moves != null) {
-      moves.add(new LongCastling(origin, target, origin2, target2));
-    }
-  }
-
-  default void newShortCastling(Square origin, Square target, Square origin2, Square target2,
-      List<Move> moves) {
-    if (moves != null) {
-      moves.add(new ShortCastling(origin, target, origin2, target2));
-    }
-  }
-
+  @Override
   default void newDoubleStep(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
     if (moves != null) {
-      moves.add(new DoubleStep(origin, target, stop));
+      Piece piece = board.get(origin);
+      if (!piece.isRoyal()) {
+        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+            piece.getColour().getOpposite(), target).equals(target);
+        moves.add(new AntiAndernachQuietMove(origin, target, castling));
+      } else {
+        moves.add(new DoubleStep(origin, target, stop));
+      }
     }
   }
 
-  default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
-      List<Move> moves) {
-    Piece piece = board.get(stop);
-    if (piece.isRoyal()) {
-      return false;
-    }
-    if (moves != null) {
-      moves.add(new EnPassant(origin, target, stop));
-    }
-    return true;
-  }
-
+  @Override
   default void newPromotion(Board board, Box box, Square origin, Square target, Section section,
       List<Move> moves) {
     if (moves != null) {
-      moves.add(new Promotion(origin, target, section));
+      Piece piece = box.peek(section);
+      if (!piece.isRoyal()) {
+        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+            piece.getColour().getOpposite(), target).equals(target);
+        moves.add(new AntiAndernachPromotion(origin, target, section, castling));
+      } else {
+        moves.add(new Promotion(origin, target, section));
+      }
     }
-  }
-
-  default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
-      Section section, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
-      return false;
-    }
-    if (moves != null) {
-      moves.add(new PromotionCapture(origin, target, section));
-    }
-    return true;
   }
 }

@@ -55,7 +55,7 @@ public interface Rider {
             }
             break;
           } else {
-            moveFactory.newQuietMove(origin, target, moves);
+            moveFactory.newQuietMove(board, origin, target, moves);
             distance++;
           }
         } else {

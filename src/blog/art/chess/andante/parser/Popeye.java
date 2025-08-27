@@ -184,7 +184,7 @@ class Popeye {
     }
   }
 
-  enum Condition {Circe, NoCapture, AntiCirce}
+  enum Condition {Circe, NoCapture, AntiCirce, AndernachChess, AntiAndernachChess}
 
   enum AntiCirce {Calvet, Cheylan}
 
@@ -193,6 +193,8 @@ class Popeye {
     private boolean circe;
     private boolean noCapture;
     private AntiCirce antiCirce;
+    private boolean andernachChess;
+    private boolean antiAndernachChess;
 
     boolean isCirce() {
       return circe;
@@ -216,6 +218,22 @@ class Popeye {
 
     void setAntiCirce(AntiCirce antiCirce) {
       this.antiCirce = antiCirce;
+    }
+
+    boolean isAndernachChess() {
+      return andernachChess;
+    }
+
+    void setAndernachChess() {
+      this.andernachChess = true;
+    }
+
+    boolean isAntiAndernachChess() {
+      return antiAndernachChess;
+    }
+
+    void setAntiAndernachChess() {
+      this.antiAndernachChess = true;
     }
   }
 

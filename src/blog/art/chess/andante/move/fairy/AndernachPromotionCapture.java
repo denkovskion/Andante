@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024-2025 Ivan Denkovski
+ * Copyright (c) 2025 Ivan Denkovski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,21 +24,20 @@
 
 package blog.art.chess.andante.move.fairy;
 
-import blog.art.chess.andante.move.EnPassant;
+import blog.art.chess.andante.move.Promotion;
 import blog.art.chess.andante.position.Position;
+import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class CirceEnPassant extends EnPassant {
+public class AndernachPromotionCapture extends Promotion {
 
-  protected final Square rebirth;
   protected final boolean castling;
 
-  public CirceEnPassant(Square origin, Square target, Square stop, Square rebirth,
+  public AndernachPromotionCapture(Square origin, Square target, Section section,
       boolean castling) {
-    super(origin, target, stop);
-    this.rebirth = rebirth;
+    super(origin, target, section);
     this.castling = castling;
   }
 
@@ -46,41 +45,42 @@ public class CirceEnPassant extends EnPassant {
   protected void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
     lanBuilder.append(position.getBoard().get(origin).getCode(locale))
         .append(position.getBoard().toCode(origin)).append("x")
-        .append(position.getBoard().toCode(target)).append(" e.p.").append("(")
-        .append(position.getBoard().get(stop).getCode(locale))
-        .append(position.getBoard().toCode(rebirth)).append(")");
+        .append(position.getBoard().toCode(target)).append("=")
+        .append(position.getBox().peek(section).getCode(locale)).append("(")
+        .append(position.getBoard().get(origin).getColour().getOpposite().getCode(locale))
+        .append(")");
   }
 
   @Override
   protected void updatePieces(Position position) {
-    position.getTable().push(position.getBoard().remove(stop));
-    position.getBoard().put(target, position.getBoard().remove(origin));
-    position.getBoard().put(rebirth, position.getTable().pop());
+    position.getTable().push(position.getBoard().remove(origin));
+    position.getTable().push(position.getBoard().remove(target));
+    position.getBoard().put(target, position.getBox().pop(section));
+    position.getBoard().get(target).toggleColour();
   }
 
   @Override
   protected void revertPieces(Position position) {
-    position.getTable().push(position.getBoard().remove(rebirth));
-    position.getBoard().put(origin, position.getBoard().remove(target));
-    position.getBoard().put(stop, position.getTable().pop());
+    position.getBoard().get(target).toggleColour();
+    position.getBox().push(section, position.getBoard().remove(target));
+    position.getBoard().put(target, position.getTable().pop());
+    position.getBoard().put(origin, position.getTable().pop());
   }
 
   @Override
   protected void updateCastlings(Position position) {
     position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
-    position.getState().removeCastling(stop);
     if (castling) {
-      position.getState().addCastling(rebirth);
+      position.getState().addCastling(target);
     } else {
-      position.getState().removeCastling(rebirth);
+      position.getState().removeCastling(target);
     }
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", CirceEnPassant.class.getSimpleName() + "[", "]").add(
-            "origin=" + origin).add("target=" + target).add("stop=" + stop).add("rebirth=" + rebirth)
+    return new StringJoiner(", ", AndernachPromotionCapture.class.getSimpleName() + "[", "]").add(
+            "origin=" + origin).add("target=" + target).add("section=" + section)
         .add("castling=" + castling).toString();
   }
 }

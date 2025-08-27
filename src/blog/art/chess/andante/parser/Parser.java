@@ -24,11 +24,18 @@
 
 package blog.art.chess.andante.parser;
 
-import blog.art.chess.andante.condition.AntiCirceCaptureRebirthMoveFactory;
-import blog.art.chess.andante.condition.AntiCirceMoveFactory;
-import blog.art.chess.andante.condition.CirceMoveFactory;
+import blog.art.chess.andante.condition.AntiCirceAndernachMoveFactory;
+import blog.art.chess.andante.condition.AntiCirceAntiAndernachMoveFactory;
+import blog.art.chess.andante.condition.CirceAndernachMoveFactory;
+import blog.art.chess.andante.condition.CirceAntiAndernachMoveFactory;
+import blog.art.chess.andante.condition.DefaultAndernachMoveFactory;
+import blog.art.chess.andante.condition.DefaultAntiAndernachMoveFactory;
+import blog.art.chess.andante.condition.DefaultAntiCirceMoveFactory;
+import blog.art.chess.andante.condition.DefaultCirceMoveFactory;
+import blog.art.chess.andante.condition.DefaultNoCaptureMoveFactory;
 import blog.art.chess.andante.condition.MoveFactory;
-import blog.art.chess.andante.condition.NoCaptureMoveFactory;
+import blog.art.chess.andante.condition.NoCaptureAntiAndernachMoveFactory;
+import blog.art.chess.andante.condition.OrthodoxMoveFactory;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.piece.fairy.Amazon;
@@ -153,6 +160,8 @@ public class Parser {
                         problem.getConditions().setAntiCirce(antiCirce);
                       }
                     }
+                    case AndernachChess -> problem.getConditions().setAndernachChess();
+                    case AntiAndernachChess -> problem.getConditions().setAntiAndernachChess();
                   }
                 } while (scanner.hasNext(conditionPattern));
               }
@@ -440,9 +449,23 @@ public class Parser {
   }
 
   private void verifyProblem(Popeye.Problem specification) {
-    Stream.of(specification.getConditions().isCirce() ? "circe" : null,
-            specification.getConditions().isNoCapture() ? "nocapture" : null,
+    Stream.of(specification.getConditions().isNoCapture() ? "nocapture" : null,
+            specification.getConditions().isCirce() ? "circe" : null,
             specification.getConditions().getAntiCirce() != null ? "anticirce" : null)
+        .filter(Objects::nonNull).reduce((oldValue, newValue) -> {
+          throw new UnsupportedOperationException(
+              "Task creation failure (not accepted condition: " + oldValue + " w/ " + newValue + ").");
+        }).ifPresent(value -> {
+        });
+    Stream.of(specification.getConditions().isNoCapture() ? "nocapture" : null,
+            specification.getConditions().isAndernachChess() ? "andernachchess" : null)
+        .filter(Objects::nonNull).reduce((oldValue, newValue) -> {
+          throw new UnsupportedOperationException(
+              "Task creation failure (not accepted condition: " + oldValue + " w/ " + newValue + ").");
+        }).ifPresent(value -> {
+        });
+    Stream.of(specification.getConditions().isAndernachChess() ? "andernachchess" : null,
+            specification.getConditions().isAntiAndernachChess() ? "antiandernachchess" : null)
         .filter(Objects::nonNull).reduce((oldValue, newValue) -> {
           throw new UnsupportedOperationException(
               "Task creation failure (not accepted condition: " + oldValue + " w/ " + newValue + ").");
@@ -525,10 +548,11 @@ public class Parser {
         case Self -> false;
       } ? specification.getStipulation().nMoves() : specification.getStipulation().nMoves() + 1;
       int nPawns = specification.getPieces().stream().collect(
-              Collectors.toMap(Popeye.Piece::square, Function.identity(),
-                  (oldValue, newValue) -> newValue)).values().stream()
-          .filter(piece -> piece.colour() == colour && piece.pieceType() == Popeye.PieceType.Pawn)
-          .mapToInt(piece -> 1).sum();
+          Collectors.toMap(Popeye.Piece::square, Function.identity(),
+              (oldValue, newValue) -> newValue)).values().stream().filter(
+          piece -> piece.pieceType() == Popeye.PieceType.Pawn && (piece.colour() == colour
+              || specification.getConditions().isAndernachChess() || specification.getConditions()
+              .isAntiAndernachChess())).mapToInt(piece -> 1).sum();
       int maxPromotion = Math.min(maxMove, nPawns);
       IntStream.range(0, promotionTypes.length).forEach(index -> IntStream.range(0, maxPromotion)
           .forEach(promotionNo -> box.push(box.getSection(convertColour(colour), index + 1),
@@ -556,13 +580,29 @@ public class Parser {
     specification.getOptions().getEnPassant().forEach(square -> state.setEnPassant(
         board.getSquare(convertFile(square.file()), convertRank(square.rank()))));
     Memory memory = new DefaultMemory();
-    MoveFactory moveFactory = specification.getConditions().isCirce() ? new CirceMoveFactory()
-        : specification.getConditions().isNoCapture() ? new NoCaptureMoveFactory()
-            : specification.getConditions().getAntiCirce() != null
-                ? switch (specification.getConditions().getAntiCirce()) {
-              case Calvet -> new AntiCirceCaptureRebirthMoveFactory();
-              case Cheylan -> new AntiCirceMoveFactory();
-            } : new MoveFactory();
+    MoveFactory moveFactory = specification.getConditions().isNoCapture() ? (
+        specification.getConditions().isAntiAndernachChess()
+            ? new NoCaptureAntiAndernachMoveFactory() : new DefaultNoCaptureMoveFactory())
+        : specification.getConditions().isCirce() ? (
+            specification.getConditions().isAndernachChess() ? new CirceAndernachMoveFactory()
+                : specification.getConditions().isAntiAndernachChess()
+                    ? new CirceAntiAndernachMoveFactory() : new DefaultCirceMoveFactory())
+            : specification.getConditions().getAntiCirce() != null ? (
+                specification.getConditions().isAndernachChess()
+                    ? switch (specification.getConditions().getAntiCirce()) {
+                  case Calvet -> new AntiCirceAndernachMoveFactory(true);
+                  case Cheylan -> new AntiCirceAndernachMoveFactory(false);
+                } : specification.getConditions().isAntiAndernachChess()
+                    ? switch (specification.getConditions().getAntiCirce()) {
+                  case Calvet -> new AntiCirceAntiAndernachMoveFactory(true);
+                  case Cheylan -> new AntiCirceAntiAndernachMoveFactory(false);
+                } : switch (specification.getConditions().getAntiCirce()) {
+                  case Calvet -> new DefaultAntiCirceMoveFactory(true);
+                  case Cheylan -> new DefaultAntiCirceMoveFactory(false);
+                }) : specification.getConditions().isAndernachChess()
+                ? new DefaultAndernachMoveFactory()
+                : specification.getConditions().isAntiAndernachChess()
+                    ? new DefaultAntiAndernachMoveFactory() : new OrthodoxMoveFactory();
     Position position = new Position(board, box, table, sideToMove, state, memory, moveFactory);
     Aim aim = switch (specification.getStipulation().goal()) {
       case Mate -> Aim.MATE;
@@ -740,7 +780,7 @@ public class Parser {
           8 - specification.getEnPassant().index() / 8));
     }
     Memory memory = new DefaultMemory();
-    MoveFactory moveFactory = new MoveFactory() {
+    MoveFactory moveFactory = new OrthodoxMoveFactory() {
       @Override
       public String toString() {
         return "default";

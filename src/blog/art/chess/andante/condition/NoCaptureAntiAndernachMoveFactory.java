@@ -30,23 +30,49 @@ import blog.art.chess.andante.position.Box;
 import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.List;
+import java.util.StringJoiner;
 
-public interface NoCaptureMoveFactory extends MoveFactory {
+public class NoCaptureAntiAndernachMoveFactory implements NoCaptureMoveFactory,
+    AntiAndernachMoveFactory {
 
   @Override
-  default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    return !board.get(target).isRoyal();
+  public void newQuietMove(Board board, Square origin, Square target, List<Move> moves) {
+    AntiAndernachMoveFactory.super.newQuietMove(board, origin, target, moves);
   }
 
   @Override
-  default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
+  public boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
+    return NoCaptureMoveFactory.super.createCapture(board, origin, target, moves);
+  }
+
+  @Override
+  public void newDoubleStep(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    return !board.get(stop).isRoyal();
+    AntiAndernachMoveFactory.super.newDoubleStep(board, origin, target, stop, moves);
   }
 
   @Override
-  default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
+  public boolean createEnPassant(Board board, Square origin, Square target, Square stop,
+      List<Move> moves) {
+    return NoCaptureMoveFactory.super.createEnPassant(board, origin, target, stop, moves);
+  }
+
+  @Override
+  public void newPromotion(Board board, Box box, Square origin, Square target, Section section,
+      List<Move> moves) {
+    AntiAndernachMoveFactory.super.newPromotion(board, box, origin, target, section, moves);
+  }
+
+  @Override
+  public boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
-    return !board.get(target).isRoyal();
+    return NoCaptureMoveFactory.super.createPromotionCapture(board, box, origin, target, section,
+        moves);
+  }
+
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", NoCaptureAntiAndernachMoveFactory.class.getSimpleName() + "[",
+        "]").toString();
   }
 }

@@ -33,10 +33,12 @@ import java.util.StringJoiner;
 public class CirceCapture extends QuietMove {
 
   protected final Square rebirth;
+  protected final boolean castling;
 
-  public CirceCapture(Square origin, Square target, Square rebirth) {
+  public CirceCapture(Square origin, Square target, Square rebirth, boolean castling) {
     super(origin, target);
     this.rebirth = rebirth;
+    this.castling = castling;
   }
 
   @Override
@@ -66,12 +68,17 @@ public class CirceCapture extends QuietMove {
   protected void updateCastlings(Position position) {
     position.getState().removeCastling(origin);
     position.getState().removeCastling(target);
-    position.getState().removeCastling(rebirth);
+    if (castling) {
+      position.getState().addCastling(rebirth);
+    } else {
+      position.getState().removeCastling(rebirth);
+    }
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", CirceCapture.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).add("rebirth=" + rebirth).toString();
+            "origin=" + origin).add("target=" + target).add("rebirth=" + rebirth)
+        .add("castling=" + castling).toString();
   }
 }

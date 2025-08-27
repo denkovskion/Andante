@@ -33,10 +33,13 @@ import java.util.StringJoiner;
 public class AntiCirceEnPassant extends EnPassant {
 
   protected final Square rebirth;
+  protected final boolean castling;
 
-  public AntiCirceEnPassant(Square origin, Square target, Square stop, Square rebirth) {
+  public AntiCirceEnPassant(Square origin, Square target, Square stop, Square rebirth,
+      boolean castling) {
     super(origin, target, stop);
     this.rebirth = rebirth;
+    this.castling = castling;
   }
 
   @Override
@@ -65,13 +68,17 @@ public class AntiCirceEnPassant extends EnPassant {
     position.getState().removeCastling(origin);
     position.getState().removeCastling(target);
     position.getState().removeCastling(stop);
-    position.getState().removeCastling(rebirth);
+    if (castling) {
+      position.getState().addCastling(rebirth);
+    } else {
+      position.getState().removeCastling(rebirth);
+    }
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", AntiCirceEnPassant.class.getSimpleName() + "[", "]").add(
             "origin=" + origin).add("target=" + target).add("stop=" + stop).add("rebirth=" + rebirth)
-        .toString();
+        .add("castling=" + castling).toString();
   }
 }

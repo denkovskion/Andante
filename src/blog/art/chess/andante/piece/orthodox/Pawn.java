@@ -86,15 +86,15 @@ public final class Pawn extends Piece {
       if (board.get(target) == null) {
         if (board.isRebirthSquare(target, Piece.class, colour)) {
           for (Section section : box.findSections(colour)) {
-            moveFactory.newPromotion(origin, target, section, moves);
+            moveFactory.newPromotion(board, box, origin, target, section, moves);
           }
         } else {
-          moveFactory.newQuietMove(origin, target, moves);
+          moveFactory.newQuietMove(board, origin, target, moves);
           if (board.isRebirthSquare(origin, Pawn.class, colour)) {
             target = board.findTarget(origin, direction, 2);
             if (board.get(target) == null) {
               Square stop = board.findTarget(origin, direction, 1);
-              moveFactory.newDoubleStep(origin, target, stop, moves);
+              moveFactory.newDoubleStep(board, origin, target, stop, moves);
             }
           }
         }

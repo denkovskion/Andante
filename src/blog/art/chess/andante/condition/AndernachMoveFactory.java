@@ -28,9 +28,9 @@ import blog.art.chess.andante.move.Capture;
 import blog.art.chess.andante.move.EnPassant;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.move.PromotionCapture;
-import blog.art.chess.andante.move.fairy.CirceCapture;
-import blog.art.chess.andante.move.fairy.CirceEnPassant;
-import blog.art.chess.andante.move.fairy.CircePromotionCapture;
+import blog.art.chess.andante.move.fairy.AndernachCapture;
+import blog.art.chess.andante.move.fairy.AndernachEnPassant;
+import blog.art.chess.andante.move.fairy.AndernachPromotionCapture;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
@@ -38,19 +38,19 @@ import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.List;
 
-public interface CirceMoveFactory extends MoveFactory {
+public interface AndernachMoveFactory extends MoveFactory {
 
   @Override
   default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
+    if (board.get(target).isRoyal()) {
       return false;
     }
     if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-      if (board.get(rebirth) == null || rebirth.equals(origin)) {
-        boolean castling = piece.isCastling();
-        moves.add(new CirceCapture(origin, target, rebirth, castling));
+      Piece piece = board.get(origin);
+      if (!piece.isRoyal()) {
+        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+            piece.getColour().getOpposite(), target).equals(target);
+        moves.add(new AndernachCapture(origin, target, castling));
       } else {
         moves.add(new Capture(origin, target));
       }
@@ -61,16 +61,15 @@ public interface CirceMoveFactory extends MoveFactory {
   @Override
   default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    Piece piece = board.get(stop);
-    if (piece.isRoyal()) {
+    if (board.get(stop).isRoyal()) {
       return false;
     }
     if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), stop);
-      if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop))
-          && !rebirth.equals(target)) {
-        boolean castling = piece.isCastling();
-        moves.add(new CirceEnPassant(origin, target, stop, rebirth, castling));
+      Piece piece = board.get(origin);
+      if (!piece.isRoyal()) {
+        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+            piece.getColour().getOpposite(), target).equals(target);
+        moves.add(new AndernachEnPassant(origin, target, stop, castling));
       } else {
         moves.add(new EnPassant(origin, target, stop));
       }
@@ -81,15 +80,15 @@ public interface CirceMoveFactory extends MoveFactory {
   @Override
   default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
+    if (board.get(target).isRoyal()) {
       return false;
     }
     if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-      if (board.get(rebirth) == null || rebirth.equals(origin)) {
-        boolean castling = piece.isCastling();
-        moves.add(new CircePromotionCapture(origin, target, section, rebirth, castling));
+      Piece piece = box.peek(section);
+      if (!piece.isRoyal()) {
+        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+            piece.getColour().getOpposite(), target).equals(target);
+        moves.add(new AndernachPromotionCapture(origin, target, section, castling));
       } else {
         moves.add(new PromotionCapture(origin, target, section));
       }

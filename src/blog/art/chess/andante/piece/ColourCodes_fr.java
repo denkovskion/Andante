@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024-2025 Ivan Denkovski
+ * Copyright (c) 2025 Ivan Denkovski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,28 +22,14 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move.fairy;
+package blog.art.chess.andante.piece;
 
-import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.Square;
-import java.util.StringJoiner;
+import java.util.ListResourceBundle;
 
-public class CirceCaptureCastling extends CirceCapture {
-
-  public CirceCaptureCastling(Square origin, Square target, Square rebirth) {
-    super(origin, target, rebirth);
-  }
+public class ColourCodes_fr extends ListResourceBundle {
 
   @Override
-  protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
-    position.getState().addCastling(rebirth);
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", CirceCaptureCastling.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).add("rebirth=" + rebirth).toString();
+  protected Object[][] getContents() {
+    return new Object[][]{{Colour.WHITE.name(), "B"}, {Colour.BLACK.name(), "N"}};
   }
 }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024-2025 Ivan Denkovski
+ * Copyright (c) 2025 Ivan Denkovski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,30 +22,14 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move.fairy;
+package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.Square;
 import java.util.StringJoiner;
 
-public class CirceEnPassantCastling extends CirceEnPassant {
-
-  public CirceEnPassantCastling(Square origin, Square target, Square stop, Square rebirth) {
-    super(origin, target, stop, rebirth);
-  }
-
-  @Override
-  protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
-    position.getState().removeCastling(stop);
-    position.getState().addCastling(rebirth);
-  }
+public class OrthodoxMoveFactory implements MoveFactory {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", CirceEnPassantCastling.class.getSimpleName() + "[", "]").add(
-            "origin=" + origin).add("target=" + target).add("stop=" + stop).add("rebirth=" + rebirth)
-        .toString();
+    return new StringJoiner(", ", OrthodoxMoveFactory.class.getSimpleName() + "[", "]").toString();
   }
 }

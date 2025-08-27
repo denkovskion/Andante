@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024-2025 Ivan Denkovski
+ * Copyright (c) 2025 Ivan Denkovski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,28 +22,15 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.piece;
+package blog.art.chess.andante.condition;
 
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.StringJoiner;
 
-public enum Colour {
-  WHITE {
-    @Override
-    public Colour getOpposite() {
-      return BLACK;
-    }
-  }, BLACK {
-    @Override
-    public Colour getOpposite() {
-      return WHITE;
-    }
-  };
+public class DefaultCirceMoveFactory implements CirceMoveFactory {
 
-  public abstract Colour getOpposite();
-
-  public String getCode(Locale locale) {
-    return ResourceBundle.getBundle("blog.art.chess.andante.piece.ColourCodes", locale)
-        .getString(name());
+  @Override
+  public String toString() {
+    return new StringJoiner(", ", DefaultCirceMoveFactory.class.getSimpleName() + "[",
+        "]").toString();
   }
 }

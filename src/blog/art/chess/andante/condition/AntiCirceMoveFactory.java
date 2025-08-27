@@ -26,83 +26,69 @@ package blog.art.chess.andante.condition;
 
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.move.fairy.AntiCirceCapture;
-import blog.art.chess.andante.move.fairy.AntiCirceCaptureCastling;
 import blog.art.chess.andante.move.fairy.AntiCirceEnPassant;
-import blog.art.chess.andante.move.fairy.AntiCirceEnPassantCastling;
 import blog.art.chess.andante.move.fairy.AntiCircePromotionCapture;
-import blog.art.chess.andante.move.fairy.AntiCircePromotionCaptureCastling;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
 import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.List;
-import java.util.StringJoiner;
 
-public class AntiCirceMoveFactory extends MoveFactory {
+public interface AntiCirceMoveFactory extends MoveFactory {
+
+  boolean isCalvet();
 
   @Override
-  public boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
+  default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
     Piece piece = board.get(origin);
     Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-    if (board.get(rebirth) == null || rebirth.equals(origin)) {
+    if (board.get(rebirth) == null || rebirth.equals(origin) || isCalvet() && rebirth.equals(
+        target)) {
       if (board.get(target).isRoyal()) {
         return false;
       }
       if (moves != null) {
-        if (piece.isCastling()) {
-          moves.add(new AntiCirceCaptureCastling(origin, target, rebirth));
-        } else {
-          moves.add(new AntiCirceCapture(origin, target, rebirth));
-        }
+        boolean castling = piece.isCastling();
+        moves.add(new AntiCirceCapture(origin, target, rebirth, castling));
       }
     }
     return true;
   }
 
   @Override
-  public boolean createEnPassant(Board board, Square origin, Square target, Square stop,
+  default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
     Piece piece = board.get(origin);
     Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-    if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop))
-        && !rebirth.equals(target)) {
+    if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop)) && (
+        isCalvet() || !rebirth.equals(target))) {
       if (board.get(stop).isRoyal()) {
         return false;
       }
       if (moves != null) {
-        if (piece.isCastling()) {
-          moves.add(new AntiCirceEnPassantCastling(origin, target, stop, rebirth));
-        } else {
-          moves.add(new AntiCirceEnPassant(origin, target, stop, rebirth));
-        }
+        boolean castling = piece.isCastling();
+        moves.add(new AntiCirceEnPassant(origin, target, stop, rebirth, castling));
       }
     }
     return true;
   }
 
   @Override
-  public boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
+  default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
     Piece piece = box.peek(section);
     Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-    if (board.get(rebirth) == null || rebirth.equals(origin)) {
+    if (board.get(rebirth) == null || rebirth.equals(origin) || isCalvet() && rebirth.equals(
+        target)) {
       if (board.get(target).isRoyal()) {
         return false;
       }
       if (moves != null) {
-        if (piece.isCastling()) {
-          moves.add(new AntiCircePromotionCaptureCastling(origin, target, section, rebirth));
-        } else {
-          moves.add(new AntiCircePromotionCapture(origin, target, section, rebirth));
-        }
+        boolean castling = piece.isCastling();
+        moves.add(new AntiCircePromotionCapture(origin, target, section, rebirth, castling));
       }
     }
     return true;
-  }
-
-  @Override
-  public String toString() {
-    return new StringJoiner(", ", AntiCirceMoveFactory.class.getSimpleName() + "[", "]").toString();
   }
 }

@@ -25,12 +25,12 @@
 package blog.art.chess.andante.condition;
 
 import blog.art.chess.andante.move.Move;
+import blog.art.chess.andante.move.fairy.AntiCirceAndernachCapture;
+import blog.art.chess.andante.move.fairy.AntiCirceAndernachEnPassant;
+import blog.art.chess.andante.move.fairy.AntiCirceAndernachPromotionCapture;
 import blog.art.chess.andante.move.fairy.AntiCirceCapture;
-import blog.art.chess.andante.move.fairy.AntiCirceCaptureCastling;
 import blog.art.chess.andante.move.fairy.AntiCirceEnPassant;
-import blog.art.chess.andante.move.fairy.AntiCirceEnPassantCastling;
 import blog.art.chess.andante.move.fairy.AntiCircePromotionCapture;
-import blog.art.chess.andante.move.fairy.AntiCircePromotionCaptureCastling;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
@@ -39,21 +39,30 @@ import blog.art.chess.andante.position.Square;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class AntiCirceCaptureRebirthMoveFactory extends MoveFactory {
+public class AntiCirceAndernachMoveFactory implements MoveFactory {
+
+  protected final boolean calvet;
+
+  public AntiCirceAndernachMoveFactory(boolean calvet) {
+    this.calvet = calvet;
+  }
 
   @Override
   public boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
     Piece piece = board.get(origin);
     Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-    if (board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(target)) {
+    if (board.get(rebirth) == null || rebirth.equals(origin) || calvet && rebirth.equals(target)) {
       if (board.get(target).isRoyal()) {
         return false;
       }
       if (moves != null) {
-        if (piece.isCastling()) {
-          moves.add(new AntiCirceCaptureCastling(origin, target, rebirth));
+        if (!piece.isRoyal()) {
+          boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+              piece.getColour().getOpposite(), rebirth).equals(rebirth);
+          moves.add(new AntiCirceAndernachCapture(origin, target, rebirth, castling));
         } else {
-          moves.add(new AntiCirceCapture(origin, target, rebirth));
+          boolean castling = piece.isCastling();
+          moves.add(new AntiCirceCapture(origin, target, rebirth, castling));
         }
       }
     }
@@ -65,15 +74,19 @@ public class AntiCirceCaptureRebirthMoveFactory extends MoveFactory {
       List<Move> moves) {
     Piece piece = board.get(origin);
     Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-    if (board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop)) {
+    if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop)) && (calvet
+        || !rebirth.equals(target))) {
       if (board.get(stop).isRoyal()) {
         return false;
       }
       if (moves != null) {
-        if (piece.isCastling()) {
-          moves.add(new AntiCirceEnPassantCastling(origin, target, stop, rebirth));
+        if (!piece.isRoyal()) {
+          boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+              piece.getColour().getOpposite(), rebirth).equals(rebirth);
+          moves.add(new AntiCirceAndernachEnPassant(origin, target, stop, rebirth, castling));
         } else {
-          moves.add(new AntiCirceEnPassant(origin, target, stop, rebirth));
+          boolean castling = piece.isCastling();
+          moves.add(new AntiCirceEnPassant(origin, target, stop, rebirth, castling));
         }
       }
     }
@@ -85,15 +98,19 @@ public class AntiCirceCaptureRebirthMoveFactory extends MoveFactory {
       Section section, List<Move> moves) {
     Piece piece = box.peek(section);
     Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-    if (board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(target)) {
+    if (board.get(rebirth) == null || rebirth.equals(origin) || calvet && rebirth.equals(target)) {
       if (board.get(target).isRoyal()) {
         return false;
       }
       if (moves != null) {
-        if (piece.isCastling()) {
-          moves.add(new AntiCircePromotionCaptureCastling(origin, target, section, rebirth));
+        if (!piece.isRoyal()) {
+          boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+              piece.getColour().getOpposite(), rebirth).equals(rebirth);
+          moves.add(
+              new AntiCirceAndernachPromotionCapture(origin, target, section, rebirth, castling));
         } else {
-          moves.add(new AntiCircePromotionCapture(origin, target, section, rebirth));
+          boolean castling = piece.isCastling();
+          moves.add(new AntiCircePromotionCapture(origin, target, section, rebirth, castling));
         }
       }
     }
@@ -102,7 +119,7 @@ public class AntiCirceCaptureRebirthMoveFactory extends MoveFactory {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", AntiCirceCaptureRebirthMoveFactory.class.getSimpleName() + "[",
-        "]").toString();
+    return new StringJoiner(", ", AntiCirceAndernachMoveFactory.class.getSimpleName() + "[",
+        "]").add("calvet=" + calvet).toString();
   }
 }
