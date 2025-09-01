@@ -24,24 +24,29 @@
 
 package blog.art.chess.andante.condition;
 
-import java.util.StringJoiner;
+import blog.art.chess.andante.move.Move;
+import blog.art.chess.andante.position.Board;
+import blog.art.chess.andante.position.Box;
+import blog.art.chess.andante.position.Section;
+import blog.art.chess.andante.position.Square;
+import java.util.List;
 
-public class DefaultAntiCirceMoveFactory implements AntiCirceMoveFactory {
+public interface NoCapture extends MoveFactory {
 
-  protected final boolean calvet;
-
-  public DefaultAntiCirceMoveFactory(boolean calvet) {
-    this.calvet = calvet;
+  @Override
+  default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
+    return !board.get(target).isRoyal();
   }
 
   @Override
-  public boolean isCalvet() {
-    return calvet;
+  default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
+      List<Move> moves) {
+    return !board.get(stop).isRoyal();
   }
 
   @Override
-  public String toString() {
-    return new StringJoiner(", ", DefaultAntiCirceMoveFactory.class.getSimpleName() + "[", "]").add(
-        "calvet=" + calvet).toString();
+  default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
+      Section section, List<Move> moves) {
+    return !board.get(target).isRoyal();
   }
 }

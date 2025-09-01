@@ -24,71 +24,24 @@
 
 package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.move.fairy.AntiCirceCapture;
-import blog.art.chess.andante.move.fairy.AntiCirceEnPassant;
-import blog.art.chess.andante.move.fairy.AntiCircePromotionCapture;
-import blog.art.chess.andante.piece.Piece;
-import blog.art.chess.andante.position.Board;
-import blog.art.chess.andante.position.Box;
-import blog.art.chess.andante.position.Section;
-import blog.art.chess.andante.position.Square;
-import java.util.List;
+import java.util.StringJoiner;
 
-public interface AntiCirceMoveFactory extends MoveFactory {
+public class AntiCirceMoveFactory implements AntiCirce {
 
-  boolean isCalvet();
+  protected final boolean calvet;
 
-  @Override
-  default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    Piece piece = board.get(origin);
-    Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-    if (board.get(rebirth) == null || rebirth.equals(origin) || isCalvet() && rebirth.equals(
-        target)) {
-      if (board.get(target).isRoyal()) {
-        return false;
-      }
-      if (moves != null) {
-        boolean castling = piece.isCastling();
-        moves.add(new AntiCirceCapture(origin, target, rebirth, castling));
-      }
-    }
-    return true;
+  public AntiCirceMoveFactory(boolean calvet) {
+    this.calvet = calvet;
   }
 
   @Override
-  default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
-      List<Move> moves) {
-    Piece piece = board.get(origin);
-    Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-    if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop)) && (
-        isCalvet() || !rebirth.equals(target))) {
-      if (board.get(stop).isRoyal()) {
-        return false;
-      }
-      if (moves != null) {
-        boolean castling = piece.isCastling();
-        moves.add(new AntiCirceEnPassant(origin, target, stop, rebirth, castling));
-      }
-    }
-    return true;
+  public boolean isCalvet() {
+    return calvet;
   }
 
   @Override
-  default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
-      Section section, List<Move> moves) {
-    Piece piece = box.peek(section);
-    Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-    if (board.get(rebirth) == null || rebirth.equals(origin) || isCalvet() && rebirth.equals(
-        target)) {
-      if (board.get(target).isRoyal()) {
-        return false;
-      }
-      if (moves != null) {
-        boolean castling = piece.isCastling();
-        moves.add(new AntiCircePromotionCapture(origin, target, section, rebirth, castling));
-      }
-    }
-    return true;
+  public String toString() {
+    return new StringJoiner(", ", AntiCirceMoveFactory.class.getSimpleName() + "[", "]").add(
+        "calvet=" + calvet).toString();
   }
 }

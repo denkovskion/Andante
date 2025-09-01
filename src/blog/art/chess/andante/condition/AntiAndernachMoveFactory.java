@@ -24,62 +24,13 @@
 
 package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.move.DoubleStep;
-import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.move.Promotion;
-import blog.art.chess.andante.move.QuietMove;
-import blog.art.chess.andante.move.fairy.AntiAndernachPromotion;
-import blog.art.chess.andante.move.fairy.AntiAndernachQuietMove;
-import blog.art.chess.andante.piece.Piece;
-import blog.art.chess.andante.position.Board;
-import blog.art.chess.andante.position.Box;
-import blog.art.chess.andante.position.Section;
-import blog.art.chess.andante.position.Square;
-import java.util.List;
+import java.util.StringJoiner;
 
-public interface AntiAndernachMoveFactory extends MoveFactory {
+public class AntiAndernachMoveFactory implements AntiAndernach {
 
   @Override
-  default void newQuietMove(Board board, Square origin, Square target, List<Move> moves) {
-    if (moves != null) {
-      Piece piece = board.get(origin);
-      if (!piece.isRoyal()) {
-        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
-            piece.getColour().getOpposite(), target).equals(target);
-        moves.add(new AntiAndernachQuietMove(origin, target, castling));
-      } else {
-        moves.add(new QuietMove(origin, target));
-      }
-    }
-  }
-
-  @Override
-  default void newDoubleStep(Board board, Square origin, Square target, Square stop,
-      List<Move> moves) {
-    if (moves != null) {
-      Piece piece = board.get(origin);
-      if (!piece.isRoyal()) {
-        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
-            piece.getColour().getOpposite(), target).equals(target);
-        moves.add(new AntiAndernachQuietMove(origin, target, castling));
-      } else {
-        moves.add(new DoubleStep(origin, target, stop));
-      }
-    }
-  }
-
-  @Override
-  default void newPromotion(Board board, Box box, Square origin, Square target, Section section,
-      List<Move> moves) {
-    if (moves != null) {
-      Piece piece = box.peek(section);
-      if (!piece.isRoyal()) {
-        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
-            piece.getColour().getOpposite(), target).equals(target);
-        moves.add(new AntiAndernachPromotion(origin, target, section, castling));
-      } else {
-        moves.add(new Promotion(origin, target, section));
-      }
-    }
+  public String toString() {
+    return new StringJoiner(", ", AntiAndernachMoveFactory.class.getSimpleName() + "[",
+        "]").toString();
   }
 }

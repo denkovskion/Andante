@@ -24,17 +24,17 @@
 
 package blog.art.chess.andante.parser;
 
+import blog.art.chess.andante.condition.AndernachMoveFactory;
+import blog.art.chess.andante.condition.AntiAndernachMoveFactory;
 import blog.art.chess.andante.condition.AntiCirceAndernachMoveFactory;
 import blog.art.chess.andante.condition.AntiCirceAntiAndernachMoveFactory;
+import blog.art.chess.andante.condition.AntiCirceMoveFactory;
 import blog.art.chess.andante.condition.CirceAndernachMoveFactory;
 import blog.art.chess.andante.condition.CirceAntiAndernachMoveFactory;
-import blog.art.chess.andante.condition.DefaultAndernachMoveFactory;
-import blog.art.chess.andante.condition.DefaultAntiAndernachMoveFactory;
-import blog.art.chess.andante.condition.DefaultAntiCirceMoveFactory;
-import blog.art.chess.andante.condition.DefaultCirceMoveFactory;
-import blog.art.chess.andante.condition.DefaultNoCaptureMoveFactory;
+import blog.art.chess.andante.condition.CirceMoveFactory;
 import blog.art.chess.andante.condition.MoveFactory;
 import blog.art.chess.andante.condition.NoCaptureAntiAndernachMoveFactory;
+import blog.art.chess.andante.condition.NoCaptureMoveFactory;
 import blog.art.chess.andante.condition.OrthodoxMoveFactory;
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
@@ -582,11 +582,11 @@ public class Parser {
     Memory memory = new DefaultMemory();
     MoveFactory moveFactory = specification.getConditions().isNoCapture() ? (
         specification.getConditions().isAntiAndernachChess()
-            ? new NoCaptureAntiAndernachMoveFactory() : new DefaultNoCaptureMoveFactory())
+            ? new NoCaptureAntiAndernachMoveFactory() : new NoCaptureMoveFactory())
         : specification.getConditions().isCirce() ? (
             specification.getConditions().isAndernachChess() ? new CirceAndernachMoveFactory()
                 : specification.getConditions().isAntiAndernachChess()
-                    ? new CirceAntiAndernachMoveFactory() : new DefaultCirceMoveFactory())
+                    ? new CirceAntiAndernachMoveFactory() : new CirceMoveFactory())
             : specification.getConditions().getAntiCirce() != null ? (
                 specification.getConditions().isAndernachChess()
                     ? switch (specification.getConditions().getAntiCirce()) {
@@ -597,12 +597,11 @@ public class Parser {
                   case Calvet -> new AntiCirceAntiAndernachMoveFactory(true);
                   case Cheylan -> new AntiCirceAntiAndernachMoveFactory(false);
                 } : switch (specification.getConditions().getAntiCirce()) {
-                  case Calvet -> new DefaultAntiCirceMoveFactory(true);
-                  case Cheylan -> new DefaultAntiCirceMoveFactory(false);
-                }) : specification.getConditions().isAndernachChess()
-                ? new DefaultAndernachMoveFactory()
+                  case Calvet -> new AntiCirceMoveFactory(true);
+                  case Cheylan -> new AntiCirceMoveFactory(false);
+                }) : specification.getConditions().isAndernachChess() ? new AndernachMoveFactory()
                 : specification.getConditions().isAntiAndernachChess()
-                    ? new DefaultAntiAndernachMoveFactory() : new OrthodoxMoveFactory();
+                    ? new AntiAndernachMoveFactory() : new OrthodoxMoveFactory();
     Position position = new Position(board, box, table, sideToMove, state, memory, moveFactory);
     Aim aim = switch (specification.getStipulation().goal()) {
       case Mate -> Aim.MATE;

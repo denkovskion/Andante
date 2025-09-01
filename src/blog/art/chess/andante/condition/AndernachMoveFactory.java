@@ -24,75 +24,12 @@
 
 package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.move.Capture;
-import blog.art.chess.andante.move.EnPassant;
-import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.move.PromotionCapture;
-import blog.art.chess.andante.move.fairy.AndernachCapture;
-import blog.art.chess.andante.move.fairy.AndernachEnPassant;
-import blog.art.chess.andante.move.fairy.AndernachPromotionCapture;
-import blog.art.chess.andante.piece.Piece;
-import blog.art.chess.andante.position.Board;
-import blog.art.chess.andante.position.Box;
-import blog.art.chess.andante.position.Section;
-import blog.art.chess.andante.position.Square;
-import java.util.List;
+import java.util.StringJoiner;
 
-public interface AndernachMoveFactory extends MoveFactory {
+public class AndernachMoveFactory implements Andernach {
 
   @Override
-  default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    if (board.get(target).isRoyal()) {
-      return false;
-    }
-    if (moves != null) {
-      Piece piece = board.get(origin);
-      if (!piece.isRoyal()) {
-        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
-            piece.getColour().getOpposite(), target).equals(target);
-        moves.add(new AndernachCapture(origin, target, castling));
-      } else {
-        moves.add(new Capture(origin, target));
-      }
-    }
-    return true;
-  }
-
-  @Override
-  default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
-      List<Move> moves) {
-    if (board.get(stop).isRoyal()) {
-      return false;
-    }
-    if (moves != null) {
-      Piece piece = board.get(origin);
-      if (!piece.isRoyal()) {
-        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
-            piece.getColour().getOpposite(), target).equals(target);
-        moves.add(new AndernachEnPassant(origin, target, stop, castling));
-      } else {
-        moves.add(new EnPassant(origin, target, stop));
-      }
-    }
-    return true;
-  }
-
-  @Override
-  default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
-      Section section, List<Move> moves) {
-    if (board.get(target).isRoyal()) {
-      return false;
-    }
-    if (moves != null) {
-      Piece piece = box.peek(section);
-      if (!piece.isRoyal()) {
-        boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
-            piece.getColour().getOpposite(), target).equals(target);
-        moves.add(new AndernachPromotionCapture(origin, target, section, castling));
-      } else {
-        moves.add(new PromotionCapture(origin, target, section));
-      }
-    }
-    return true;
+  public String toString() {
+    return new StringJoiner(", ", AndernachMoveFactory.class.getSimpleName() + "[", "]").toString();
   }
 }

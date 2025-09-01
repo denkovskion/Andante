@@ -32,42 +32,40 @@ import blog.art.chess.andante.position.Square;
 import java.util.List;
 import java.util.StringJoiner;
 
-public class NoCaptureAntiAndernachMoveFactory implements NoCaptureMoveFactory,
-    AntiAndernachMoveFactory {
+public class NoCaptureAntiAndernachMoveFactory implements NoCapture, AntiAndernach {
 
   @Override
   public void newQuietMove(Board board, Square origin, Square target, List<Move> moves) {
-    AntiAndernachMoveFactory.super.newQuietMove(board, origin, target, moves);
+    AntiAndernach.super.newQuietMove(board, origin, target, moves);
   }
 
   @Override
   public boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    return NoCaptureMoveFactory.super.createCapture(board, origin, target, moves);
+    return NoCapture.super.createCapture(board, origin, target, moves);
   }
 
   @Override
   public void newDoubleStep(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    AntiAndernachMoveFactory.super.newDoubleStep(board, origin, target, stop, moves);
+    AntiAndernach.super.newDoubleStep(board, origin, target, stop, moves);
   }
 
   @Override
   public boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    return NoCaptureMoveFactory.super.createEnPassant(board, origin, target, stop, moves);
+    return NoCapture.super.createEnPassant(board, origin, target, stop, moves);
   }
 
   @Override
   public void newPromotion(Board board, Box box, Square origin, Square target, Section section,
       List<Move> moves) {
-    AntiAndernachMoveFactory.super.newPromotion(board, box, origin, target, section, moves);
+    AntiAndernach.super.newPromotion(board, box, origin, target, section, moves);
   }
 
   @Override
   public boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
-    return NoCaptureMoveFactory.super.createPromotionCapture(board, box, origin, target, section,
-        moves);
+    return NoCapture.super.createPromotionCapture(board, box, origin, target, section, moves);
   }
 
   @Override

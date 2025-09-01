@@ -24,29 +24,12 @@
 
 package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.position.Board;
-import blog.art.chess.andante.position.Box;
-import blog.art.chess.andante.position.Section;
-import blog.art.chess.andante.position.Square;
-import java.util.List;
+import java.util.StringJoiner;
 
-public interface NoCaptureMoveFactory extends MoveFactory {
+public class NoCaptureMoveFactory implements NoCapture {
 
   @Override
-  default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    return !board.get(target).isRoyal();
-  }
-
-  @Override
-  default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
-      List<Move> moves) {
-    return !board.get(stop).isRoyal();
-  }
-
-  @Override
-  default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
-      Section section, List<Move> moves) {
-    return !board.get(target).isRoyal();
+  public String toString() {
+    return new StringJoiner(", ", NoCaptureMoveFactory.class.getSimpleName() + "[", "]").toString();
   }
 }
