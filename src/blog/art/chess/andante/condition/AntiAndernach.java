@@ -24,12 +24,11 @@
 
 package blog.art.chess.andante.condition;
 
+import blog.art.chess.andante.move.AntiAndernachMove;
 import blog.art.chess.andante.move.DoubleStep;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.move.Promotion;
 import blog.art.chess.andante.move.QuietMove;
-import blog.art.chess.andante.move.fairy.AntiAndernachPromotion;
-import blog.art.chess.andante.move.fairy.AntiAndernachQuietMove;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
@@ -46,7 +45,7 @@ public interface AntiAndernach extends MoveFactory {
       if (!piece.isRoyal()) {
         boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
             piece.getColour().getOpposite(), target).equals(target);
-        moves.add(new AntiAndernachQuietMove(origin, target, castling));
+        moves.add(new AntiAndernachMove(new QuietMove(origin, target), castling));
       } else {
         moves.add(new QuietMove(origin, target));
       }
@@ -61,7 +60,7 @@ public interface AntiAndernach extends MoveFactory {
       if (!piece.isRoyal()) {
         boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
             piece.getColour().getOpposite(), target).equals(target);
-        moves.add(new AntiAndernachQuietMove(origin, target, castling));
+        moves.add(new AntiAndernachMove(new QuietMove(origin, target), castling));
       } else {
         moves.add(new DoubleStep(origin, target, stop));
       }
@@ -76,7 +75,7 @@ public interface AntiAndernach extends MoveFactory {
       if (!piece.isRoyal()) {
         boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
             piece.getColour().getOpposite(), target).equals(target);
-        moves.add(new AntiAndernachPromotion(origin, target, section, castling));
+        moves.add(new AntiAndernachMove(new Promotion(origin, target, section), castling));
       } else {
         moves.add(new Promotion(origin, target, section));
       }

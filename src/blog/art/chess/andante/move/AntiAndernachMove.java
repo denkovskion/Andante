@@ -22,15 +22,23 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.condition;
+package blog.art.chess.andante.move;
 
 import java.util.StringJoiner;
 
-public class NoCaptureAntiAndernachMoveFactory implements NoCapture, AntiAndernach {
+public class AntiAndernachMove extends AndernachMove {
+
+  public AntiAndernachMove(QuietMove baseMove, boolean castling) {
+    super(baseMove, castling);
+  }
+
+  public AntiAndernachMove(Promotion baseMove, boolean castling) {
+    super(baseMove, castling);
+  }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", NoCaptureAntiAndernachMoveFactory.class.getSimpleName() + "[",
-        "]").toString();
+    return new StringJoiner(", ", AntiAndernachMove.class.getSimpleName() + "[", "]").add(
+        "baseMove=" + baseMove).add("castling=" + castling).toString();
   }
 }

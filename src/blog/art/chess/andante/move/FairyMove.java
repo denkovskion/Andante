@@ -22,59 +22,53 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move.fairy;
+package blog.art.chess.andante.move;
 
-import blog.art.chess.andante.move.QuietMove;
 import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.Square;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class AndernachCapture extends QuietMove {
+public abstract class FairyMove extends NullMove {
 
-  protected final boolean castling;
+  protected final NullMove baseMove;
 
-  public AndernachCapture(Square origin, Square target, boolean castling) {
-    super(origin, target);
-    this.castling = castling;
+  protected FairyMove(NullMove baseMove) {
+    this.baseMove = baseMove;
+  }
+
+  @Override
+  protected boolean preMake(Position position) {
+    return baseMove.preMake(position);
   }
 
   @Override
   protected void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    lanBuilder.append(position.getBoard().get(origin).getCode(locale))
-        .append(position.getBoard().toCode(origin)).append("x")
-        .append(position.getBoard().toCode(target)).append("(")
-        .append(position.getBoard().get(origin).getColour().getOpposite().getCode(locale))
-        .append(")");
+    baseMove.preWrite(position, lanBuilder, locale);
   }
 
   @Override
   protected void updatePieces(Position position) {
-    position.getTable().push(position.getBoard().remove(target));
-    position.getBoard().put(target, position.getBoard().remove(origin));
-    position.getBoard().get(target).toggleColour();
+    baseMove.updatePieces(position);
   }
 
   @Override
   protected void revertPieces(Position position) {
-    position.getBoard().get(target).toggleColour();
-    position.getBoard().put(origin, position.getBoard().remove(target));
-    position.getBoard().put(target, position.getTable().pop());
+    baseMove.revertPieces(position);
   }
 
   @Override
   protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    if (castling) {
-      position.getState().addCastling(target);
-    } else {
-      position.getState().removeCastling(target);
-    }
+    baseMove.updateCastlings(position);
+  }
+
+  @Override
+  protected void updateEnPassant(Position position) {
+    baseMove.updateEnPassant(position);
   }
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", AndernachCapture.class.getSimpleName() + "[", "]").add(
-        "origin=" + origin).add("target=" + target).add("castling=" + castling).toString();
+    return new StringJoiner(", ", FairyMove.class.getSimpleName() + "[", "]").add(
+        "baseMove=" + baseMove).toString();
   }
 }

@@ -25,12 +25,10 @@
 package blog.art.chess.andante.condition;
 
 import blog.art.chess.andante.move.Capture;
+import blog.art.chess.andante.move.CirceMove;
 import blog.art.chess.andante.move.EnPassant;
 import blog.art.chess.andante.move.Move;
 import blog.art.chess.andante.move.PromotionCapture;
-import blog.art.chess.andante.move.fairy.CirceCapture;
-import blog.art.chess.andante.move.fairy.CirceEnPassant;
-import blog.art.chess.andante.move.fairy.CircePromotionCapture;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
@@ -50,7 +48,7 @@ public interface Circe extends MoveFactory {
       Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
       if (board.get(rebirth) == null || rebirth.equals(origin)) {
         boolean castling = piece.isCastling();
-        moves.add(new CirceCapture(origin, target, rebirth, castling));
+        moves.add(new CirceMove(new Capture(origin, target), rebirth, castling));
       } else {
         moves.add(new Capture(origin, target));
       }
@@ -70,7 +68,7 @@ public interface Circe extends MoveFactory {
       if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop))
           && !rebirth.equals(target)) {
         boolean castling = piece.isCastling();
-        moves.add(new CirceEnPassant(origin, target, stop, rebirth, castling));
+        moves.add(new CirceMove(new EnPassant(origin, target, stop), rebirth, castling));
       } else {
         moves.add(new EnPassant(origin, target, stop));
       }
@@ -89,7 +87,7 @@ public interface Circe extends MoveFactory {
       Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
       if (board.get(rebirth) == null || rebirth.equals(origin)) {
         boolean castling = piece.isCastling();
-        moves.add(new CircePromotionCapture(origin, target, section, rebirth, castling));
+        moves.add(new CirceMove(new PromotionCapture(origin, target, section), rebirth, castling));
       } else {
         moves.add(new PromotionCapture(origin, target, section));
       }

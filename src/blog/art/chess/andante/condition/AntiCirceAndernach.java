@@ -24,13 +24,12 @@
 
 package blog.art.chess.andante.condition;
 
+import blog.art.chess.andante.move.AndernachMove;
+import blog.art.chess.andante.move.AntiCirceMove;
+import blog.art.chess.andante.move.Capture;
+import blog.art.chess.andante.move.EnPassant;
 import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.move.fairy.AntiCirceAndernachCapture;
-import blog.art.chess.andante.move.fairy.AntiCirceAndernachEnPassant;
-import blog.art.chess.andante.move.fairy.AntiCirceAndernachPromotionCapture;
-import blog.art.chess.andante.move.fairy.AntiCirceCapture;
-import blog.art.chess.andante.move.fairy.AntiCirceEnPassant;
-import blog.art.chess.andante.move.fairy.AntiCircePromotionCapture;
+import blog.art.chess.andante.move.PromotionCapture;
 import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
@@ -52,13 +51,15 @@ public interface AntiCirceAndernach extends MoveFactory {
         return false;
       }
       if (moves != null) {
+        boolean castling = piece.isCastling();
         if (!piece.isRoyal()) {
-          boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+          boolean castling2 = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
               piece.getColour().getOpposite(), rebirth).equals(rebirth);
-          moves.add(new AntiCirceAndernachCapture(origin, target, rebirth, castling));
+          moves.add(
+              new AndernachMove(new AntiCirceMove(new Capture(origin, target), rebirth, castling),
+                  castling2));
         } else {
-          boolean castling = piece.isCastling();
-          moves.add(new AntiCirceCapture(origin, target, rebirth, castling));
+          moves.add(new AntiCirceMove(new Capture(origin, target), rebirth, castling));
         }
       }
     }
@@ -76,13 +77,15 @@ public interface AntiCirceAndernach extends MoveFactory {
         return false;
       }
       if (moves != null) {
+        boolean castling = piece.isCastling();
         if (!piece.isRoyal()) {
-          boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+          boolean castling2 = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
               piece.getColour().getOpposite(), rebirth).equals(rebirth);
-          moves.add(new AntiCirceAndernachEnPassant(origin, target, stop, rebirth, castling));
+          moves.add(new AndernachMove(
+              new AntiCirceMove(new EnPassant(origin, target, stop), rebirth, castling),
+              castling2));
         } else {
-          boolean castling = piece.isCastling();
-          moves.add(new AntiCirceEnPassant(origin, target, stop, rebirth, castling));
+          moves.add(new AntiCirceMove(new EnPassant(origin, target, stop), rebirth, castling));
         }
       }
     }
@@ -100,14 +103,16 @@ public interface AntiCirceAndernach extends MoveFactory {
         return false;
       }
       if (moves != null) {
+        boolean castling = piece.isCastling();
         if (!piece.isRoyal()) {
-          boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+          boolean castling2 = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
               piece.getColour().getOpposite(), rebirth).equals(rebirth);
-          moves.add(
-              new AntiCirceAndernachPromotionCapture(origin, target, section, rebirth, castling));
+          moves.add(new AndernachMove(
+              new AntiCirceMove(new PromotionCapture(origin, target, section), rebirth, castling),
+              castling2));
         } else {
-          boolean castling = piece.isCastling();
-          moves.add(new AntiCircePromotionCapture(origin, target, section, rebirth, castling));
+          moves.add(
+              new AntiCirceMove(new PromotionCapture(origin, target, section), rebirth, castling));
         }
       }
     }

@@ -1,7 +1,7 @@
 /*
  * MIT License
  *
- * Copyright (c) 2024-2025 Ivan Denkovski
+ * Copyright (c) 2025 Ivan Denkovski
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,57 +22,63 @@
  * SOFTWARE.
  */
 
-package blog.art.chess.andante.move.fairy;
+package blog.art.chess.andante.move;
 
-import blog.art.chess.andante.move.Promotion;
 import blog.art.chess.andante.position.Position;
-import blog.art.chess.andante.position.Section;
 import blog.art.chess.andante.position.Square;
 import java.util.Locale;
 import java.util.StringJoiner;
 
-public class CircePromotionCapture extends Promotion {
+public class AntiCirceMove extends FairyMove {
 
   protected final Square rebirth;
   protected final boolean castling;
 
-  public CircePromotionCapture(Square origin, Square target, Section section, Square rebirth,
-      boolean castling) {
-    super(origin, target, section);
+  public AntiCirceMove(Capture baseMove, Square rebirth, boolean castling) {
+    super(baseMove);
+    this.rebirth = rebirth;
+    this.castling = castling;
+  }
+
+  public AntiCirceMove(EnPassant baseMove, Square rebirth, boolean castling) {
+    super(baseMove);
+    this.rebirth = rebirth;
+    this.castling = castling;
+  }
+
+  public AntiCirceMove(PromotionCapture baseMove, Square rebirth, boolean castling) {
+    super(baseMove);
     this.rebirth = rebirth;
     this.castling = castling;
   }
 
   @Override
   protected void preWrite(Position position, StringBuilder lanBuilder, Locale locale) {
-    lanBuilder.append(position.getBoard().get(origin).getCode(locale))
-        .append(position.getBoard().toCode(origin)).append("x")
-        .append(position.getBoard().toCode(target)).append("=")
-        .append(position.getBox().peek(section).getCode(locale)).append("(")
-        .append(position.getBoard().get(target).getCode(locale))
-        .append(position.getBoard().toCode(rebirth)).append(")");
+    baseMove.preWrite(position, lanBuilder, locale);
+    lanBuilder.append("(");
+    if (baseMove instanceof PromotionCapture promotionCapture) {
+      lanBuilder.append(position.getBox().peek(promotionCapture.section).getCode(locale));
+    } else {
+      lanBuilder.append(position.getBoard().get(((QuietMove) baseMove).origin).getCode(locale));
+    }
+    lanBuilder.append(position.getBoard().toCode(rebirth)).append(")");
   }
 
   @Override
   protected void updatePieces(Position position) {
-    position.getTable().push(position.getBoard().remove(origin));
-    position.getTable().push(position.getBoard().remove(target));
-    position.getBoard().put(target, position.getBox().pop(section));
-    position.getBoard().put(rebirth, position.getTable().pop());
+    baseMove.updatePieces(position);
+    position.getBoard().put(rebirth, position.getBoard().remove(((QuietMove) baseMove).target));
   }
 
   @Override
   protected void revertPieces(Position position) {
-    position.getTable().push(position.getBoard().remove(rebirth));
-    position.getBox().push(section, position.getBoard().remove(target));
-    position.getBoard().put(target, position.getTable().pop());
-    position.getBoard().put(origin, position.getTable().pop());
+    position.getBoard().put(((QuietMove) baseMove).target, position.getBoard().remove(rebirth));
+    baseMove.revertPieces(position);
   }
 
   @Override
   protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
+    baseMove.updateCastlings(position);
     if (castling) {
       position.getState().addCastling(rebirth);
     } else {
@@ -82,8 +88,7 @@ public class CircePromotionCapture extends Promotion {
 
   @Override
   public String toString() {
-    return new StringJoiner(", ", CircePromotionCapture.class.getSimpleName() + "[", "]").add(
-            "origin=" + origin).add("target=" + target).add("section=" + section)
-        .add("rebirth=" + rebirth).add("castling=" + castling).toString();
+    return new StringJoiner(", ", AntiCirceMove.class.getSimpleName() + "[", "]").add(
+        "baseMove=" + baseMove).add("rebirth=" + rebirth).add("castling=" + castling).toString();
   }
 }

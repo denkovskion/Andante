@@ -24,12 +24,6 @@
 
 package blog.art.chess.andante.condition;
 
-import blog.art.chess.andante.move.Move;
-import blog.art.chess.andante.position.Board;
-import blog.art.chess.andante.position.Box;
-import blog.art.chess.andante.position.Section;
-import blog.art.chess.andante.position.Square;
-import java.util.List;
 import java.util.StringJoiner;
 
 public class AntiCirceAntiAndernachMoveFactory implements AntiCirce, AntiAndernach {
@@ -43,40 +37,6 @@ public class AntiCirceAntiAndernachMoveFactory implements AntiCirce, AntiAnderna
   @Override
   public boolean isCalvet() {
     return calvet;
-  }
-
-  @Override
-  public void newQuietMove(Board board, Square origin, Square target, List<Move> moves) {
-    AntiAndernach.super.newQuietMove(board, origin, target, moves);
-  }
-
-  @Override
-  public boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    return AntiCirce.super.createCapture(board, origin, target, moves);
-  }
-
-  @Override
-  public void newDoubleStep(Board board, Square origin, Square target, Square stop,
-      List<Move> moves) {
-    AntiAndernach.super.newDoubleStep(board, origin, target, stop, moves);
-  }
-
-  @Override
-  public boolean createEnPassant(Board board, Square origin, Square target, Square stop,
-      List<Move> moves) {
-    return AntiCirce.super.createEnPassant(board, origin, target, stop, moves);
-  }
-
-  @Override
-  public void newPromotion(Board board, Box box, Square origin, Square target, Section section,
-      List<Move> moves) {
-    AntiAndernach.super.newPromotion(board, box, origin, target, section, moves);
-  }
-
-  @Override
-  public boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
-      Section section, List<Move> moves) {
-    return AntiCirce.super.createPromotionCapture(board, box, origin, target, section, moves);
   }
 
   @Override

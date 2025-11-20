@@ -779,12 +779,7 @@ public class Parser {
           8 - specification.getEnPassant().index() / 8));
     }
     Memory memory = new DefaultMemory();
-    MoveFactory moveFactory = new OrthodoxMoveFactory() {
-      @Override
-      public String toString() {
-        return "default";
-      }
-    };
+    MoveFactory moveFactory = new OrthodoxMoveFactory();
     Position position = new Position(board, box, table, sideToMove, state, memory, moveFactory);
     int nMoves = switch (specification.getOperation().opcode()) {
       case ACD -> specification.getOperation().operand() / 2;
