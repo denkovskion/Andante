@@ -47,7 +47,8 @@ public interface AntiCirceAndernach extends MoveFactory {
     Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
     if (board.get(rebirth) == null || rebirth.equals(origin) || isCalvet() && rebirth.equals(
         target)) {
-      if (board.get(target).isRoyal()) {
+      Piece other = board.get(target);
+      if (other.isRoyal()) {
         return false;
       }
       if (moves != null) {
@@ -73,7 +74,8 @@ public interface AntiCirceAndernach extends MoveFactory {
     Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
     if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop)) && (
         isCalvet() || !rebirth.equals(target))) {
-      if (board.get(stop).isRoyal()) {
+      Piece other = board.get(stop);
+      if (other.isRoyal()) {
         return false;
       }
       if (moves != null) {
@@ -99,7 +101,8 @@ public interface AntiCirceAndernach extends MoveFactory {
     Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
     if (board.get(rebirth) == null || rebirth.equals(origin) || isCalvet() && rebirth.equals(
         target)) {
-      if (board.get(target).isRoyal()) {
+      Piece other = board.get(target);
+      if (other.isRoyal()) {
         return false;
       }
       if (moves != null) {

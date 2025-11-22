@@ -80,14 +80,18 @@ public class AndernachMove extends FairyMove {
       antiCirceMove.baseMove.preWrite(position, lanBuilder, locale);
       lanBuilder.append("(");
       if (antiCirceMove.baseMove instanceof PromotionCapture promotionCapture) {
-        lanBuilder.append(position.getBox().peek(promotionCapture.section).getCode(locale));
+        lanBuilder.append(position.getBox().peek(promotionCapture.section).getCode(locale))
+            .append(position.getBoard().toCode(antiCirceMove.rebirth)).append(
+                position.getBox().peek(promotionCapture.section).getColour().getOpposite()
+                    .getCode(locale));
       } else {
         lanBuilder.append(
-            position.getBoard().get(((QuietMove) antiCirceMove.baseMove).origin).getCode(locale));
+                position.getBoard().get(((QuietMove) antiCirceMove.baseMove).origin).getCode(locale))
+            .append(position.getBoard().toCode(antiCirceMove.rebirth)).append(
+                position.getBoard().get(((QuietMove) antiCirceMove.baseMove).origin).getColour()
+                    .getOpposite().getCode(locale));
       }
-      lanBuilder.append(position.getBoard().toCode(antiCirceMove.rebirth)).append(
-          position.getBoard().get(((QuietMove) antiCirceMove.baseMove).origin).getColour()
-              .getOpposite().getCode(locale)).append(")");
+      lanBuilder.append(")");
     } else {
       baseMove.preWrite(position, lanBuilder, locale);
       lanBuilder.append("(").append(

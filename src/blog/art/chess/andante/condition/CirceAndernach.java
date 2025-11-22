@@ -41,27 +41,27 @@ public interface CirceAndernach extends MoveFactory {
 
   @Override
   default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
+    Piece other = board.get(target);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-      Piece piece2 = board.get(origin);
+      Square rebirth = board.findRebirthSquare(other.getClass(), other.getColour(), target);
+      Piece piece = board.get(origin);
       if (board.get(rebirth) == null || rebirth.equals(origin)) {
-        boolean castling = piece.isCastling();
-        if (!piece2.isRoyal()) {
-          boolean castling2 = piece2.isCastling() && board.findRebirthSquare(piece2.getClass(),
-              piece2.getColour().getOpposite(), target).equals(target);
+        boolean castling = other.isCastling();
+        if (!piece.isRoyal()) {
+          boolean castling2 = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+              piece.getColour().getOpposite(), target).equals(target);
           moves.add(new AndernachMove(new CirceMove(new Capture(origin, target), rebirth, castling),
               castling2));
         } else {
           moves.add(new CirceMove(new Capture(origin, target), rebirth, castling));
         }
       } else {
-        if (!piece2.isRoyal()) {
-          boolean castling = piece2.isCastling() && board.findRebirthSquare(piece2.getClass(),
-              piece2.getColour().getOpposite(), target).equals(target);
+        if (!piece.isRoyal()) {
+          boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+              piece.getColour().getOpposite(), target).equals(target);
           moves.add(new AndernachMove(new Capture(origin, target), castling));
         } else {
           moves.add(new Capture(origin, target));
@@ -74,28 +74,28 @@ public interface CirceAndernach extends MoveFactory {
   @Override
   default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    Piece piece = board.get(stop);
-    if (piece.isRoyal()) {
+    Piece other = board.get(stop);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), stop);
-      Piece piece2 = board.get(origin);
+      Square rebirth = board.findRebirthSquare(other.getClass(), other.getColour(), stop);
+      Piece piece = board.get(origin);
       if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop))
           && !rebirth.equals(target)) {
-        boolean castling = piece.isCastling();
-        if (!piece2.isRoyal()) {
-          boolean castling2 = piece2.isCastling() && board.findRebirthSquare(piece2.getClass(),
-              piece2.getColour().getOpposite(), target).equals(target);
+        boolean castling = other.isCastling();
+        if (!piece.isRoyal()) {
+          boolean castling2 = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+              piece.getColour().getOpposite(), target).equals(target);
           moves.add(new AndernachMove(
               new CirceMove(new EnPassant(origin, target, stop), rebirth, castling), castling2));
         } else {
           moves.add(new CirceMove(new EnPassant(origin, target, stop), rebirth, castling));
         }
       } else {
-        if (!piece2.isRoyal()) {
-          boolean castling = piece2.isCastling() && board.findRebirthSquare(piece2.getClass(),
-              piece2.getColour().getOpposite(), target).equals(target);
+        if (!piece.isRoyal()) {
+          boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+              piece.getColour().getOpposite(), target).equals(target);
           moves.add(new AndernachMove(new EnPassant(origin, target, stop), castling));
         } else {
           moves.add(new EnPassant(origin, target, stop));
@@ -108,18 +108,18 @@ public interface CirceAndernach extends MoveFactory {
   @Override
   default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
+    Piece other = board.get(target);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
-      Piece piece2 = box.peek(section);
+      Square rebirth = board.findRebirthSquare(other.getClass(), other.getColour(), target);
+      Piece piece = box.peek(section);
       if (board.get(rebirth) == null || rebirth.equals(origin)) {
-        boolean castling = piece.isCastling();
-        if (!piece2.isRoyal()) {
-          boolean castling2 = piece2.isCastling() && board.findRebirthSquare(piece2.getClass(),
-              piece2.getColour().getOpposite(), target).equals(target);
+        boolean castling = other.isCastling();
+        if (!piece.isRoyal()) {
+          boolean castling2 = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+              piece.getColour().getOpposite(), target).equals(target);
           moves.add((new AndernachMove(
               new CirceMove(new PromotionCapture(origin, target, section), rebirth, castling),
               castling2)));
@@ -128,9 +128,9 @@ public interface CirceAndernach extends MoveFactory {
               new CirceMove(new PromotionCapture(origin, target, section), rebirth, castling));
         }
       } else {
-        if (!piece2.isRoyal()) {
-          boolean castling = piece2.isCastling() && board.findRebirthSquare(piece2.getClass(),
-              piece2.getColour().getOpposite(), target).equals(target);
+        if (!piece.isRoyal()) {
+          boolean castling = piece.isCastling() && board.findRebirthSquare(piece.getClass(),
+              piece.getColour().getOpposite(), target).equals(target);
           moves.add(new AndernachMove(new PromotionCapture(origin, target, section), castling));
         } else {
           moves.add(new PromotionCapture(origin, target, section));

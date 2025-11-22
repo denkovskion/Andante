@@ -25,6 +25,7 @@
 package blog.art.chess.andante.condition;
 
 import blog.art.chess.andante.move.Move;
+import blog.art.chess.andante.piece.Piece;
 import blog.art.chess.andante.position.Board;
 import blog.art.chess.andante.position.Box;
 import blog.art.chess.andante.position.Section;
@@ -35,18 +36,21 @@ public interface NoCapture extends MoveFactory {
 
   @Override
   default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    return !board.get(target).isRoyal();
+    Piece other = board.get(target);
+    return !other.isRoyal();
   }
 
   @Override
   default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    return !board.get(stop).isRoyal();
+    Piece other = board.get(stop);
+    return !other.isRoyal();
   }
 
   @Override
   default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
-    return !board.get(target).isRoyal();
+    Piece other = board.get(target);
+    return !other.isRoyal();
   }
 }

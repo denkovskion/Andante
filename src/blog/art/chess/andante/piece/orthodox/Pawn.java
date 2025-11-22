@@ -55,9 +55,9 @@ public final class Pawn extends Piece {
       Direction direction = board.getDirection(fileOffset, rankOffset);
       Square target = board.findTarget(origin, direction, 1);
       if (target != null) {
-        Piece piece = board.get(target);
-        if (piece != null) {
-          if (piece.getColour() != colour) {
+        Piece other = board.get(target);
+        if (other != null) {
+          if (other.getColour() != colour) {
             if (board.isRebirthSquare(target, Piece.class, colour)) {
               for (Section section : box.findSections(colour)) {
                 if (!moveFactory.createPromotionCapture(board, box, origin, target, section,

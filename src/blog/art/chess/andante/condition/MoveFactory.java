@@ -49,8 +49,8 @@ public interface MoveFactory {
   }
 
   default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
+    Piece other = board.get(target);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
@@ -82,8 +82,8 @@ public interface MoveFactory {
 
   default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    Piece piece = board.get(stop);
-    if (piece.isRoyal()) {
+    Piece other = board.get(stop);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
@@ -101,8 +101,8 @@ public interface MoveFactory {
 
   default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
+    Piece other = board.get(target);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {

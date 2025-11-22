@@ -26,30 +26,31 @@ package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.piece.Colour;
 import blog.art.chess.andante.piece.Piece;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.StringJoiner;
 import java.util.TreeMap;
 
 public class DefaultBox implements Box {
 
-  private final Map<Section, Stack<Piece>> pieces = new TreeMap<>();
+  private final Map<Section, Deque<Piece>> pieces = new TreeMap<>();
 
   @Override
   public Piece peek(Section section) {
-    return pieces.get(section).peek();
+    return pieces.get(section).getFirst();
   }
 
   @Override
   public Piece pop(Section section) {
-    return pieces.get(section).pop();
+    return pieces.get(section).removeFirst();
   }
 
   @Override
   public void push(Section section, Piece piece) {
-    pieces.computeIfAbsent(section, s -> new Stack<>()).push(piece);
+    pieces.computeIfAbsent(section, s -> new ArrayDeque<>()).addFirst(piece);
   }
 
   @Override

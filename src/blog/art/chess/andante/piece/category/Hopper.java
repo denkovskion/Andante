@@ -49,9 +49,9 @@ public interface Hopper {
           if (board.get(target) != null) {
             target = board.findTarget(origin, direction, distance + 1);
             if (target != null) {
-              Piece piece = board.get(target);
-              if (piece != null) {
-                if (piece.getColour() != getColour()) {
+              Piece other = board.get(target);
+              if (other != null) {
+                if (other.getColour() != getColour()) {
                   if (!moveFactory.createCapture(board, origin, target, moves)) {
                     return false;
                   }

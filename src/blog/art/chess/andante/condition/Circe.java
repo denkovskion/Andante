@@ -40,14 +40,14 @@ public interface Circe extends MoveFactory {
 
   @Override
   default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
+    Piece other = board.get(target);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
+      Square rebirth = board.findRebirthSquare(other.getClass(), other.getColour(), target);
       if (board.get(rebirth) == null || rebirth.equals(origin)) {
-        boolean castling = piece.isCastling();
+        boolean castling = other.isCastling();
         moves.add(new CirceMove(new Capture(origin, target), rebirth, castling));
       } else {
         moves.add(new Capture(origin, target));
@@ -59,15 +59,15 @@ public interface Circe extends MoveFactory {
   @Override
   default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    Piece piece = board.get(stop);
-    if (piece.isRoyal()) {
+    Piece other = board.get(stop);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), stop);
+      Square rebirth = board.findRebirthSquare(other.getClass(), other.getColour(), stop);
       if ((board.get(rebirth) == null || rebirth.equals(origin) || rebirth.equals(stop))
           && !rebirth.equals(target)) {
-        boolean castling = piece.isCastling();
+        boolean castling = other.isCastling();
         moves.add(new CirceMove(new EnPassant(origin, target, stop), rebirth, castling));
       } else {
         moves.add(new EnPassant(origin, target, stop));
@@ -79,14 +79,14 @@ public interface Circe extends MoveFactory {
   @Override
   default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
-    Piece piece = board.get(target);
-    if (piece.isRoyal()) {
+    Piece other = board.get(target);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
-      Square rebirth = board.findRebirthSquare(piece.getClass(), piece.getColour(), target);
+      Square rebirth = board.findRebirthSquare(other.getClass(), other.getColour(), target);
       if (board.get(rebirth) == null || rebirth.equals(origin)) {
-        boolean castling = piece.isCastling();
+        boolean castling = other.isCastling();
         moves.add(new CirceMove(new PromotionCapture(origin, target, section), rebirth, castling));
       } else {
         moves.add(new PromotionCapture(origin, target, section));

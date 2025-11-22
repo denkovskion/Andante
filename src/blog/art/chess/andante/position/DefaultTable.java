@@ -25,21 +25,22 @@
 package blog.art.chess.andante.position;
 
 import blog.art.chess.andante.piece.Piece;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.StringJoiner;
 
 public class DefaultTable implements Table {
 
-  private final Stack<Piece> pieces = new Stack<>();
+  private final Deque<Piece> pieces = new ArrayDeque<>();
 
   @Override
   public Piece pop() {
-    return pieces.pop();
+    return pieces.removeFirst();
   }
 
   @Override
   public void push(Piece piece) {
-    pieces.push(piece);
+    pieces.addFirst(piece);
   }
 
   @Override

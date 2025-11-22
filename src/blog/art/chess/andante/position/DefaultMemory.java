@@ -24,21 +24,22 @@
 
 package blog.art.chess.andante.position;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.StringJoiner;
 
 public class DefaultMemory implements Memory {
 
-  private final Stack<State> states = new Stack<>();
+  private final Deque<State> states = new ArrayDeque<>();
 
   @Override
   public State pop() {
-    return states.pop();
+    return states.removeFirst();
   }
 
   @Override
   public void push(State state) {
-    states.push(state);
+    states.addFirst(state);
   }
 
   @Override

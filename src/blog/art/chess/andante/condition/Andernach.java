@@ -40,7 +40,8 @@ public interface Andernach extends MoveFactory {
 
   @Override
   default boolean createCapture(Board board, Square origin, Square target, List<Move> moves) {
-    if (board.get(target).isRoyal()) {
+    Piece other = board.get(target);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
@@ -59,7 +60,8 @@ public interface Andernach extends MoveFactory {
   @Override
   default boolean createEnPassant(Board board, Square origin, Square target, Square stop,
       List<Move> moves) {
-    if (board.get(stop).isRoyal()) {
+    Piece other = board.get(stop);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
@@ -78,7 +80,8 @@ public interface Andernach extends MoveFactory {
   @Override
   default boolean createPromotionCapture(Board board, Box box, Square origin, Square target,
       Section section, List<Move> moves) {
-    if (board.get(target).isRoyal()) {
+    Piece other = board.get(target);
+    if (other.isRoyal()) {
       return false;
     }
     if (moves != null) {
