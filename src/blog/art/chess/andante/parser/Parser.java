@@ -382,9 +382,9 @@ public class Parser {
               if (lineScanner.hasNext(castlingPattern)) {
                 String castlingToken = lineScanner.next(castlingPattern);
                 Arrays.stream(castlingToken.split("")).forEach(castlingSymbol -> {
-                  Model.Castling castling = Model.Castling.values()[castlingSymbols.indexOf(
+                  Model.CastlingRight castlingRight = Model.CastlingRight.values()[castlingSymbols.indexOf(
                       castlingSymbol)];
-                  position.getCastlings().add(castling);
+                  position.getCastlingRights().add(castlingRight);
                 });
               } else {
                 lineScanner.next("-");
@@ -394,7 +394,7 @@ public class Parser {
                 String enPassantToken = lineScanner.next(enPassantPattern);
                 int file = enPassantToken.charAt(0) - 'a' + 1;
                 int rank = enPassantToken.charAt(1) - '1' + 1;
-                position.setEnPassant(new Model.Square((8 - rank) * 8 + file - 1));
+                position.setEnPassantTarget(new Model.Square((8 - rank) * 8 + file - 1));
               } else {
                 lineScanner.next("-");
               }
@@ -575,9 +575,9 @@ public class Parser {
                 || piece.colour() == Popeye.Colour.Black && piece.square().rank() == Popeye.Rank._8))
         .map(Popeye.Piece::square)
         .filter(square -> !specification.getOptions().getNoCastling().contains(square)).forEach(
-            square -> state.addCastling(
+            square -> state.addCastlingOrigin(
                 board.getSquare(convertFile(square.file()), convertRank(square.rank()))));
-    specification.getOptions().getEnPassant().forEach(square -> state.setEnPassant(
+    specification.getOptions().getEnPassant().forEach(square -> state.setEnPassantTarget(
         board.getSquare(convertFile(square.file()), convertRank(square.rank()))));
     Memory memory = new DefaultMemory();
     MoveFactory moveFactory = specification.getConditions().isNoCapture() ? (
@@ -697,32 +697,33 @@ public class Parser {
       throw new IllegalArgumentException(
           "Position conversion failure (not accepted number of kings).");
     }
-    if (!specification.getCastlings().stream().allMatch(castling -> switch (castling) {
-      case WhiteShort, WhiteLong -> specification.getBoard().get(60) == Model.Piece.WhiteKing;
-      case BlackShort, BlackLong -> specification.getBoard().get(4) == Model.Piece.BlackKing;
-    } && switch (castling) {
-      case WhiteShort -> specification.getBoard().get(63) == Model.Piece.WhiteRook;
-      case WhiteLong -> specification.getBoard().get(56) == Model.Piece.WhiteRook;
-      case BlackShort -> specification.getBoard().get(7) == Model.Piece.BlackRook;
-      case BlackLong -> specification.getBoard().get(0) == Model.Piece.BlackRook;
-    })) {
+    if (!specification.getCastlingRights().stream()
+        .allMatch(castlingRight -> switch (castlingRight) {
+          case WhiteShort, WhiteLong -> specification.getBoard().get(60) == Model.Piece.WhiteKing;
+          case BlackShort, BlackLong -> specification.getBoard().get(4) == Model.Piece.BlackKing;
+        } && switch (castlingRight) {
+          case WhiteShort -> specification.getBoard().get(63) == Model.Piece.WhiteRook;
+          case WhiteLong -> specification.getBoard().get(56) == Model.Piece.WhiteRook;
+          case BlackShort -> specification.getBoard().get(7) == Model.Piece.BlackRook;
+          case BlackLong -> specification.getBoard().get(0) == Model.Piece.BlackRook;
+        })) {
       throw new IllegalArgumentException(
           "Position conversion failure (not accepted castling rights).");
     }
-    if (specification.getEnPassant() != null) {
+    if (specification.getEnPassantTarget() != null) {
       if (!switch (specification.getSideToMove()) {
-        case White ->
-            specification.getEnPassant().index() >= 16 && specification.getEnPassant().index() <= 23
-                && specification.getBoard().get(specification.getEnPassant().index()) == null
-                && specification.getBoard().get(specification.getEnPassant().index() - 8) == null
-                && specification.getBoard().get(specification.getEnPassant().index() + 8)
-                == Model.Piece.BlackPawn;
-        case Black ->
-            specification.getEnPassant().index() >= 40 && specification.getEnPassant().index() <= 47
-                && specification.getBoard().get(specification.getEnPassant().index()) == null
-                && specification.getBoard().get(specification.getEnPassant().index() + 8) == null
-                && specification.getBoard().get(specification.getEnPassant().index() - 8)
-                == Model.Piece.WhitePawn;
+        case White -> specification.getEnPassantTarget().index() >= 16
+            && specification.getEnPassantTarget().index() <= 23
+            && specification.getBoard().get(specification.getEnPassantTarget().index()) == null
+            && specification.getBoard().get(specification.getEnPassantTarget().index() - 8) == null
+            && specification.getBoard().get(specification.getEnPassantTarget().index() + 8)
+            == Model.Piece.BlackPawn;
+        case Black -> specification.getEnPassantTarget().index() >= 40
+            && specification.getEnPassantTarget().index() <= 47
+            && specification.getBoard().get(specification.getEnPassantTarget().index()) == null
+            && specification.getBoard().get(specification.getEnPassantTarget().index() + 8) == null
+            && specification.getBoard().get(specification.getEnPassantTarget().index() - 8)
+            == Model.Piece.WhitePawn;
       }) {
         throw new IllegalArgumentException(
             "Position conversion failure (not accepted en passant square).");
@@ -765,18 +766,18 @@ public class Parser {
     Table table = new DefaultTable();
     Colour sideToMove = convertColour(specification.getSideToMove());
     State state = new DefaultState();
-    specification.getCastlings().forEach(castling -> IntStream.of(switch (castling) {
+    specification.getCastlingRights().forEach(castlingRight -> IntStream.of(switch (castlingRight) {
       case WhiteShort, WhiteLong -> 60;
       case BlackShort, BlackLong -> 4;
-    }, switch (castling) {
+    }, switch (castlingRight) {
       case WhiteShort -> 63;
       case WhiteLong -> 56;
       case BlackShort -> 7;
       case BlackLong -> 0;
-    }).forEach(index -> state.addCastling(board.getSquare(index % 8 + 1, 8 - index / 8))));
-    if (specification.getEnPassant() != null) {
-      state.setEnPassant(board.getSquare(specification.getEnPassant().index() % 8 + 1,
-          8 - specification.getEnPassant().index() / 8));
+    }).forEach(index -> state.addCastlingOrigin(board.getSquare(index % 8 + 1, 8 - index / 8))));
+    if (specification.getEnPassantTarget() != null) {
+      state.setEnPassantTarget(board.getSquare(specification.getEnPassantTarget().index() % 8 + 1,
+          8 - specification.getEnPassantTarget().index() / 8));
     }
     Memory memory = new DefaultMemory();
     MoveFactory moveFactory = new OrthodoxMoveFactory();

@@ -63,11 +63,11 @@ public abstract class Castling extends QuietMove {
   }
 
   @Override
-  protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
-    position.getState().removeCastling(origin2);
-    position.getState().removeCastling(target2);
+  protected void updateCastlingOrigins(Position position) {
+    position.getState().removeCastlingOrigin(origin);
+    position.getState().removeCastlingOrigin(target);
+    position.getState().removeCastlingOrigin(origin2);
+    position.getState().removeCastlingOrigin(target2);
   }
 
   @Override

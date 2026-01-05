@@ -38,15 +38,15 @@ public class DoubleStep extends QuietMove {
   }
 
   @Override
-  protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
-    position.getState().removeCastling(stop);
+  protected void updateCastlingOrigins(Position position) {
+    position.getState().removeCastlingOrigin(origin);
+    position.getState().removeCastlingOrigin(target);
+    position.getState().removeCastlingOrigin(stop);
   }
 
   @Override
-  protected void updateEnPassant(Position position) {
-    position.getState().setEnPassant(stop);
+  protected void updateEnPassantTarget(Position position) {
+    position.getState().setEnPassantTarget(stop);
   }
 
   @Override

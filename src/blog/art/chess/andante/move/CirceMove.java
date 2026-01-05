@@ -77,12 +77,12 @@ public class CirceMove extends FairyMove {
   }
 
   @Override
-  protected void updateCastlings(Position position) {
-    baseMove.updateCastlings(position);
+  protected void updateCastlingOrigins(Position position) {
+    baseMove.updateCastlingOrigins(position);
     if (castling) {
-      position.getState().addCastling(rebirth);
+      position.getState().addCastlingOrigin(rebirth);
     } else {
-      position.getState().removeCastling(rebirth);
+      position.getState().removeCastlingOrigin(rebirth);
     }
   }
 

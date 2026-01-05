@@ -30,15 +30,15 @@ import java.util.TreeSet;
 
 public class DefaultState implements State {
 
-  private final Set<Square> castlings = new TreeSet<>();
-  private Square enPassant;
+  private final Set<Square> castlingOrigins = new TreeSet<>();
+  private Square enPassantTarget;
 
   public DefaultState() {
   }
 
   private DefaultState(DefaultState state) {
-    this.castlings.addAll(state.castlings);
-    this.enPassant = state.enPassant;
+    this.castlingOrigins.addAll(state.castlingOrigins);
+    this.enPassantTarget = state.enPassantTarget;
   }
 
   @Override
@@ -47,38 +47,38 @@ public class DefaultState implements State {
   }
 
   @Override
-  public boolean isCastling(Square square) {
-    return castlings.contains(square);
+  public boolean isCastlingOrigin(Square square) {
+    return castlingOrigins.contains(square);
   }
 
   @Override
-  public void addCastling(Square square) {
-    castlings.add(square);
+  public void addCastlingOrigin(Square square) {
+    castlingOrigins.add(square);
   }
 
   @Override
-  public void removeCastling(Square square) {
-    castlings.remove(square);
+  public void removeCastlingOrigin(Square square) {
+    castlingOrigins.remove(square);
   }
 
   @Override
-  public boolean isEnPassant(Square square) {
-    return square.equals(enPassant);
+  public boolean isEnPassantTarget(Square square) {
+    return square.equals(enPassantTarget);
   }
 
   @Override
-  public void setEnPassant(Square square) {
-    this.enPassant = square;
+  public void setEnPassantTarget(Square square) {
+    this.enPassantTarget = square;
   }
 
   @Override
-  public void resetEnPassant() {
-    this.enPassant = null;
+  public void resetEnPassantTarget() {
+    this.enPassantTarget = null;
   }
 
   @Override
   public String toString() {
     return new StringJoiner(", ", DefaultState.class.getSimpleName() + "[", "]").add(
-        "castlings=" + castlings).add("enPassant=" + enPassant).toString();
+        "castlingOrigins=" + castlingOrigins).add("enPassantTarget=" + enPassantTarget).toString();
   }
 }

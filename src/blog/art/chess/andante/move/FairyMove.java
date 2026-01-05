@@ -57,13 +57,13 @@ public abstract class FairyMove extends NullMove {
   }
 
   @Override
-  protected void updateCastlings(Position position) {
-    baseMove.updateCastlings(position);
+  protected void updateCastlingOrigins(Position position) {
+    baseMove.updateCastlingOrigins(position);
   }
 
   @Override
-  protected void updateEnPassant(Position position) {
-    baseMove.updateEnPassant(position);
+  protected void updateEnPassantTarget(Position position) {
+    baseMove.updateEnPassantTarget(position);
   }
 
   @Override

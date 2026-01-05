@@ -35,7 +35,7 @@ class Model {
 
   enum Colour {White, Black}
 
-  enum Castling {WhiteShort, WhiteLong, BlackShort, BlackLong}
+  enum CastlingRight {WhiteShort, WhiteLong, BlackShort, BlackLong}
 
   record Square(int index) {
 
@@ -51,8 +51,8 @@ class Model {
 
     private final List<Piece> board = Arrays.asList(new Piece[64]);
     private Colour sideToMove;
-    private final Set<Castling> castlings = new TreeSet<>();
-    private Square enPassant;
+    private final Set<CastlingRight> castlingRights = new TreeSet<>();
+    private Square enPassantTarget;
     private Operation operation;
 
     List<Piece> getBoard() {
@@ -67,16 +67,16 @@ class Model {
       this.sideToMove = sideToMove;
     }
 
-    Set<Castling> getCastlings() {
-      return castlings;
+    Set<CastlingRight> getCastlingRights() {
+      return castlingRights;
     }
 
-    Square getEnPassant() {
-      return enPassant;
+    Square getEnPassantTarget() {
+      return enPassantTarget;
     }
 
-    void setEnPassant(Square enPassant) {
-      this.enPassant = enPassant;
+    void setEnPassantTarget(Square enPassantTarget) {
+      this.enPassantTarget = enPassantTarget;
     }
 
     Operation getOperation() {

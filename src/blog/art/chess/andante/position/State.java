@@ -28,15 +28,15 @@ public interface State {
 
   State copy();
 
-  boolean isCastling(Square square);
+  boolean isCastlingOrigin(Square square);
 
-  void addCastling(Square square);
+  void addCastlingOrigin(Square square);
 
-  void removeCastling(Square square);
+  void removeCastlingOrigin(Square square);
 
-  boolean isEnPassant(Square square);
+  boolean isEnPassantTarget(Square square);
 
-  void setEnPassant(Square square);
+  void setEnPassantTarget(Square square);
 
-  void resetEnPassant();
+  void resetEnPassantTarget();
 }

@@ -64,14 +64,14 @@ public final class King extends Piece implements Leaper {
     if (!generateMoves(board, origin, moveFactory, moves)) {
       return false;
     }
-    if (board.isRebirthSquare(origin, King.class, colour) && state.isCastling(origin)) {
+    if (board.isRebirthSquare(origin, King.class, colour) && state.isCastlingOrigin(origin)) {
       for (int fileOffset : new int[]{-1, 1}) {
         Direction direction = board.getDirection(fileOffset, 0);
         int distance = 1;
         while (true) {
           Square origin2 = board.findTarget(origin, direction, distance);
           if (origin2 != null) {
-            if (state.isCastling(origin2)) {
+            if (state.isCastlingOrigin(origin2)) {
               Square target = board.findTarget(origin, direction, 2);
               Square target2 = board.findTarget(origin, direction, 1);
               if (fileOffset > 0) {

@@ -125,21 +125,21 @@ public class AndernachMove extends FairyMove {
   }
 
   @Override
-  protected void updateCastlings(Position position) {
-    baseMove.updateCastlings(position);
+  protected void updateCastlingOrigins(Position position) {
+    baseMove.updateCastlingOrigins(position);
     if (baseMove instanceof CirceMove circeMove) {
       if (castling) {
-        position.getState().addCastling(((QuietMove) circeMove.baseMove).target);
+        position.getState().addCastlingOrigin(((QuietMove) circeMove.baseMove).target);
       }
     } else if (baseMove instanceof AntiCirceMove antiCirceMove) {
       if (castling) {
-        position.getState().addCastling(antiCirceMove.rebirth);
+        position.getState().addCastlingOrigin(antiCirceMove.rebirth);
       } else {
-        position.getState().removeCastling(antiCirceMove.rebirth);
+        position.getState().removeCastlingOrigin(antiCirceMove.rebirth);
       }
     } else {
       if (castling) {
-        position.getState().addCastling(((QuietMove) baseMove).target);
+        position.getState().addCastlingOrigin(((QuietMove) baseMove).target);
       }
     }
   }

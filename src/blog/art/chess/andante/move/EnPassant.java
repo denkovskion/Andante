@@ -58,10 +58,10 @@ public class EnPassant extends QuietMove {
   }
 
   @Override
-  protected void updateCastlings(Position position) {
-    position.getState().removeCastling(origin);
-    position.getState().removeCastling(target);
-    position.getState().removeCastling(stop);
+  protected void updateCastlingOrigins(Position position) {
+    position.getState().removeCastlingOrigin(origin);
+    position.getState().removeCastlingOrigin(target);
+    position.getState().removeCastlingOrigin(stop);
   }
 
   @Override

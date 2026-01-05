@@ -71,7 +71,7 @@ public final class Pawn extends Piece {
               }
             }
           }
-        } else if (state.isEnPassant(target)) {
+        } else if (state.isEnPassantTarget(target)) {
           Square stop = board.findTarget(target, board.getDirection(0, -rankOffset), 1);
           if (!moveFactory.createEnPassant(board, origin, target, stop, moves)) {
             return false;
