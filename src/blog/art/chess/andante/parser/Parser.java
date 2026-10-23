@@ -105,7 +105,11 @@ public class Parser {
     String line = null;
     String token = null;
     try (Reader reader = inputFile != null ? new FileReader(inputFile)
-        : new InputStreamReader(System.in); Scanner scanner = new Scanner(reader)) {
+        : new InputStreamReader(System.in) {
+          @Override
+          public void close() {
+          }
+        }; Scanner scanner = new Scanner(reader)) {
       Pattern beginProblemPattern = Pattern.compile(
           Stream.of(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN).map(
                   locale -> ResourceBundle.getBundle("blog.art.chess.andante.parser.PopeyeKeywords",
