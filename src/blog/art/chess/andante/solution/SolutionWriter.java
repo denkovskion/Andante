@@ -28,6 +28,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Spliterator;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class SolutionWriter {
@@ -119,9 +120,10 @@ public class SolutionWriter {
 
   }
 
-  public static String toOrderedAndFormatted(List<Point> points) {
-    return points.stream().sorted(Comparator.comparing(Point::score))
-        .map(point -> point.score() + "\t" + point.move())
+  public static String toGroupedAndFormatted(List<Point> points) {
+    return points.stream().collect(Collectors.groupingBy(Point::score, TreeMap::new,
+            Collectors.mapping(Point::move, Collectors.joining(",")))).entrySet().stream()
+        .map(entry -> entry.getKey() + "\t" + entry.getValue())
         .collect(Collectors.joining(System.lineSeparator()));
   }
 }

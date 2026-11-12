@@ -65,7 +65,7 @@ public class MateSearch extends Problem {
         }
         move.unmake(position);
       }
-      System.out.println(SolutionWriter.toOrderedAndFormatted(points));
+      System.out.println(SolutionWriter.toGroupedAndFormatted(points));
     } else {
       System.out.println("Illegal position.");
     }
